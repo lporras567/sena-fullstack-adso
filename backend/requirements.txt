@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+asyncpg
+greenlet
+pydantic[email]
+passlib[bcrypt]
+pyjwt
+python-dotenv
+gunicorn
+pytest
+httpx
+pytest-asyncio
+aiosqlite

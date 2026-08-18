@@ -1,0 +1,2266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Backend Empresarial · FastAPI + PostgreSQL · ADSO 228118</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0F4F8; --tinta:#111D2B; --suave:#4A5B6E;
+  --azul:#1A56A0; --teal:#0A8F82; --ambar:#B87A10; --ok:#1F8C4E; --err:#B83030;
+  --term:#0B1520; --term2:#162030; --borde:#C8D5E2;
+  --card:#fff; --radio:10px; --sh:0 2px 12px rgba(17,29,43,.07);
+  /* estación colors */
+  --c0:#1A56A0; --c1:#0A8F82; --c2:#7B3FBF; --c3:#B87A10;
+  --c4:#1F8C4E; --c5:#C04A20; --c6:#1A56A0; --c7:#6B2FA0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tinta);line-height:1.65;font-size:16px}
+h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif}
+code,pre,.mono{font-family:'JetBrains Mono',Consolas,monospace}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== HEADER ===== */
+header{background:var(--term);color:#D7E2EF;padding:32px 20px 0;border-bottom:4px solid var(--teal)}
+.hi{max-width:1100px;margin:0 auto}
+.eyebrow{color:#5FD3C4;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+header h1{font-size:clamp(24px,4vw,42px);font-weight:700;margin:6px 0 4px;line-height:1.1}
+header h1 em{color:#7EB6FF;font-style:normal}
+.sub{color:#8FA8C0;font-size:14.5px;margin-bottom:24px;max-width:700px}
+
+/* ===== PIPELINE ===== */
+.pipe{display:flex;max-width:1100px;margin:0 auto;overflow-x:auto;gap:0;position:relative}
+.pipe::before{content:"";position:absolute;top:20px;left:2%;right:2%;height:2px;background:#1E2C3F;z-index:0}
+.est{flex:1;min-width:90px;background:none;border:none;color:#8FA8C0;padding:0 2px 16px;position:relative;z-index:1;text-align:center;transition:color .2s}
+.nodo{width:40px;height:40px;border-radius:50%;background:var(--term);border:2.5px solid #1E2C3F;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-family:'JetBrains Mono';font-weight:700;font-size:13px;transition:all .22s}
+.elab{font-family:'Space Grotesk';font-weight:700;font-size:11.5px;display:block;line-height:1.2}
+.epct{font-size:10px;font-family:'JetBrains Mono';color:#5FD3C4;display:block}
+.est:hover{color:#fff}
+.est.on{color:#fff}.est.on .nodo{border-color:var(--teal);background:var(--teal);color:#06201C}
+.est.done .nodo{border-color:var(--ok);background:var(--ok);color:#fff}
+.tag-async{background:#7B3FBF;color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono';vertical-align:middle;margin-left:3px}
+
+/* ===== MAIN ===== */
+main{max-width:1100px;margin:0 auto;padding:32px 20px 90px}
+.ep{display:none}.ep.vis{display:block;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Actos */
+.acto{margin-bottom:40px}
+.acab{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--borde);padding-bottom:7px;margin-bottom:18px}
+.anum{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:var(--teal);letter-spacing:.1em}
+.acab h2{font-size:22px}
+.lead{color:var(--suave);max-width:840px;margin-bottom:14px}
+
+/* Paso */
+.paso{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);margin-bottom:20px;overflow:hidden}
+.pcab{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--borde);background:#FAFCFE}
+.pnum{background:var(--azul);color:#fff;font-family:'JetBrains Mono';font-size:12px;font-weight:700;min-width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.pcab h3{font-size:16px;flex:1}
+.chk{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--suave);cursor:pointer;user-select:none;white-space:nowrap}
+.chk input{width:17px;height:17px;accent-color:var(--ok);cursor:pointer}
+.pbody{padding:16px}
+.pbody p{margin-bottom:10px;max-width:860px}
+.nota{border-radius:0 8px 8px 0;padding:11px 15px;font-size:14px;margin:12px 0;border-left:4px solid}
+.nota.v{background:#E8F5EE;border-color:var(--ok)}.nota.a{background:#FBF2E0;border-color:var(--ambar)}.nota.p{background:#FAEBE9;border-color:var(--err)}
+.nota b{font-family:'Space Grotesk'}
+
+/* Editor */
+.ed{background:var(--term);border-radius:10px;overflow:hidden;margin:12px 0;border:1px solid #1E2C3F;position:relative}
+.ebar{display:flex;align-items:center;gap:8px;background:#162030;padding:8px 13px;border-bottom:1px solid #1E2C3F}
+.dots{display:flex;gap:5px}.dots span{width:10px;height:10px;border-radius:50%}
+.dots span:nth-child(1){background:#E5564C}.dots span:nth-child(2){background:#E5B554}.dots span:nth-child(3){background:#4FBF6B}
+.fich{font-family:'JetBrains Mono';font-size:12px;color:#8FA8C0;flex:1}
+.tag-n{background:#1E3A5F;color:#7EB6FF;font-size:10px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono'}
+.bcopy{background:none;border:1px solid #1E2C3F;color:#8FA8C0;font-size:11.5px;padding:3px 10px;border-radius:6px;font-family:'JetBrains Mono'}
+.bcopy:hover{color:#fff;border-color:var(--teal)}
+.ed pre{padding:15px 17px;overflow-x:auto;font-size:13px;line-height:1.7;color:#D7E2EF}
+.k{color:#7EB6FF}.s{color:#8FD9A8}.c{color:#5B7084;font-style:italic}.n{color:#F0B76A}.f{color:#5FD3C4}
+/* andamiaje */
+.blur pre{filter:blur(5px);pointer-events:none;user-select:none}
+.velo{position:absolute;inset:40px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:rgba(11,21,32,.55);text-align:center;padding:20px}
+.velo p{color:#D7E2EF;font-size:14px;max-width:400px;font-weight:500}
+.velo button{background:var(--ambar);border:none;color:#241A02;font-weight:700;padding:8px 18px;border-radius:8px;font-size:13.5px}
+
+/* Diagrama */
+.dg{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);padding:16px;margin:14px 0;box-shadow:var(--sh)}
+.dg svg{width:100%;height:auto;display:block}
+.dg figcaption{font-size:13px;color:var(--suave);text-align:center;margin-top:9px}
+
+/* Demo interactivo */
+.demo{background:var(--term);border-radius:10px;padding:16px;margin:12px 0;border:1px solid #1E2C3F}
+.demo h4{color:#E8F0F9;font-size:14.5px;margin-bottom:3px;font-family:'Space Grotesk'}
+.demo .desc{color:#8FA8C0;font-size:13px;margin-bottom:10px}
+.fila{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.btn{background:#162030;border:1px solid #2C405B;color:#D7E2EF;padding:7px 14px;border-radius:8px;font-family:'JetBrains Mono';font-size:12px}
+.btn:hover{border-color:var(--teal);color:#fff}
+.btn.p{background:var(--teal);border-color:var(--teal);color:#06201C;font-weight:700}
+.inp{background:#080E16;border:1px solid #2C405B;color:#D7E2EF;padding:7px 11px;border-radius:8px;font-family:'JetBrains Mono';font-size:12.5px;min-width:0}
+.out{background:#080E16;border-radius:8px;padding:13px;font-family:'JetBrains Mono';font-size:12.5px;line-height:1.75;color:#A8BCCC;min-height:48px;white-space:pre-wrap;overflow-x:auto}
+.out .ok{color:#7FDD9A}.out .er{color:#F08A7E}.out .wa{color:#F0C674}.out .in{color:#7EB6FF}
+.tok{word-break:break-all;background:#080E16;border:1px dashed #2C405B;border-radius:8px;padding:9px;font-family:'JetBrains Mono';font-size:11px;color:#8FD9A8;margin-bottom:10px;display:none}
+
+/* Comparativa sync/async */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+@media(max-width:680px){.split{grid-template-columns:1fr}}
+.split .ed{margin:0}
+.split-lbl{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;font-family:'Space Grotesk'}
+.lbl-s{color:#F0B76A}.lbl-a{color:#5FD3C4}
+
+/* Quiz */
+.quiz{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);padding:18px;margin-top:6px}
+.preg{margin-bottom:16px}
+.preg .enun{font-weight:600;margin-bottom:7px}
+.preg label{display:flex;gap:8px;align-items:flex-start;padding:7px 11px;border:1px solid var(--borde);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:14px;transition:background .15s}
+.preg label:hover{background:#F4F8FB}
+.preg label.b{background:#E9F5EE;border-color:var(--ok)}
+.preg label.m{background:#FAEBE9;border-color:var(--err)}
+.preg input{margin-top:3px;accent-color:var(--azul)}
+.exp{display:none;font-size:13px;color:var(--suave);margin-top:4px}
+.bcal{background:var(--azul);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-weight:600;font-size:14.5px}
+.res{margin-top:10px;font-weight:600;display:none}
+
+/* Reto / solución */
+.reto{background:linear-gradient(135deg,#0B1520,#122030);color:#E8F0F9;border-radius:var(--radio);padding:20px;margin-top:20px;border:1px solid #1E3450}
+.reto .ey{color:var(--ambar);font-size:11.5px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.reto h3{font-size:18px;margin:5px 0 7px}
+.reto p{color:#A8BCCC;font-size:14px;max-width:780px}
+.sol{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);margin-top:20px;overflow:hidden}
+.sol-cab{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F5F8FB;border-bottom:1px solid var(--borde);cursor:pointer}
+.sol-cab h3{font-size:16px}
+.sol-cab .ico{font-size:18px;transition:transform .25s}
+.sol-body{display:none;padding:16px}
+
+/* Nav */
+.nav{display:flex;justify-content:space-between;margin-top:38px;gap:10px}
+.nav button{background:var(--card);border:1px solid var(--borde);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;color:var(--tinta);box-shadow:var(--sh)}
+.nav button:hover{border-color:var(--teal)}.nav button:disabled{opacity:.3;cursor:default}
+
+footer{background:var(--term);color:#5B7084;text-align:center;padding:24px 20px;font-size:13px}
+footer .hl{color:#5FD3C4}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hi">
+    <span class="eyebrow">SENA CDMC · ADSO 228118 · Ruta Backend Empresarial</span>
+    <h1>Backend Empresarial con <em>FastAPI</em> + <em>PostgreSQL</em></h1>
+    <p class="sub">8 estaciones · Arquitectura <code style="color:#5FD3C4;font-size:13px">async/await</code> desde el inicio · 1:N y N:M · Variables de entorno · Testing · Est.08: variante síncrona para proyectos pequeños</p>
+  </div>
+  <nav class="pipe" aria-label="Estaciones">
+    <button class="est on" data-ep="0"><span class="nodo">01</span><span class="elab">Construir<span class="tag-async">async</span></span><span class="epct" id="p0">0%</span></button>
+    <button class="est" data-ep="1"><span class="nodo">02</span><span class="elab">Replicar<span class="tag-async">async</span></span><span class="epct" id="p1">0%</span></button>
+    <button class="est" data-ep="2"><span class="nodo">03</span><span class="elab">Conectar<br>1:N<span class="tag-async">async</span></span><span class="epct" id="p2">0%</span></button>
+    <button class="est" data-ep="3"><span class="nodo">04</span><span class="elab">Blindar<span class="tag-async">async</span></span><span class="epct" id="p3">0%</span></button>
+    <button class="est" data-ep="4"><span class="nodo">05</span><span class="elab">Escalar<br>N:M + Cursos<span class="tag-async">async</span></span><span class="epct" id="p4">0%</span></button>
+    <button class="est" data-ep="5"><span class="nodo">06</span><span class="elab">Entorno<br>&amp; Config</span><span class="epct" id="p5">0%</span></button>
+    <button class="est" data-ep="6"><span class="nodo">07</span><span class="elab">Testing<br>pytest</span><span class="epct" id="p6">0%</span></button>
+    <button class="est" data-ep="7"><span class="nodo">08</span><span class="elab">Variante<br>Síncrona</span><span class="epct" id="p7">0%</span></button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ======== EP 0: CONSTRUIR ======== -->
+<section class="ep vis" id="ep0">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>Patrón MVC asíncrono desde el inicio</h2></div>
+    <p class="lead">Construiremos el backend <b>completamente asíncrono</b> desde el primer paso. Usaremos <code>async/await</code>, <code>AsyncSession</code> y <code>asyncpg</code> en todas las capas. La «Vista» en una API REST es el JSON de respuesta, no un HTML.</p>
+    <figure class="dg">
+      <svg viewBox="0 0 880 200"><defs><marker id="fl" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6Z" fill="#4A5B6E"/></marker></defs>
+        <rect x="10" y="70" width="130" height="60" rx="10" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+        <text x="75" y="104" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="15" fill="#111D2B">Cliente</text>
+        <line x1="140" y1="88" x2="220" y2="88" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl)"/>
+        <line x1="220" y1="112" x2="140" y2="112" stroke="#0A8F82" stroke-width="2" marker-end="url(#fl)"/>
+        <text x="180" y="78" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">HTTP</text>
+        <text x="180" y="130" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#0A8F82">JSON (Vista)</text>
+        <rect x="225" y="20" width="400" height="160" rx="12" fill="#0B1520"/>
+        <text x="425" y="42" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="13" fill="#5FD3C4">FastAPI — Patrón MVC</text>
+        <rect x="248" y="58" width="120" height="48" rx="8" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+        <text x="308" y="79" text-anchor="middle" font-size="12" font-weight="600" font-family="Space Grotesk" fill="#E8F0F9">Rutas</text>
+        <text x="308" y="96" text-anchor="middle" font-size="10" fill="#8FA8C0">reciben/delegan</text>
+        <rect x="248" y="118" width="120" height="48" rx="8" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+        <text x="308" y="140" text-anchor="middle" font-size="12" font-weight="600" font-family="Space Grotesk" fill="#E8F0F9">Controlador</text>
+        <text x="308" y="157" text-anchor="middle" font-size="10" fill="#8FA8C0">lógica CRUD</text>
+        <rect x="400" y="88" width="120" height="48" rx="8" fill="#162030" stroke="#7EB6FF" stroke-width="1.5"/>
+        <text x="460" y="108" text-anchor="middle" font-size="12" font-weight="600" font-family="Space Grotesk" fill="#E8F0F9">Modelo ORM</text>
+        <text x="460" y="126" text-anchor="middle" font-size="10" fill="#8FA8C0">clases Python</text>
+        <line x1="308" y1="106" x2="308" y2="118" stroke="#5FD3C4" stroke-width="1.5" marker-end="url(#fl)"/>
+        <line x1="368" y1="142" x2="400" y2="120" stroke="#5FD3C4" stroke-width="1.5" marker-end="url(#fl)"/>
+        <line x1="520" y1="112" x2="630" y2="100" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl)"/>
+        <rect x="635" y="70" width="150" height="60" rx="10" fill="#EFF4F8" stroke="#336791" stroke-width="2"/>
+        <text x="710" y="104" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="14" fill="#336791">PostgreSQL</text>
+      </svg>
+      <figcaption>Orden de construcción (async desde el inicio): BD → database.py (AsyncSession) → models.py (lazy=selectin) → schemas.py → crud.py (async def) → routers/ (async def) → main.py (lifespan)</figcaption>
+    </figure>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span><h2>Implementación capa por capa</h2></div>
+    <div id="ps0"></div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span><h2>Verifica el ciclo completo</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Ciclo API → BD → API</h3><label class="chk"><input type="checkbox" data-p="0"> Completado</label></div>
+    <div class="pbody"><p>Levanta con <code>uvicorn app.main:app --reload</code> y en <b>/docs</b>: crea un usuario (POST), lístalo (GET), verifica en pgAdmin con <code>SELECT * FROM usuarios;</code> que persiste aunque apagues el servidor.</p>
+    <div class="nota v"><b>Desacoplamiento real:</b> migrar de SQLite a PostgreSQL no tocó Modelo, Controlador ni Rutas. Solo cambia la cadena en database.py.</div></div></div>
+    <div class="quiz" id="q0"></div>
+    <div class="reto"><span class="ey">RETO ESTACIÓN 01</span><h3>Completa el CRUD</h3><p>Verifica que PUT y DELETE funcionan desde Swagger y crea 3 usuarios. En la estación 02 construirás un módulo completo sin ayuda.</p></div>
+
+<div class="sol" id="rsol-e01">
+  <div class="sol-cab" onclick="toggleSol('rsol-e01')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">PUT /usuarios/{uid} — actualizar parcialmente</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/routers/user_routes.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre>@router.put(<span class="s">"/{uid}"</span>, response_model=schemas.UsuarioResponse)
+<span class="k">async</span> <span class="k">def</span> modificar_usuario(
+    uid: int,
+    data: schemas.UsuarioUpdate,
+    db: AsyncSession = Depends(get_db),
+    me = Depends(obtener_usuario_actual)
+):
+    usuario = <span class="k">await</span> crud.actualizar_usuario(db, uid, data)
+    <span class="k">if</span> <span class="k">not</span> usuario:
+        <span class="k">raise</span> HTTPException(status_code=<span class="n">404</span>, detail=<span class="s">"Usuario no encontrado"</span>)
+    <span class="k">return</span> usuario</pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">DELETE /usuarios/{uid} — solo admin</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/routers/user_routes.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre>@router.delete(<span class="s">"/{uid}"</span>, status_code=status.HTTP_204_NO_CONTENT)
+<span class="k">async</span> <span class="k">def</span> borrar_usuario(
+    uid: int,
+    db: AsyncSession = Depends(get_db),
+    me = Depends(obtener_usuario_actual)
+):
+    <span class="k">if</span> me.rol != <span class="s">"admin"</span>:
+        <span class="k">raise</span> HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=<span class="s">"Solo un administrador puede eliminar usuarios."</span>
+        )
+    exito = <span class="k">await</span> crud.eliminar_usuario(db, uid)
+    <span class="k">if</span> <span class="k">not</span> exito:
+        <span class="k">raise</span> HTTPException(status_code=<span class="n">404</span>, detail=<span class="s">"Usuario no encontrado"</span>)
+    <span class="k">return</span> <span class="k">None</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Verificación en Swagger — secuencia esperada</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">Swagger UI /docs</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># 1. POST /usuarios → 201 Created (crear Ana, Juan, Sofía)</span>
+<span class="c"># 2. GET /usuarios/  → 200 OK [ lista de 3 usuarios ]</span>
+<span class="c"># 3. PUT /usuarios/1 → 200 OK { nombre actualizado }</span>
+<span class="c">#    body: { "nombre": "Ana María" }</span>
+<span class="c"># 4. DELETE /usuarios/3 → 204 No Content</span>
+<span class="c"># 5. GET /usuarios/  → 200 OK [ lista de 2 usuarios ]</span>
+<span class="c"># 6. DELETE /usuarios/99 → 404 Not Found</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0"></div>
+</div>
+  </div>
+</section>
+
+<!-- ======== EP 1: REPLICAR ======== -->
+<section class="ep" id="ep1">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>¿Puedes construir un CRUD sin guía?</h2></div>
+    <p class="lead">Esta estación es de <b>replicación autónoma</b>: mecanizarás el patrón MVC creando el módulo <b>Departamentos</b> solo. El código está bajo llave — revélalo solo si de verdad lo intentaste primero.</p>
+    <div class="nota a"><b>Regla:</b> la estación 01 es tu espejo. Donde decía usuario ahora dice departamento. Seis paradas, mismo orden.</div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · ANDAMIAJE</span><h2>El mapa (código bajo llave)</h2></div>
+    <div id="ps1"></div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span><h2>Criterios de entrega</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Resultado esperado</h3><label class="chk"><input type="checkbox" data-p="1"> Completado</label></div>
+    <div class="pbody"><p>Tu módulo está listo cuando POST /departamentos crea y GET /departamentos lista en Swagger. Antes de decir "profe no funciona" revisa:</p>
+    <div class="nota p"><b>Error 1:</b> falta <code>app.include_router(department_routes.router)</code> en main.py · <b>Error 2:</b> imports incompletos en crud.py · <b>Error 3:</b> typo en <code>__tablename__</code> (doble guion bajo)</div></div></div>
+    <div class="quiz" id="q1"></div>
+    <div class="reto"><span class="ey">LO QUE VIENE</span><h3>Dos mundos aislados — por ahora</h3><p>Nota que Departamentos nace sin conexión con Usuarios. En la estación 03 construiremos el puente.</p></div>
+
+<div class="sol" id="rsol-e02">
+  <div class="sol-cab" onclick="toggleSol('rsol-e02')">
+    <h3>📂 Anticipo: lo que construirás en la estación 03</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="margin-bottom:12px;font-size:14px">La conexión entre Usuarios y Departamentos se hace con una <strong>FK</strong> y un <strong>relationship</strong>. Este es el resultado final al que debe llegar tu módulo:</p>
+    <div class="ed"><div class="ebar"><div class="dots"><span></span><span></span><span></span></div><span class="fich">Resultado esperado — GET /usuarios/1</span><button class="bcopy" onclick="cp(this)">Copiar</button></div>
+    <pre>{
+  <span class="s">"id"</span>: <span class="n">1</span>,
+  <span class="s">"nombre"</span>: <span class="s">"Ana"</span>,
+  <span class="s">"email"</span>: <span class="s">"ana@sena.edu.co"</span>,
+  <span class="s">"departamento_id"</span>: <span class="n">1</span>,
+  <span class="s">"departamento"</span>: {          <span class="c"># objeto anidado — no un número plano</span>
+    <span class="s">"id"</span>: <span class="n">1</span>,
+    <span class="s">"nombre"</span>: <span class="s">"Contabilidad"</span>,
+    <span class="s">"codigo"</span>: <span class="s">"CONT"</span>
+  }
+}</pre></div>
+    <p style="font-size:13px;color:var(--suave);margin-top:10px">Si tu GET ya devuelve el objeto anidado, estás listo para la estación 03.</p>
+  </div>
+</div>
+  </div>
+</section>
+
+<!-- ======== EP 2: CONECTAR 1:N ======== -->
+<section class="ep" id="ep2">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>Relación 1 a Muchos — integridad referencial</h2></div>
+    <p class="lead">Un departamento aloja muchos usuarios; cada usuario pertenece a un único departamento. La FK garantiza que ningún usuario apunte a un departamento inexistente.</p>
+    <figure class="dg">
+      <svg viewBox="0 0 780 160"><rect x="30" y="40" width="200" height="80" rx="10" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+        <text x="130" y="68" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="14" fill="#1A56A0">DEPARTAMENTOS</text>
+        <text x="130" y="90" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#111D2B">id · nombre · codigo</text>
+        <text x="130" y="110" text-anchor="middle" font-size="11" fill="#4A5B6E">"Contabilidad"</text>
+        <rect x="550" y="40" width="200" height="80" rx="10" fill="#EFF4F8" stroke="#0A8F82" stroke-width="2"/>
+        <text x="650" y="68" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="14" fill="#0A8F82">USUARIOS</text>
+        <text x="650" y="88" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="#111D2B">id · nombre · email</text>
+        <text x="650" y="106" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="#B87A10">departamento_id FK</text>
+        <line x1="230" y1="80" x2="550" y2="80" stroke="#4A5B6E" stroke-width="2"/>
+        <text x="270" y="70" font-family="Space Grotesk" font-weight="700" font-size="16" fill="#111D2B">1</text>
+        <text x="510" y="70" font-family="Space Grotesk" font-weight="700" font-size="16" fill="#111D2B">N</text>
+        <path d="M550,80 L535,70 M550,80 L535,80 M550,80 L535,90" stroke="#4A5B6E" stroke-width="1.5" fill="none"/>
+      </svg>
+      <figcaption>ForeignKey = columna física real · relationship = atajo virtual solo en Python</figcaption>
+    </figure>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span><h2>Construyendo el puente</h2></div>
+    <div id="ps2"></div>
+    <div class="demo">
+      <h4>🧪 La base de datos se defiende sola</h4>
+      <p class="desc">Simula lo que hace PostgreSQL ante violaciones de integridad. Solo existe departamento_id = 1.</p>
+      <div class="fila">
+        <button class="btn p" onclick="demoFK(1)">INSERT usuario con dept_id = 1 ✓</button>
+        <button class="btn" onclick="demoFK(999)">INSERT usuario con dept_id = 999 ✗</button>
+        <button class="btn" onclick="demoFK('d')">DELETE departamento 1 → ON DELETE SET NULL</button>
+      </div>
+      <div class="out" id="ofk">-- Ejecuta una sentencia…</div>
+    </div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span><h2>Respuesta anidada en Swagger</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Ciclo con objetos anidados</h3><label class="chk"><input type="checkbox" data-p="2"> Completado</label></div>
+    <div class="pbody">
+      <div class="ed"><div class="ebar"><div class="dots"><span></span><span></span><span></span></div><span class="fich">GET /usuarios/1 · JSON anidado</span></div>
+      <pre>{ <span class="s">"id"</span>: <span class="n">1</span>, <span class="s">"nombre"</span>: <span class="s">"Ana"</span>,
+  <span class="s">"departamento_id"</span>: <span class="n">1</span>,
+  <span class="s">"departamento"</span>: { <span class="c">← objeto anidado automático</span>
+    <span class="s">"id"</span>: <span class="n">1</span>, <span class="s">"nombre"</span>: <span class="s">"Contabilidad"</span>
+  }
+}</pre></div>
+    </div></div>
+    <div class="quiz" id="q2"></div>
+    <div class="reto"><span class="ey">RETO ESTACIÓN 03</span><h3>Usa la relación virtual</h3><p>Crea <code>GET /departamentos/{id}/usuarios</code> que liste los usuarios de un departamento usando <code>relationship</code> sin escribir SQL.</p></div>
+
+<div class="sol" id="rsol-e03">
+  <div class="sol-cab" onclick="toggleSol('rsol-e03')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">CRUD — listar usuarios de un departamento</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/crud.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="k">async</span> <span class="k">def</span> obtener_usuarios_de_departamento(
+    db: AsyncSession, depto_id: int
+):
+    <span class="c"># Opción 1: usar la relación virtual (relationship)</span>
+    <span class="c"># Obtener el departamento con sus usuarios ya cargados (lazy="selectin")</span>
+    result = <span class="k">await</span> db.execute(
+        select(DepartamentoModel).filter(DepartamentoModel.id == depto_id)
+    )
+    depto = result.scalars().first()
+    <span class="k">if</span> <span class="k">not</span> depto:
+        <span class="k">return</span> <span class="k">None</span>
+    <span class="c"># .usuarios ya está cargado porque usamos lazy="selectin" en el modelo</span>
+    <span class="k">return</span> depto.usuarios
+
+    <span class="c"># Opción 2: query directa (sin usar relationship)</span>
+    <span class="c"># result = await db.execute(</span>
+    <span class="c">#     select(UsuarioModel).filter(UsuarioModel.departamento_id == depto_id)</span>
+    <span class="c"># )</span>
+    <span class="c"># return result.scalars().all()</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Ruta en department_routes.py</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/routers/department_routes.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre>@router.get(<span class="s">"/{did}/usuarios"</span>, response_model=list[schemas.UsuarioResponse])
+<span class="k">async</span> <span class="k">def</span> listar_usuarios_departamento(
+    did: int,
+    db: AsyncSession = Depends(get_db),
+    me = Depends(obtener_usuario_actual)
+):
+    usuarios = <span class="k">await</span> crud.obtener_usuarios_de_departamento(db, did)
+    <span class="k">if</span> usuarios is <span class="k">None</span>:
+        <span class="k">raise</span> HTTPException(status_code=<span class="n">404</span>, detail=<span class="s">"Departamento no encontrado"</span>)
+    <span class="k">return</span> usuarios</pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Verificación en Swagger</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">Swagger UI /docs</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># GET /departamentos/1/usuarios</span>
+<span class="c"># Resultado esperado:</span>
+<span class="c"># [</span>
+<span class="c">#   { "id": 1, "nombre": "Ana",  "email": "ana@sena.edu.co",  ... },</span>
+<span class="c">#   { "id": 2, "nombre": "Juan", "email": "juan@sena.edu.co", ... }</span>
+<span class="c"># ]</span>
+<span class="c">#</span>
+<span class="c"># GET /departamentos/999/usuarios → 404 Not Found</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0"></div>
+</div>
+  </div>
+</section>
+
+<!-- ======== EP 3: BLINDAR ======== -->
+<section class="ep" id="ep3">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>Las contraseñas están en texto plano — eso termina hoy</h2></div>
+    <div class="ed"><div class="ebar"><div class="dots"><span></span><span></span><span></span></div><span class="fich">SELECT * FROM usuarios; ← PELIGRO</span></div>
+    <pre style="padding:14px 16px;font-size:13px;color:#D7E2EF"> id | nombre | email                |  <span style="color:#F08A7E">password</span>
+----+--------+----------------------+----------
+  1 | Ana    | ana@sena.edu.co      | <span style="color:#F08A7E">sena2026</span>
+  2 | Sofía  | sofia@sena.edu.co    | <span style="color:#F08A7E">qwerty</span></pre></div>
+    <p class="lead">Tres fases: <b>1) Roles</b> → <b>2) Bcrypt</b> → <b>3) JWT</b>. De menor a mayor abstracción.</p>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span><h2>Las tres fases de blindaje</h2></div>
+    <div id="ps3"></div>
+    <div class="demo">
+      <h4>🎫 Simulador JWT — 401 → 200 → 403</h4>
+      <p class="desc">Usuarios de prueba: <span class="mono">ana@sena.edu.co</span> (user) y <span class="mono">sofia@sena.edu.co</span> (admin). Contraseña: <span class="mono">sena2026</span></p>
+      <div class="fila">
+        <input class="inp" id="sem" type="email" value="ana@sena.edu.co" style="width:200px">
+        <input class="inp" id="spw" type="password" placeholder="sena2026" style="width:120px">
+        <button class="btn p" onclick="simLogin()">POST /login</button>
+      </div>
+      <div class="tok" id="stok"></div>
+      <div class="fila">
+        <button class="btn" onclick="simGet(false)">GET /usuarios — sin token</button>
+        <button class="btn" onclick="simGet(true)">GET /usuarios — con token</button>
+        <button class="btn" onclick="simOut()">Cerrar sesión</button>
+      </div>
+      <div class="out" id="sjwt">-- Intenta primero el GET sin token…</div>
+    </div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span><h2>401 → 200 → 403 en tu Swagger</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Verificación final</h3><label class="chk"><input type="checkbox" data-p="3"> Completado</label></div>
+    <div class="pbody"><p>Reproduce la secuencia en tu Swagger real: sin token → 401 → login + Authorize → 200 admin → 403 con token user. Verifica en pgAdmin que los passwords se ven como <code>$2b$12$…</code>.</p>
+    <div class="nota a"><b>Regla de oro:</b> la SECRET_KEY va en un archivo <code>.env</code> en <code>.gitignore</code>. Nunca en el código, nunca en GitHub.</div></div></div>
+    <div class="quiz" id="q3"></div>
+    <div class="reto"><span class="ey">RETO ESTACIÓN 04</span><h3>Protege el DELETE</h3><p>Que solo un admin pueda ejecutar <code>DELETE /departamentos/{id}</code>. La estación 05 introduce relaciones Muchos a Muchos y el nuevo módulo de Cursos.</p></div>
+
+<div class="sol" id="rsol-e04">
+  <div class="sol-cab" onclick="toggleSol('rsol-e04')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Agregar verificación de rol en el DELETE</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/routers/department_routes.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># Importar obtener_usuario_actual si aún no está importado</span>
+<span class="k">from</span> app.auth <span class="k">import</span> obtener_usuario_actual
+
+@router.delete(<span class="s">"/{did}"</span>, status_code=status.HTTP_204_NO_CONTENT)
+<span class="k">async</span> <span class="k">def</span> eliminar_departamento(
+    did: int,
+    db: AsyncSession = Depends(get_db),
+    me = Depends(obtener_usuario_actual)   <span class="c"># ← inyectar usuario autenticado</span>
+):
+    <span class="c"># Verificar que es admin antes de eliminar</span>
+    <span class="k">if</span> me.rol != <span class="s">"admin"</span>:
+        <span class="k">raise</span> HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=<span class="s">"Solo un administrador puede eliminar departamentos."</span>
+        )
+    exito = <span class="k">await</span> crud.eliminar_departamento(db, did)
+    <span class="k">if</span> <span class="k">not</span> exito:
+        <span class="k">raise</span> HTTPException(status_code=<span class="n">404</span>, detail=<span class="s">"Departamento no encontrado"</span>)
+    <span class="k">return</span> <span class="k">None</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Secuencia de prueba en Swagger</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">Swagger UI /docs</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># Caso 1: token de usuario con rol "user"</span>
+<span class="c"># DELETE /departamentos/1</span>
+<span class="c"># → 403 Forbidden</span>
+<span class="c">#   { "detail": "Solo un administrador puede eliminar departamentos." }</span>
+
+<span class="c"># Caso 2: token de usuario con rol "admin"</span>
+<span class="c"># DELETE /departamentos/1</span>
+<span class="c"># → 204 No Content  (sin cuerpo de respuesta)</span>
+
+<span class="c"># Caso 3: sin token</span>
+<span class="c"># DELETE /departamentos/1</span>
+<span class="c"># → 401 Unauthorized</span>
+
+<span class="c"># Caso 4: admin, id inexistente</span>
+<span class="c"># DELETE /departamentos/999</span>
+<span class="c"># → 404 Not Found</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0"></div>
+</div>
+  </div>
+</section>
+
+<!-- ======== EP 4: ESCALAR N:M + CURSOS ======== -->
+<section class="ep" id="ep4">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>Relación N:M — un usuario en muchos cursos, un curso con muchos usuarios</h2></div>
+    <p class="lead">Una FK simple no puede modelar "un usuario puede inscribirse en 0, 1 o más cursos y un curso puede tener 0, 1 o más usuarios". Se necesita una <b>tabla asociativa intermedia</b> con validaciones de negocio: capacidad máxima y fecha de inscripción.</p>
+    <figure class="dg">
+      <svg viewBox="0 0 860 180">
+        <rect x="10" y="50" width="180" height="80" rx="10" fill="#EFF4F8" stroke="#0A8F82" stroke-width="2"/>
+        <text x="100" y="78" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="13" fill="#0A8F82">USUARIOS</text>
+        <text x="100" y="98" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#111D2B">id · nombre · email</text>
+        <text x="100" y="116" text-anchor="middle" font-size="11" fill="#4A5B6E">Ana, Juan, Sofía…</text>
+        <rect x="340" y="30" width="180" height="120" rx="10" fill="#0B1520" stroke="#7B3FBF" stroke-width="2"/>
+        <text x="430" y="58" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#C39AFF">USUARIO_CURSO</text>
+        <text x="430" y="75" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#8FA8C0">usuario_id FK</text>
+        <text x="430" y="91" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#8FA8C0">curso_id FK</text>
+        <text x="430" y="107" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#F0B76A">fecha_inscripcion</text>
+        <text x="430" y="122" text-anchor="middle" font-size="9" fill="#5B7084">PK(usuario_id, curso_id)</text>
+        <text x="430" y="139" text-anchor="middle" font-size="9" fill="#5B7084">fecha ≤ fecha_inicio</text>
+        <rect x="670" y="50" width="180" height="80" rx="10" fill="#EFF4F8" stroke="#7B3FBF" stroke-width="2"/>
+        <text x="760" y="78" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="13" fill="#7B3FBF">CURSOS</text>
+        <text x="760" y="96" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#111D2B">id · nombre · capacidad</text>
+        <text x="760" y="114" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#B87A10">fecha_inicio</text>
+        <line x1="190" y1="90" x2="340" y2="90" stroke="#4A5B6E" stroke-width="2"/>
+        <text x="230" y="80" font-family="Space Grotesk" font-weight="700" font-size="15">N</text>
+        <line x1="520" y1="90" x2="670" y2="90" stroke="#4A5B6E" stroke-width="2"/>
+        <text x="620" y="80" font-family="Space Grotesk" font-weight="700" font-size="15">N</text>
+      </svg>
+      <figcaption>La tabla <code>usuario_curso</code> rompe el N:M y agrega atributos propios de la relación: fecha de inscripción y validación de capacidad</figcaption>
+    </figure>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span><h2>Implementación con validaciones de negocio</h2></div>
+    <div id="ps4"></div>
+    <div class="demo">
+      <h4>🧪 Validador de inscripción</h4>
+      <p class="desc">Simula las reglas de negocio antes de que lleguen a la BD. Curso: capacidad 2, fecha_inicio: 2026-09-01.</p>
+      <div class="fila">
+        <button class="btn p" onclick="demoInsc('ok')">Inscribir usuario 1 — fecha 2026-08-15 ✓</button>
+        <button class="btn" onclick="demoInsc('fecha')">Inscribir — fecha 2026-09-15 (posterior a inicio) ✗</button>
+        <button class="btn" onclick="demoInsc('cap')">Inscribir usuario 3 — cupo lleno ✗</button>
+        <button class="btn" onclick="demoInsc('dup')">Inscribir usuario 1 de nuevo — duplicado ✗</button>
+      </div>
+      <div class="out" id="oinsc">-- Ejecuta una validación…</div>
+    </div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y SOLUCIÓN</span><h2>Reto + solución del módulo Cursos</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Verifica el módulo completo</h3><label class="chk"><input type="checkbox" data-p="4"> Completado</label></div>
+    <div class="pbody"><p>En Swagger: crea un curso (POST /cursos), inscribe un usuario (POST /cursos/{id}/inscribir/{uid}), intenta superar la capacidad y verifica el 400, intenta una fecha posterior al inicio y verifica el 400.</p></div></div>
+    <div class="sol" id="sol4">
+      <div class="sol-cab" onclick="toggleSol('sol4')"><h3>📂 Ver solución completa del módulo Cursos (N:M con validaciones)</h3><span class="ico">▼</span></div>
+      <div class="sol-body" id="ps4-sol"></div>
+    </div>
+    <div class="quiz" id="q4"></div>
+    <div class="reto"><span class="ey">RETO ESTACIÓN 05</span><h3>Agrega el endpoint inverso</h3><p>Crea <code>GET /cursos/{id}/usuarios</code> que liste los inscritos con su fecha de inscripción. Luego agrega un endpoint para desinscribirse (<code>DELETE /cursos/{cid}/inscribir/{uid}</code>).</p></div>
+
+<div class="sol" id="rsol-e05">
+  <div class="sol-cab" onclick="toggleSol('rsol-e05')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">CRUD — listar inscritos con fecha</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/crud.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="k">from</span> sqlalchemy <span class="k">import</span> select as sa_select
+
+<span class="k">async</span> <span class="k">def</span> obtener_inscritos_con_fecha(db: AsyncSession, curso_id: int):
+    <span class="c"># La tabla pivote tiene la fecha_inscripcion como columna propia</span>
+    rows = (<span class="k">await</span> db.execute(
+        sa_select(usuario_curso)
+        .where(usuario_curso.c.curso_id == curso_id)
+    )).fetchall()
+    <span class="k">return</span> [
+        {
+            <span class="s">"usuario_id"</span>:        r.usuario_id,
+            <span class="s">"fecha_inscripcion"</span>: str(r.fecha_inscripcion)
+        }
+        <span class="k">for</span> r <span class="k">in</span> rows
+    ]
+
+<span class="k">async</span> <span class="k">def</span> desinscribir_usuario(
+    db: AsyncSession, curso_id: int, usuario_id: int
+):
+    <span class="k">from</span> sqlalchemy <span class="k">import</span> delete as sa_delete
+    result = <span class="k">await</span> db.execute(
+        sa_delete(usuario_curso)
+        .where(usuario_curso.c.curso_id   == curso_id)
+        .where(usuario_curso.c.usuario_id == usuario_id)
+    )
+    <span class="k">await</span> db.commit()
+    <span class="k">return</span> result.rowcount &gt; <span class="n">0</span>   <span class="c"># True si se eliminó, False si no existía</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Rutas en course_routes.py</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/routers/course_routes.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre>@router.get(<span class="s">"/{curso_id}/usuarios"</span>)
+<span class="k">async</span> <span class="k">def</span> listar_inscritos(
+    curso_id: int,
+    db: AsyncSession = Depends(get_db),
+    me = Depends(obtener_usuario_actual)
+):
+    <span class="k">return</span> <span class="k">await</span> crud.obtener_inscritos_con_fecha(db, curso_id)
+
+
+@router.delete(<span class="s">"/{curso_id}/inscribir/{usuario_id}"</span>,
+               status_code=status.HTTP_204_NO_CONTENT)
+<span class="k">async</span> <span class="k">def</span> desinscribir(
+    curso_id: int,
+    usuario_id: int,
+    db: AsyncSession = Depends(get_db),
+    me = Depends(obtener_usuario_actual)
+):
+    exito = <span class="k">await</span> crud.desinscribir_usuario(db, curso_id, usuario_id)
+    <span class="k">if</span> <span class="k">not</span> exito:
+        <span class="k">raise</span> HTTPException(
+            status_code=<span class="n">404</span>,
+            detail=<span class="s">"Inscripción no encontrada"</span>
+        )
+    <span class="k">return</span> <span class="k">None</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Resultado esperado</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">Swagger /docs</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># GET /cursos/1/usuarios</span>
+<span class="c"># [</span>
+<span class="c">#   { "usuario_id": 1, "fecha_inscripcion": "2026-08-15" },</span>
+<span class="c">#   { "usuario_id": 2, "fecha_inscripcion": "2026-08-20" }</span>
+<span class="c"># ]</span>
+
+<span class="c"># DELETE /cursos/1/inscribir/1  → 204 No Content</span>
+<span class="c"># DELETE /cursos/1/inscribir/99 → 404 Not Found</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0"></div>
+</div>
+  </div>
+</section>
+
+<!-- ======== EP 5: VARIABLES DE ENTORNO ======== -->
+<section class="ep" id="ep5">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>Las credenciales en el código son una bomba de tiempo</h2></div>
+    <p class="lead">Un <code>git push</code> descuidado expone la contraseña de tu BD y tu SECRET_KEY a internet. Las variables de entorno desacoplan las credenciales del código fuente.</p>
+    <div class="nota p"><b>Escenario real:</b> bots de GitHub escanean commits en tiempo real buscando cadenas como <code>postgresql://postgres:</code> o <code>SECRET_KEY=</code>. En minutos la cuenta está comprometida.</div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span><h2>Refactorización a python-dotenv</h2></div>
+    <div id="ps5"></div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span><h2>El proyecto arranca desde .env</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Verificación</h3><label class="chk"><input type="checkbox" data-p="5"> Completado</label></div>
+    <div class="pbody"><p>Borra la cadena hardcodeada de database.py, levanta el servidor y confirma que sigue conectando. Busca en tu repositorio con <code>git log -p | grep "postgresql://"</code> — si aparece en un commit anterior, cambia la contraseña en pgAdmin.</p></div></div>
+    <div class="quiz" id="q5"></div>
+    <div class="reto"><span class="ey">RETO ESTACIÓN 06</span><h3>Agrega ACCESS_TOKEN_EXPIRE_MINUTES al .env</h3><p>Mueve la duración del token a una variable de entorno para poder cambiarla sin tocar el código. Luego crea un archivo <code>.env.example</code> con los nombres de variable sin valores para incluirlo en el repo.</p></div>
+
+<div class="sol" id="rsol-e06">
+  <div class="sol-cab" onclick="toggleSol('rsol-e06')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Agregar la variable al .env y .env.example</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">.env / .env.example</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># .env  (archivo real — NO subir a git)</span>
+DB_USER=postgres
+DB_PASSWORD=tu_contrasena_real
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=sena_mvc_db
+JWT_SECRET_KEY=SENA_KEY_SECRET_ALTA_SEGURIDAD_ADSO
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30   <span class="c"># ← nueva variable</span>
+
+<span class="c"># .env.example  (plantilla — SÍ subir a git, sin valores)</span>
+DB_USER=
+DB_PASSWORD=
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=
+JWT_SECRET_KEY=
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30</pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Leer la variable en auth.py</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">app/auth.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="k">import</span> os
+<span class="k">from</span> dotenv <span class="k">import</span> load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv(<span class="s">"JWT_SECRET_KEY"</span>)
+ALGORITHM  = os.getenv(<span class="s">"JWT_ALGORITHM"</span>, <span class="s">"HS256"</span>)
+<span class="c"># int() con valor por defecto: si la variable no existe usa 30</span>
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv(<span class="s">"ACCESS_TOKEN_EXPIRE_MINUTES"</span>, <span class="s">"30"</span>)
+)
+
+<span class="k">def</span> crear_token_acceso(data: dict) -&gt; str:
+    datos = data.copy()
+    datos[<span class="s">"exp"</span>] = datetime.now(timezone.utc) + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES  <span class="c"># ← ya viene del .env</span>
+    )
+    <span class="k">return</span> jwt.encode(datos, SECRET_KEY, algorithm=ALGORITHM)</pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Agregar .env al .gitignore</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">.gitignore</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># .gitignore — verificar que estas líneas existen</span>
+.env
+*.env
+!.env.example   <span class="c"># esta línea permite subir el ejemplo</span>
+
+<span class="c"># Verificar que no se subió por accidente:</span>
+git status
+<span class="c"># Si .env aparece como "tracked", removerlo del índice:</span>
+git rm --cached .env</pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0"></div>
+</div>
+  </div>
+</section>
+
+<!-- ======== EP 6: TESTING ======== -->
+<section class="ep" id="ep6">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>Las pruebas manuales en Swagger no escalan</h2></div>
+    <p class="lead">Cada vez que agregas un módulo puedes romper otro sin darte cuenta. Pytest + httpx ejecutan todas las pruebas en milisegundos y detectan regresiones automáticamente — es el escudo del proyecto de grado.</p>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span><h2>Matriz de casos de prueba y automatización</h2></div>
+    <div id="ps6"></div>
+    <div class="demo">
+      <h4>🧪 Simulador de ejecución pytest</h4>
+      <p class="desc">Simula la consola de pytest con los casos de prueba de la guía G6.</p>
+      <div class="fila">
+        <button class="btn p" onclick="demoPytest('all')">pytest tests/ — ejecutar todos</button>
+        <button class="btn" onclick="demoPytest('fail')">pytest — con un test fallido</button>
+        <button class="btn" onclick="demoPytest('v')">pytest -v — modo verbose</button>
+      </div>
+      <div class="out" id="opy">-- Ejecuta pytest para ver la salida…</div>
+    </div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span><h2>Verde en todos los casos</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Todos los tests pasan</h3><label class="chk"><input type="checkbox" data-p="6"> Completado</label></div>
+    <div class="pbody"><p>Ejecuta <code>pytest</code> en tu terminal y confirma que todos los puntos son verdes. Si alguno falla, lee el traceback — pytest te dice exactamente qué línea y qué valor esperaba vs qué recibió.</p></div></div>
+    <div class="quiz" id="q6"></div>
+    <div class="reto"><span class="ey">RETO ESTACIÓN 07</span><h3>Agrega tests para Cursos</h3><p>Escribe los casos CP-CURSO-01 (inscripción exitosa) y CP-CURSO-02 (capacidad excedida) usando el mismo patrón de la guía G8. La estación 08 migra todo a <code>async/await</code>.</p></div>
+
+<div class="sol" id="rsol-e07">
+  <div class="sol-cab" onclick="toggleSol('rsol-e07')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">CP-CURSO-01: inscripción exitosa y CP-CURSO-02: capacidad excedida</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">tests/test_api.py</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="k">import</span> pytest
+<span class="k">from</span> httpx <span class="k">import</span> AsyncClient, ASGITransport
+<span class="k">from</span> datetime <span class="k">import</span> date, timedelta
+<span class="k">from</span> app.main <span class="k">import</span> app
+
+<span class="c"># Helper: obtener token de admin</span>
+<span class="k">async</span> <span class="k">def</span> get_token(ac: AsyncClient, email: str, password: str) -&gt; str:
+    r = <span class="k">await</span> ac.post(<span class="s">"/login"</span>,
+        data={<span class="s">"username"</span>: email, <span class="s">"password"</span>: password})
+    <span class="k">return</span> r.json().get(<span class="s">"access_token"</span>, <span class="s">""</span>)
+
+
+@pytest.mark.asyncio
+<span class="k">async</span> <span class="k">def</span> test_cp_curso_01_inscripcion_exitosa():
+    <span class="s">""</span><span class="s">"CP-CURSO-01: un usuario se inscribe antes de la fecha de inicio"</span><span class="s">""</span>
+    <span class="k">async</span> <span class="k">with</span> AsyncClient(
+        transport=ASGITransport(app=app), base_url=<span class="s">"http://test"</span>
+    ) as ac:
+        token = <span class="k">await</span> get_token(ac, <span class="s">"sofia@sena.edu.co"</span>, <span class="s">"sena2026"</span>)
+        headers = {<span class="s">"Authorization"</span>: f<span class="s">"Bearer {token}"</span>}
+
+        <span class="c"># Crear curso con fecha de inicio en el futuro</span>
+        fecha_inicio = str(date.today() + timedelta(days=<span class="n">30</span>))
+        curso_r = <span class="k">await</span> ac.post(<span class="s">"/cursos"</span>,
+            json={<span class="s">"nombre"</span>: <span class="s">"Python Test"</span>, <span class="s">"capacidad"</span>: <span class="n">5</span>,
+                  <span class="s">"fecha_inicio"</span>: fecha_inicio},
+            headers=headers)
+        assert curso_r.status_code == <span class="n">201</span>
+        curso_id = curso_r.json()[<span class="s">"id"</span>]
+
+        <span class="c"># Inscribir usuario 1 con fecha de hoy (anterior al inicio)</span>
+        insc_r = <span class="k">await</span> ac.post(
+            f<span class="s">"/cursos/{curso_id}/inscribir/1"</span>,
+            json={<span class="s">"fecha_inscripcion"</span>: str(date.today())},
+            headers=headers)
+
+        assert insc_r.status_code == <span class="n">200</span>
+
+
+@pytest.mark.asyncio
+<span class="k">async</span> <span class="k">def</span> test_cp_curso_02_capacidad_excedida():
+    <span class="s">""</span><span class="s">"CP-CURSO-02: no se puede inscribir si el cupo está lleno"</span><span class="s">""</span>
+    <span class="k">async</span> <span class="k">with</span> AsyncClient(
+        transport=ASGITransport(app=app), base_url=<span class="s">"http://test"</span>
+    ) as ac:
+        token = <span class="k">await</span> get_token(ac, <span class="s">"sofia@sena.edu.co"</span>, <span class="s">"sena2026"</span>)
+        headers = {<span class="s">"Authorization"</span>: f<span class="s">"Bearer {token}"</span>}
+
+        <span class="c"># Crear curso con capacidad 1</span>
+        fecha_inicio = str(date.today() + timedelta(days=<span class="n">30</span>))
+        curso_r = <span class="k">await</span> ac.post(<span class="s">"/cursos"</span>,
+            json={<span class="s">"nombre"</span>: <span class="s">"Cupo Mínimo"</span>, <span class="s">"capacidad"</span>: <span class="n">1</span>,
+                  <span class="s">"fecha_inicio"</span>: fecha_inicio},
+            headers=headers)
+        curso_id = curso_r.json()[<span class="s">"id"</span>]
+        fecha_insc = str(date.today())
+
+        <span class="c"># Primera inscripción — debe funcionar</span>
+        r1 = <span class="k">await</span> ac.post(f<span class="s">"/cursos/{curso_id}/inscribir/1"</span>,
+            json={<span class="s">"fecha_inscripcion"</span>: fecha_insc}, headers=headers)
+        assert r1.status_code == <span class="n">200</span>
+
+        <span class="c"># Segunda inscripción — debe fallar por cupo lleno</span>
+        r2 = <span class="k">await</span> ac.post(f<span class="s">"/cursos/{curso_id}/inscribir/2"</span>,
+            json={<span class="s">"fecha_inscripcion"</span>: fecha_insc}, headers=headers)
+        assert r2.status_code == <span class="n">400</span>
+        assert <span class="s">"cupo"</span> <span class="k">in</span> r2.json()[<span class="s">"detail"</span>].lower() <span class="k">or</span> \
+               <span class="s">"capacidad"</span> <span class="k">in</span> r2.json()[<span class="s">"detail"</span>].lower()
+
+
+@pytest.mark.asyncio
+<span class="k">async</span> <span class="k">def</span> test_cp_curso_03_fecha_invalida():
+    <span class="s">""</span><span class="s">"CP-CURSO-03 (bonus): fecha de inscripción posterior al inicio"</span><span class="s">""</span>
+    <span class="k">async</span> <span class="k">with</span> AsyncClient(
+        transport=ASGITransport(app=app), base_url=<span class="s">"http://test"</span>
+    ) as ac:
+        token = <span class="k">await</span> get_token(ac, <span class="s">"sofia@sena.edu.co"</span>, <span class="s">"sena2026"</span>)
+        headers = {<span class="s">"Authorization"</span>: f<span class="s">"Bearer {token}"</span>}
+
+        fecha_inicio = str(date.today() + timedelta(days=<span class="n">5</span>))
+        curso_r = <span class="k">await</span> ac.post(<span class="s">"/cursos"</span>,
+            json={<span class="s">"nombre"</span>: <span class="s">"Fecha Test"</span>, <span class="s">"capacidad"</span>: <span class="n">10</span>,
+                  <span class="s">"fecha_inicio"</span>: fecha_inicio},
+            headers=headers)
+        curso_id = curso_r.json()[<span class="s">"id"</span>]
+
+        <span class="c"># Fecha de inscripción POSTERIOR al inicio → 400</span>
+        fecha_futura = str(date.today() + timedelta(days=<span class="n">10</span>))
+        r = <span class="k">await</span> ac.post(f<span class="s">"/cursos/{curso_id}/inscribir/1"</span>,
+            json={<span class="s">"fecha_inscripcion"</span>: fecha_futura}, headers=headers)
+        assert r.status_code == <span class="n">400</span>
+        assert <span class="s">"fecha"</span> <span class="k">in</span> r.json()[<span class="s">"detail"</span>].lower()</pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Ejecutar solo los tests de cursos</p>
+    <div class="ed">
+      <div class="ebar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="fich">terminal</span>
+        <button class="bcopy" onclick="cp(this)">Copiar</button>
+      </div>
+      <pre><span class="c"># Ejecutar solo los tests del módulo de cursos</span>
+<span class="k">pytest</span> tests/test_api.py -k <span class="s">"curso"</span> -v
+
+<span class="c"># Resultado esperado:</span>
+<span class="c"># tests/test_api.py::test_cp_curso_01_inscripcion_exitosa  PASSED</span>
+<span class="c"># tests/test_api.py::test_cp_curso_02_capacidad_excedida   PASSED</span>
+<span class="c"># tests/test_api.py::test_cp_curso_03_fecha_invalida       PASSED</span>
+<span class="c"># 3 passed in 0.8s</span></pre>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0"></div>
+</div>
+  </div>
+</section>
+
+<!-- ======== EP 7: ASYNC ======== -->
+<section class="ep" id="ep7">
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span><h2>Variante síncrona — cuándo usarla y cómo es diferente</h2></div>
+    <p class="lead">Si tu proyecto tiene <b>pocos usuarios simultáneos</b> (un sistema interno, una API de clase, un prototipo) el modo síncrono es más simple: menos imports, sin <code>await</code>, sin <code>asyncpg</code>. Esta estación muestra cómo se ve el mismo backend en modo síncrono para que entiendas exactamente qué cambia y por qué en producción preferimos async.</p>
+    <div class="dg" style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <thead>
+          <tr>
+            <th style="padding:10px 14px;background:#162030;color:#8FA8C0;text-align:left;font-family:'JetBrains Mono';font-size:12px;border-bottom:2px solid #1E2C3F">Aspecto</th>
+            <th style="padding:10px 14px;background:#1A2E20;color:#7FDD9A;text-align:left;font-family:'Space Grotesk';border-bottom:2px solid #1E2C3F">✅ Async (estaciones 1–7)</th>
+            <th style="padding:10px 14px;background:#2E2010;color:#F0C674;text-align:left;font-family:'Space Grotesk';border-bottom:2px solid #1E2C3F">⚠️ Síncrono (esta estación)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#0B1520"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">Driver BD</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>asyncpg</code></td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>psycopg2-binary</code></td></tr>
+          <tr style="background:#0D1828"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">Motor SQLAlchemy</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>create_async_engine</code></td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>create_engine</code></td></tr>
+          <tr style="background:#0B1520"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">Sesión</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>AsyncSession</code></td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>Session</code></td></tr>
+          <tr style="background:#0D1828"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">URL conexión</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>postgresql+asyncpg://</code></td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>postgresql://</code></td></tr>
+          <tr style="background:#0B1520"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">Funciones CRUD</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>async def</code> + <code>await</code></td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>def</code> normal</td></tr>
+          <tr style="background:#0D1828"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">Query ORM</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>await db.execute(select(...))</code></td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>db.query(...).all()</code></td></tr>
+          <tr style="background:#0B1520"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">lazy en relationships</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>lazy="selectin"</code> (obligatorio)</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F">lazy por defecto (sin especificar)</td></tr>
+          <tr style="background:#0D1828"><td style="padding:9px 14px;color:#8FA8C0;border-bottom:1px solid #1E2C3F">main.py arranque</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>lifespan</code> async</td><td style="padding:9px 14px;color:#D7E2EF;border-bottom:1px solid #1E2C3F"><code>Base.metadata.create_all(bind=engine)</code></td></tr>
+          <tr style="background:#0B1520"><td style="padding:9px 14px;color:#8FA8C0">Cuándo usarlo</td><td style="padding:9px 14px;color:#7FDD9A">APIs con muchos usuarios simultáneos, producción</td><td style="padding:9px 14px;color:#F0C674">Prototipos, sistemas internos, &lt;50 usuarios</td></tr>
+        </tbody>
+      </table>
+      <figcaption style="margin-top:10px">El código síncrono es más simple de leer; el asíncrono escala mejor. Ambos producen exactamente la misma API.</figcaption>
+    </div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span><h2>El mismo backend en modo síncrono — diferencias capa por capa</h2></div>
+    <div id="ps7"></div>
+  </div>
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · CÓDIGO FINAL COMPLETO + SOLUCIÓN RETO</span><h2>Cuándo elegir síncrono y cuándo async</h2></div>
+    <div class="paso"><div class="pcab"><span class="pnum">✓</span><h3>Convierte el proyecto a modo síncrono</h3><label class="chk"><input type="checkbox" data-p="7"> Completado</label></div>
+    <div class="pbody"><p>Toma el proyecto async de las estaciones 1–7 y conviértelo a síncrono aplicando los cambios de la tabla comparativa. El resultado debe pasar exactamente los mismos tests, con la misma API, solo que sin <code>async/await</code>.</p>
+    <div class="nota a"><b>Decisión de arquitectura:</b> si tu proyecto de grado es un sistema para una sola empresa con menos de 50 usuarios simultáneos, el modo síncrono es perfectamente válido y más fácil de mantener. Si proyectas escalar o hacer APIs públicas, empieza en async desde el día 1 — como hiciste en las estaciones anteriores.</div></div></div>
+    <div class="sol" id="sol7">
+      <div class="sol-cab" onclick="toggleSol('sol7')"><h3>📂 Ver código final completo: BD + Backend asíncrono con Cursos</h3><span class="ico">▼</span></div>
+      <div class="sol-body" id="ps7-final"></div>
+    </div>
+    <div class="quiz" id="q7"></div>
+    <div class="reto"><span class="ey">PROYECTO FORMATIVO</span><h3>Dominas ambos paradigmas</h3><p>8 estaciones completas: MVC async · Módulos · 1:N · Seguridad JWT · N:M + Cursos con validaciones · Variables de entorno · Testing con pytest · y la variante síncrona como contexto. El código async de las estaciones 1–7 es tu base de proyecto formativo. El siguiente paso: conectar un frontend Angular o React y desplegar en Railway o Render.</p></div>
+
+<div class="sol" id="rsol-e08">
+  <div class="sol-cab" onclick="toggleSol('rsol-e08')">
+    <h3>📂 Checklist de conversión async → síncrono</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-size:14px;margin-bottom:14px">Aplica estos cambios archivo por archivo y verifica que el proyecto sigue funcionando igual después de cada uno:</p>
+    <div class="ed"><div class="ebar"><div class="dots"><span></span><span></span><span></span></div><span class="fich">Checklist de migración async → sync</span><button class="bcopy" onclick="cp(this)">Copiar</button></div>
+    <pre><span class="c"># 1. requirements.txt</span>
+<span class="c">#    Cambiar:  asyncpg, greenlet</span>
+<span class="c">#    Por:      psycopg2-binary</span>
+
+<span class="c"># 2. app/database.py</span>
+<span class="c">#    create_async_engine     → create_engine</span>
+<span class="c">#    AsyncSession            → Session</span>
+<span class="c">#    async_sessionmaker      → sessionmaker</span>
+<span class="c">#    postgresql+asyncpg://   → postgresql://</span>
+<span class="c">#    async def get_db()      → def get_db()</span>
+<span class="c">#    async with ...          → try/finally</span>
+
+<span class="c"># 3. app/models.py</span>
+<span class="c">#    lazy="selectin"  → eliminar (o dejar lazy por defecto)</span>
+
+<span class="c"># 4. app/crud.py — todas las funciones</span>
+<span class="c">#    async def obtener_X  → def obtener_X</span>
+<span class="c">#    AsyncSession         → Session</span>
+<span class="c">#    await db.execute(select(...)) → db.query(...).all()</span>
+<span class="c">#    await db.commit()    → db.commit()</span>
+<span class="c">#    await db.refresh()   → db.refresh()</span>
+<span class="c">#    await db.delete()    → db.delete()</span>
+
+<span class="c"># 5. app/auth.py</span>
+<span class="c">#    async def obtener_usuario_actual → def obtener_usuario_actual</span>
+<span class="c">#    AsyncSession   → Session</span>
+<span class="c">#    await db.execute(select(...)) → db.query().filter().first()</span>
+
+<span class="c"># 6. app/routers/*.py — todas las rutas</span>
+<span class="c">#    async def → def</span>
+<span class="c">#    AsyncSession → Session</span>
+<span class="c">#    await crud.X() → crud.X()</span>
+
+<span class="c"># 7. app/main.py</span>
+<span class="c">#    @asynccontextmanager + lifespan → eliminar</span>
+<span class="c">#    Reemplazar por:                                    </span>
+<span class="c">#    Base.metadata.create_all(bind=engine)  (línea directa)</span>
+<span class="c">#    app = FastAPI(title="...")  (sin lifespan=)</span>
+<span class="c">#    async def inicio() → def inicio()</span>
+
+<span class="c"># 8. Verificación final</span>
+<span class="c">#    uvicorn app.main:app --reload</span>
+<span class="c">#    → todos los endpoints responden igual que en async</span>
+<span class="c">#    pytest tests/ → todos los tests siguen en verde</span></pre>
+    </div>
+  </div>
+</div>
+  </div>
+</section>
+
+</main>
+
+<div class="nav" style="max-width:1100px;margin:0 auto;padding:0 20px 40px">
+  <button id="ba" onclick="go(-1)" disabled>← Estación anterior</button>
+  <button id="bs" onclick="go(1)">Siguiente estación →</button>
+</div>
+
+<footer>Curso interactivo · Backend Empresarial 8 estaciones · ADSO 228118 · SENA CDMC Itagüí · <span class="hl">Ing. Luis Eladio Porras Camargo</span></footer>
+
+<script>
+/* ============================================================
+   UTILIDADES DE SINTAXIS (una sola pasada, sin anidamiento)
+   ============================================================ */
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function hi(code,lang){
+  const s=esc(code);
+  const kwPy="from|import|class|def|async|await|return|if|else|elif|not|try|except|finally|yield|raise|for|in|None|True|False|pass|and|or|with";
+  const kwSql="CREATE|TABLE|ALTER|ADD|COLUMN|CONSTRAINT|FOREIGN|KEY|REFERENCES|ON|DELETE|CASCADE|SET|NULL|NOT|UNIQUE|PRIMARY|SERIAL|VARCHAR|INTEGER|DATE|TEXT|DEFAULT|SELECT|FROM|WHERE|INSERT|INTO|VALUES|IF|EXISTS|CHECK";
+  const kwBash="pip|install|pytest|uvicorn|python|mkdir|cd|source|activate";
+  let re;
+  if(lang==="sql")    re=new RegExp("(--[^\\n]*)|('(?:[^'\\n])*')|\\b("+kwSql+")\\b|\\b(\\d+)\\b","g");
+  else if(lang==="sh")re=new RegExp("(#[^\\n]*)|('(?:[^'\\n])*'|\"(?:[^\"\\n])*\")|\\b("+kwBash+")\\b","g");
+  else                re=new RegExp("(#[^\\n]*)|('(?:[^'\\n])*'|\"(?:[^\"\\n])*\")|\\b("+kwPy+")\\b|\\b(\\d+)\\b","g");
+  return s.replace(re,(m,c,str,k,n)=>{
+    if(c!==undefined)   return'<span class="c">'+c+'</span>';
+    if(str!==undefined) return'<span class="s">'+str+'</span>';
+    if(k!==undefined)   return'<span class="k">'+k+'</span>';
+    return'<span class="n">'+n+'</span>';
+  });
+}
+function edHTML(fichero,code,lang,blur,etiq){
+  const b=blur?'blur':'';const d=blur?'data-blur="1"':'';
+  return`<div class="ed ${b}" ${d}>
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">${fichero}</span>${etiq?`<span class="tag-n">${etiq}</span>`:''}
+<button class="bcopy" onclick="cp(this)"${blur?' disabled':''}>Copiar</button></div>
+<pre>${hi(code,lang)}</pre>
+${blur?`<div class="velo"><p>🔒 Inténtalo primero en tu editor.</p><button onclick="rev(this)">Ya lo intenté — revelar</button></div>`:''}
+</div>`;
+}
+
+/* ============================================================
+   DATOS: pasos por estación
+   ============================================================ */
+const PASOS=[
+/* 0: Construir */[
+{t:"Entorno y dependencias",f:"terminal",l:"sh",d:"Aislamos el proyecto con un venv para no contaminar el Python global.",
+c:`mkdir sena_mvc_project && cd sena_mvc_project
+python -m venv venv
+venv\\Scripts\\activate          # Windows
+pip install fastapi uvicorn sqlalchemy asyncpg greenlet pydantic[email] passlib[bcrypt] pyjwt python-dotenv
+pip freeze > requirements.txt`},
+{t:"Base de Datos — tabla usuarios",f:"pgAdmin / psql",l:"sql",d:"La BD se crea FUERA del código. SERIAL = auto-incremental. email UNIQUE = índice de búsqueda.",
+c:`CREATE DATABASE sena_mvc_db;
+CREATE TABLE usuarios (
+    id       SERIAL PRIMARY KEY,
+    nombre   VARCHAR(100) NOT NULL,
+    email    VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);`},
+{t:"Conexión con SQLAlchemy — async",f:"app/database.py",l:"py",d:"URL hardcodeada por ahora — en la estación 06 la moveremos a un archivo .env. Por eso nunca subas este archivo a GitHub mientras tenga la contraseña real.",
+c:`from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
+
+# ── URL de conexión hardcodeada (solo para desarrollo local) ──
+# Formato: postgresql+asyncpg://usuario:contraseña@host:puerto/nombre_bd
+# En la estación 06 refactorizamos esto a python-dotenv (.env)
+DATABASE_URL = "postgresql+asyncpg://postgres:tu_contrasena@localhost:5432/sena_mvc_db"
+
+engine = create_async_engine(DATABASE_URL, echo=True)
+AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession,
+                                        expire_on_commit=False)
+Base = declarative_base()
+
+async def get_db():           # async desde el inicio
+    async with AsyncSessionLocal() as session:
+        yield session`},
+{t:"Modelo ORM — con lazy='selectin' para async",f:"app/models.py",l:"py",d:"La clase ES la tabla. En async, los relationships usan lazy='selectin' para evitar DetachedInstanceError.",
+c:`from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from app.database import Base
+
+class UsuarioModel(Base):
+    __tablename__ = "usuarios"
+    id       = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre   = Column(String, nullable=False)
+    email    = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False)
+    # lazy="selectin" es OBLIGATORIO en async para que las relaciones
+    # se carguen antes de que la sesión se cierre
+    # (se agrega en la estación 03 cuando se crean las relaciones)`},
+{t:"Esquemas Pydantic (validación E/S)",f:"app/schemas.py",l:"py",d:"Pydantic valida lo que entra y filtra lo que sale. UsuarioResponse NUNCA expone el password.",
+c:`from pydantic import BaseModel, EmailStr
+
+class UsuarioBase(BaseModel):
+    nombre: str
+    email: EmailStr
+
+class UsuarioCreate(UsuarioBase):
+    password: str
+
+class UsuarioUpdate(BaseModel):
+    nombre: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+
+class UsuarioResponse(UsuarioBase):
+    id: int
+    class Config:
+        from_attributes = True`},
+{t:"Controlador CRUD — async def + await",f:"app/crud.py",l:"py",d:"Todas las funciones son async def. Los commits y queries usan await. select() reemplaza a db.query().",
+c:`from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from app.models import UsuarioModel
+from app.schemas import UsuarioCreate, UsuarioUpdate
+
+async def obtener_usuarios(db: AsyncSession):
+    result = await db.execute(select(UsuarioModel))
+    return result.scalars().all()
+
+async def obtener_usuario_por_id(db: AsyncSession, uid: int):
+    result = await db.execute(select(UsuarioModel).filter(UsuarioModel.id==uid))
+    return result.scalars().first()
+
+async def crear_usuario(db: AsyncSession, u: UsuarioCreate):
+    obj = UsuarioModel(nombre=u.nombre, email=u.email, password=u.password)
+    db.add(obj)
+    await db.commit()    # await obligatorio
+    await db.refresh(obj)
+    return obj
+
+async def actualizar_usuario(db: AsyncSession, uid: int, data: UsuarioUpdate):
+    obj = await obtener_usuario_por_id(db, uid)
+    if obj:
+        for k,v in data.model_dump(exclude_unset=True).items():
+            setattr(obj, k, v)
+        await db.commit(); await db.refresh(obj)
+    return obj
+
+async def eliminar_usuario(db: AsyncSession, uid: int):
+    obj = await obtener_usuario_por_id(db, uid)
+    if obj: await db.delete(obj); await db.commit(); return True
+    return False`},
+{t:"Rutas async + main.py con lifespan",f:"app/routers/user_routes.py + app/main.py",l:"py",d:"Las rutas usan async def y await crud.*. main.py usa lifespan async para crear las tablas al arrancar.",
+c:`# app/routers/user_routes.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database import get_db
+from app import crud, schemas
+
+router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
+
+@router.get("/", response_model=list[schemas.UsuarioResponse])
+async def listar(db: AsyncSession = Depends(get_db)):
+    return await crud.obtener_usuarios(db)
+
+@router.post("/", response_model=schemas.UsuarioResponse,
+             status_code=status.HTTP_201_CREATED)
+async def crear(u: schemas.UsuarioCreate, db: AsyncSession = Depends(get_db)):
+    return await crud.crear_usuario(db, u)
+
+@router.put("/{uid}", response_model=schemas.UsuarioResponse)
+async def actualizar(uid: int, data: schemas.UsuarioUpdate,
+                     db: AsyncSession = Depends(get_db)):
+    obj = await crud.actualizar_usuario(db, uid, data)
+    if not obj: raise HTTPException(404, "No encontrado")
+    return obj
+
+@router.delete("/{uid}", status_code=204)
+async def eliminar(uid: int, db: AsyncSession = Depends(get_db)):
+    if not await crud.eliminar_usuario(db, uid):
+        raise HTTPException(404, "No encontrado")
+
+# app/main.py — lifespan reemplaza a create_all() directo
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.database import engine, Base
+from app.routers import user_routes
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+app = FastAPI(title="SENA MVC Backend Async", lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
+                   allow_methods=["*"], allow_headers=["*"])
+app.include_router(user_routes.router)
+
+@app.get("/")
+async def inicio(): return {"mensaje": "Backend MVC Async activo"}`}
+],
+/* 1: Replicar */[
+{t:"Tabla SQL — la única que te doy",f:"pgAdmin / psql",l:"sql",d:"Sin conexión con usuarios: este módulo nace aislado. Eso es intencional.",
+c:`CREATE TABLE departamentos (
+    id     SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) UNIQUE NOT NULL,
+    codigo VARCHAR(10)  UNIQUE NOT NULL
+);`},
+{t:"Modelo — te toca",f:"app/models.py",l:"py",blur:true,d:"Clase DepartamentoModel, debajo de UsuarioModel. __tablename__ con doble guion bajo.",
+c:`class DepartamentoModel(Base):
+    __tablename__ = "departamentos"
+    id     = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre = Column(String, unique=True, nullable=False)
+    codigo = Column(String, unique=True, nullable=False)`},
+{t:"Esquemas — cuatro clases",f:"app/schemas.py",l:"py",blur:true,d:"Base, Create, Update (campos opcionales), Response con from_attributes=True.",
+c:`class DepartamentoBase(BaseModel):
+    nombre: str
+    codigo: str
+
+class DepartamentoCreate(DepartamentoBase):
+    pass
+
+class DepartamentoUpdate(BaseModel):
+    nombre: str | None = None
+    codigo: str | None = None
+
+class DepartamentoResponse(DepartamentoBase):
+    id: int
+    class Config:
+        from_attributes = True`},
+{t:"CRUD — cinco funciones async",f:"app/crud.py",l:"py",blur:true,d:"Mismas firmas que usuarios pero en async: cada función usa async def, await db.commit() y select() en lugar de db.query().",
+c:`from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
+async def obtener_departamentos(db: AsyncSession):
+    result = await db.execute(select(DepartamentoModel))
+    return result.scalars().all()
+
+async def obtener_departamento_por_id(db: AsyncSession, did: int):
+    result = await db.execute(
+        select(DepartamentoModel).filter(DepartamentoModel.id == did))
+    return result.scalars().first()
+
+async def crear_departamento(db: AsyncSession, d: DepartamentoCreate):
+    obj = DepartamentoModel(nombre=d.nombre, codigo=d.codigo)
+    db.add(obj)
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+async def actualizar_departamento(db: AsyncSession, did: int,
+                                   data: DepartamentoUpdate):
+    obj = await obtener_departamento_por_id(db, did)
+    if obj:
+        for k, v in data.model_dump(exclude_unset=True).items():
+            setattr(obj, k, v)
+        await db.commit()
+        await db.refresh(obj)
+    return obj
+
+async def eliminar_departamento(db: AsyncSession, did: int):
+    obj = await obtener_departamento_por_id(db, did)
+    if obj:
+        await db.delete(obj)
+        await db.commit()
+        return True
+    return False`},
+{t:"Rutas async + registrar en main.py",f:"app/routers/department_routes.py",l:"py",blur:true,d:"Prefijo /departamentos. Rutas async def con await crud.*. RECUERDA: app.include_router(department_routes.router) en main.py.",
+c:`from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database import get_db
+from app import crud, schemas
+
+router = APIRouter(prefix="/departamentos", tags=["Departamentos"])
+
+@router.get("/", response_model=list[schemas.DepartamentoResponse])
+async def listar(db: AsyncSession = Depends(get_db)):
+    return await crud.obtener_departamentos(db)
+
+@router.post("/", response_model=schemas.DepartamentoResponse,
+             status_code=status.HTTP_201_CREATED)
+async def crear(d: schemas.DepartamentoCreate,
+                db: AsyncSession = Depends(get_db)):
+    return await crud.crear_departamento(db, d)
+
+@router.put("/{did}", response_model=schemas.DepartamentoResponse)
+async def actualizar(did: int, data: schemas.DepartamentoUpdate,
+                     db: AsyncSession = Depends(get_db)):
+    obj = await crud.actualizar_departamento(db, did, data)
+    if not obj: raise HTTPException(404, "No encontrado")
+    return obj
+
+@router.delete("/{did}", status_code=204)
+async def eliminar(did: int, db: AsyncSession = Depends(get_db)):
+    if not await crud.eliminar_departamento(db, did):
+        raise HTTPException(404, "No encontrado")`}
+],
+/* 2: Conectar 1:N */[
+{t:"FK en PostgreSQL",f:"pgAdmin / psql",l:"sql",d:"ON DELETE SET NULL: si el departamento muere, los usuarios quedan huérfanos pero vivos.",
+c:`ALTER TABLE usuarios ADD COLUMN departamento_id INTEGER;
+ALTER TABLE usuarios
+    ADD CONSTRAINT fk_usuarios_departamentos
+    FOREIGN KEY (departamento_id) REFERENCES departamentos(id)
+    ON DELETE SET NULL;`},
+{t:"Modelo — ForeignKey vs relationship",f:"app/models.py",l:"py",d:"ForeignKey = columna física real. relationship = atajo virtual solo en Python. back_populates debe coincidir en AMBOS modelos.",
+c:`from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+from app.database import Base
+
+class DepartamentoModel(Base):
+    __tablename__ = "departamentos"
+    id     = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre = Column(String, unique=True, nullable=False)
+    codigo = Column(String, unique=True, nullable=False)
+    # relación virtual inversa
+    usuarios = relationship("UsuarioModel", back_populates="departamento")
+
+class UsuarioModel(Base):
+    __tablename__ = "usuarios"
+    id              = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre          = Column(String, nullable=False)
+    email           = Column(String, unique=True, nullable=False)
+    password        = Column(String, nullable=False)
+    # columna FÍSICA
+    departamento_id = Column(Integer, ForeignKey("departamentos.id"), nullable=True)
+    # relación VIRTUAL
+    departamento    = relationship("DepartamentoModel", back_populates="usuarios")`},
+{t:"Schema con objeto anidado",f:"app/schemas.py",l:"py",d:"La respuesta del usuario ya no devuelve solo un número: devuelve el objeto completo del departamento.",
+c:`class UsuarioCreate(UsuarioBase):
+    password: str
+    departamento_id: int | None = None
+
+class UsuarioResponse(UsuarioBase):
+    id: int
+    departamento_id: int | None = None
+    departamento: DepartamentoResponse | None = None  # ← anidado
+    class Config:
+        from_attributes = True`}
+],
+/* 3: Blindar */[
+{t:"Fase 1 — Roles",f:"pgAdmin + models.py + schemas.py",l:"py",d:"DEFAULT 'user': nadie nace siendo admin por accidente.",
+c:`-- PostgreSQL
+ALTER TABLE usuarios ADD COLUMN rol VARCHAR(20) DEFAULT 'user' NOT NULL;
+
+# models.py — agregar campo
+rol = Column(String, default="user", nullable=False)
+
+# schemas.py — agregar campo
+class UsuarioBase(BaseModel):
+    nombre: str
+    email: EmailStr
+    rol: str = "user"`},
+{t:"Fase 2 — Bcrypt: hashear ≠ encriptar",f:"app/security.py",l:"py",d:"Bcrypt es de una sola vía. El salt aleatorio hace único cada hash. Para verificar: comparamos hashes, nunca desencriptamos.",
+c:`# pip install "passlib[bcrypt]"
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def encriptar_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verificar_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)`},
+{t:"Fase 3 — JWT: la manilla del festival",f:"app/auth.py",l:"py",d:"El servidor firma con SECRET_KEY. El token lleva email, rol y fecha de expiración. La manilla expira.",
+c:`import jwt, os
+from datetime import datetime, timedelta, timezone
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.models import UsuarioModel
+
+SECRET_KEY = "SENA_KEY_SECRET"   # en producción: os.getenv("JWT_SECRET_KEY")
+ALGORITHM  = "HS256"
+EXPIRE_MIN = 30
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def crear_token_acceso(data: dict) -> str:
+    d = data.copy()
+    d["exp"] = datetime.now(timezone.utc) + timedelta(minutes=EXPIRE_MIN)
+    return jwt.encode(d, SECRET_KEY, algorithm=ALGORITHM)
+
+def obtener_usuario_actual(token=Depends(oauth2_scheme), db=Depends(get_db)):
+    exc = HTTPException(status.HTTP_401_UNAUTHORIZED,
+                        "Token inválido", {"WWW-Authenticate":"Bearer"})
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email: raise exc
+    except jwt.PyJWTError: raise exc
+    u = db.query(UsuarioModel).filter(UsuarioModel.email==email).first()
+    if not u: raise exc
+    return u`},
+{t:"Ruta de login y protección de endpoints",f:"app/routers/auth_routes.py + user_routes.py",l:"py",d:"401 = no sé quién eres. 403 = sé quién eres pero no tienes permiso.",
+c:`# auth_routes.py
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.security import verificar_password
+from app.auth import crear_token_acceso
+from app.models import UsuarioModel
+
+router = APIRouter(tags=["Autenticación"])
+
+@router.post("/login")
+def login(form=Depends(OAuth2PasswordRequestForm), db=Depends(get_db)):
+    u = db.query(UsuarioModel).filter(UsuarioModel.email==form.username).first()
+    if not u or not verificar_password(form.password, u.password):
+        raise HTTPException(400, "Correo o contraseña incorrectos")
+    return {"access_token": crear_token_acceso({"sub":u.email,"rol":u.rol}),
+            "token_type": "bearer"}
+
+# user_routes.py — proteger GET /usuarios solo para admin
+from app.auth import obtener_usuario_actual
+
+@router.get("/", response_model=list[schemas.UsuarioResponse])
+def listar(db=Depends(get_db), me=Depends(obtener_usuario_actual)):
+    if me.rol != "admin":
+        raise HTTPException(403, "Se requieren permisos de Administrador")
+    return crud.obtener_usuarios(db)`}
+],
+/* 4: N:M Cursos */[
+{t:"Tabla BD — cursos + tabla pivote usuario_curso",f:"pgAdmin / psql",l:"sql",d:"La tabla pivote rompe el N:M. Añadimos fecha_inscripcion y la restricción CHECK de capacidad la haremos en la capa CRUD.",
+c:`CREATE TABLE cursos (
+    id             SERIAL PRIMARY KEY,
+    nombre         VARCHAR(150) NOT NULL,
+    descripcion    TEXT,
+    capacidad      INTEGER NOT NULL DEFAULT 30,
+    fecha_inicio   DATE NOT NULL
+);
+
+CREATE TABLE usuario_curso (
+    usuario_id       INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+    curso_id         INTEGER REFERENCES cursos(id)   ON DELETE CASCADE,
+    fecha_inscripcion DATE NOT NULL DEFAULT CURRENT_DATE,
+    PRIMARY KEY (usuario_id, curso_id)
+);`},
+{t:"Modelo — tabla asociativa con atributos",f:"app/models.py",l:"py",d:"La tabla asociativa se declara como objeto Table independiente. lazy='selectin' evita el problema N+1 de queries.",
+c:`from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, Table
+from sqlalchemy.orm import relationship
+from app.database import Base
+
+usuario_curso = Table(
+    "usuario_curso", Base.metadata,
+    Column("usuario_id", Integer, ForeignKey("usuarios.id", ondelete="CASCADE"),
+           primary_key=True),
+    Column("curso_id",   Integer, ForeignKey("cursos.id",   ondelete="CASCADE"),
+           primary_key=True),
+    Column("fecha_inscripcion", Date, nullable=False)
+)
+
+class CursoModel(Base):
+    __tablename__ = "cursos"
+    id           = Column(Integer, primary_key=True, autoincrement=True)
+    nombre       = Column(String, nullable=False)
+    descripcion  = Column(Text, nullable=True)
+    capacidad    = Column(Integer, nullable=False, default=30)
+    fecha_inicio = Column(Date, nullable=False)
+    # relación virtual inversa
+    inscritos = relationship("UsuarioModel", secondary=usuario_curso,
+                             back_populates="cursos", lazy="selectin")
+
+# En UsuarioModel agregar:
+# cursos = relationship("CursoModel", secondary=usuario_curso,
+#                       back_populates="inscritos", lazy="selectin")`},
+{t:"Esquemas — respuesta con listas anidadas",f:"app/schemas.py",l:"py",d:"El Response del usuario incluye lista de cursos; el Response del curso incluye lista de inscritos.",
+c:`from datetime import date
+
+class CursoBase(BaseModel):
+    nombre: str
+    descripcion: str | None = None
+    capacidad: int = 30
+    fecha_inicio: date
+
+class CursoCreate(CursoBase):
+    pass
+
+class CursoResponse(CursoBase):
+    id: int
+    class Config:
+        from_attributes = True
+
+class InscripcionCreate(BaseModel):
+    usuario_id: int
+    curso_id: int
+    fecha_inscripcion: date
+
+# Actualizar UsuarioResponse para incluir cursos:
+class UsuarioResponse(UsuarioBase):
+    id: int
+    departamento: DepartamentoResponse | None = None
+    cursos: list[CursoResponse] = []
+    class Config:
+        from_attributes = True`},
+{t:"CRUD — validaciones de negocio",f:"app/crud.py",l:"py",d:"Aquí viven las dos reglas críticas: (1) fecha_inscripcion ≤ fecha_inicio del curso, (2) cupo disponible > 0.",
+c:`from datetime import date
+from sqlalchemy import insert, select, func
+from fastapi import HTTPException
+
+def crear_curso(db: Session, curso: schemas.CursoCreate):
+    obj = CursoModel(**curso.model_dump())
+    db.add(obj); db.commit(); db.refresh(obj)
+    return obj
+
+def inscribir_usuario(db: Session, usuario_id: int, curso_id: int,
+                      fecha_inscripcion: date):
+    # 1. Obtener el curso
+    curso = db.query(CursoModel).filter(CursoModel.id == curso_id).first()
+    if not curso:
+        raise HTTPException(404, "Curso no encontrado")
+
+    # 2. Validar fecha: inscripción debe ser ANTERIOR o IGUAL al inicio
+    if fecha_inscripcion > curso.fecha_inicio:
+        raise HTTPException(400,
+            f"La fecha de inscripción ({fecha_inscripcion}) debe ser "
+            f"menor o igual a la fecha de inicio del curso ({curso.fecha_inicio})")
+
+    # 3. Validar capacidad
+    inscritos_count = db.execute(
+        select(func.count()).select_from(usuario_curso)
+        .where(usuario_curso.c.curso_id == curso_id)
+    ).scalar()
+    if inscritos_count >= curso.capacidad:
+        raise HTTPException(400,
+            f"El curso '{curso.nombre}' ha alcanzado su capacidad máxima "
+            f"({curso.capacidad} inscritos)")
+
+    # 4. Validar duplicado
+    existe = db.execute(
+        select(usuario_curso)
+        .where(usuario_curso.c.usuario_id == usuario_id)
+        .where(usuario_curso.c.curso_id == curso_id)
+    ).first()
+    if existe:
+        raise HTTPException(400, "El usuario ya está inscrito en este curso")
+
+    # 5. Insertar la inscripción con la fecha
+    db.execute(insert(usuario_curso).values(
+        usuario_id=usuario_id,
+        curso_id=curso_id,
+        fecha_inscripcion=fecha_inscripcion
+    ))
+    db.commit()
+    return db.query(CursoModel).filter(CursoModel.id == curso_id).first()`},
+{t:"Rutas del módulo Cursos",f:"app/routers/course_routes.py",l:"py",d:"El endpoint de inscripción recibe la fecha_inscripcion en el body y aplica todas las validaciones.",
+c:`from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from datetime import date
+from pydantic import BaseModel
+from app.database import get_db
+from app import crud, schemas
+from app.auth import obtener_usuario_actual
+
+router = APIRouter(prefix="/cursos", tags=["Cursos"])
+
+class InscripcionBody(BaseModel):
+    fecha_inscripcion: date
+
+@router.get("/", response_model=list[schemas.CursoResponse])
+def listar_cursos(db: Session = Depends(get_db)):
+    return db.query(CursoModel).all()
+
+@router.post("/", response_model=schemas.CursoResponse,
+             status_code=status.HTTP_201_CREATED)
+def crear_curso(curso: schemas.CursoCreate, db: Session = Depends(get_db),
+                me=Depends(obtener_usuario_actual)):
+    if me.rol != "admin":
+        raise HTTPException(403, "Solo admin puede crear cursos")
+    return crud.crear_curso(db, curso)
+
+@router.post("/{curso_id}/inscribir/{usuario_id}",
+             response_model=schemas.CursoResponse)
+def inscribir(curso_id: int, usuario_id: int, body: InscripcionBody,
+              db: Session = Depends(get_db),
+              me=Depends(obtener_usuario_actual)):
+    return crud.inscribir_usuario(db, usuario_id, curso_id,
+                                   body.fecha_inscripcion)
+
+@router.get("/{curso_id}/usuarios")
+def listar_inscritos(curso_id: int, db: Session = Depends(get_db)):
+    from sqlalchemy import select as sa_select
+    rows = db.execute(
+        sa_select(usuario_curso).where(usuario_curso.c.curso_id == curso_id)
+    ).fetchall()
+    return [{"usuario_id": r.usuario_id,
+             "fecha_inscripcion": str(r.fecha_inscripcion)} for r in rows]`}
+],
+/* 5: Variables de entorno */[
+{t:"Instalar python-dotenv",f:"terminal",l:"sh",d:"La librería que lee el .env en tiempo de ejecución e inyecta las variables.",
+c:`pip install python-dotenv
+pip freeze > requirements.txt`},
+{t:"Crear el archivo .env",f:".env (raíz del proyecto)",l:"sh",d:"NUNCA subas este archivo a Git. Agrégalo a .gitignore inmediatamente.",
+c:`# .gitignore — agregar esta línea:
+.env
+
+# .env — credenciales reales (solo en tu máquina):
+DB_USER=postgres
+DB_PASSWORD=tu_contrasena_real
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=sena_mvc_db
+JWT_SECRET_KEY=SENA_KEY_SECRET_ALTA_SEGURIDAD_ADSO
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30`},
+{t:"Refactorizar database.py — de hardcodeado a .env",f:"app/database.py",l:"py",d:"Este es el cambio que veníamos preparando desde la estación 01: sacar la contraseña del código y leerla desde el .env con load_dotenv(). La URL ya no expone credenciales.",
+c:`import os
+from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
+
+load_dotenv()   # ← lee el archivo .env y carga las variables en el proceso
+
+# Antes (estación 01): URL con contraseña hardcodeada — nunca a GitHub
+# Ahora: las credenciales vienen del .env — el código es seguro de publicar
+DATABASE_URL = (
+    f"postgresql+asyncpg://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+)
+engine = create_async_engine(DATABASE_URL, echo=True)
+AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession,
+                                        expire_on_commit=False)
+Base = declarative_base()
+
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session`},
+{t:"Refactorizar auth.py",f:"app/auth.py",l:"py",d:"La SECRET_KEY y el algoritmo ahora vienen del entorno, no del código.",
+c:`import os
+from dotenv import load_dotenv
+load_dotenv()
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+ALGORITHM  = os.getenv("JWT_ALGORITHM", "HS256")
+EXPIRE_MIN = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))`}
+],
+/* 6: Testing */[
+{t:"Instalación de pytest + httpx",f:"terminal",l:"sh",d:"httpx es el cliente HTTP asíncrono/síncrono que emula peticiones sin levantar el servidor físico.",
+c:`pip install pytest httpx pytest-asyncio
+pip freeze > requirements.txt
+mkdir tests
+echo "" > tests/__init__.py`},
+{t:"Script de pruebas sincrónico",f:"tests/test_api.py",l:"py",d:"TestClient emula HTTP en memoria. Cada función test_ es un caso de prueba independiente.",
+c:`import pytest
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+
+def test_raiz():
+    r = client.get("/")
+    assert r.status_code == 200
+
+def test_login_exitoso():
+    r = client.post("/login", data={
+        "username": "admin@sena.edu.co",
+        "password": "Sena2026*"
+    })
+    assert r.status_code == 200
+    assert "access_token" in r.json()
+
+def test_login_fallido():
+    r = client.post("/login", data={
+        "username": "admin@sena.edu.co",
+        "password": "ClaveErronea"
+    })
+    assert r.status_code == 400
+    assert r.json()["detail"] == "Correo o contraseña incorrectos"
+
+def test_listar_usuarios_sin_token():
+    r = client.get("/usuarios/")
+    assert r.status_code == 401
+
+def test_listar_usuarios_rol_user():
+    # login con rol user
+    token = client.post("/login",
+        data={"username":"ana@sena.edu.co","password":"sena2026"}
+    ).json()["access_token"]
+    r = client.get("/usuarios/",
+        headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 403
+
+def test_inscripcion_fecha_invalida():
+    # fecha_inscripcion > fecha_inicio → 400
+    # (requiere curso y usuario previos en BD de prueba)
+    pass  # completar con fixture de BD de prueba`},
+{t:"Ejecución y cobertura",f:"terminal",l:"sh",d:"pytest descubre automáticamente todos los archivos test_*.py y funciones test_*.",
+c:`# Ejecutar todos los tests
+pytest
+
+# Modo verbose (muestra nombre de cada test)
+pytest -v
+
+# Con reporte de cobertura de código
+pip install pytest-cov
+pytest --cov=app --cov-report=term-missing`}
+],
+/* 7: Variante Síncrona */[
+{t:"Dependencias — sin asyncpg",f:"terminal",l:"sh",d:"El modo síncrono usa psycopg2-binary. No se necesita asyncpg ni greenlet.",
+c:`pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic[email] passlib[bcrypt] pyjwt python-dotenv pytest httpx
+pip freeze > requirements.txt`},
+{t:"database.py — motor síncrono",f:"app/database.py",l:"py",d:"create_engine y SessionLocal en lugar de create_async_engine y AsyncSession. La URL usa postgresql:// sin el prefijo asyncpg.",
+c:`import os
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+load_dotenv()
+DATABASE_URL = (
+    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+)
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+def get_db():          # def normal, sin async
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()`},
+{t:"models.py — sin lazy='selectin'",f:"app/models.py",l:"py",d:"En modo síncrono la sesión sigue abierta durante toda la petición, así que el lazy loading por defecto funciona sin problemas.",
+c:`# En sync, los relationships NO necesitan lazy="selectin"
+# Se usa el lazy por defecto (carga bajo demanda con sesión abierta)
+class DepartamentoModel(Base):
+    __tablename__ = "departamentos"
+    id       = Column(Integer, primary_key=True, autoincrement=True)
+    nombre   = Column(String, unique=True, nullable=False)
+    codigo   = Column(String, unique=True, nullable=False)
+    usuarios = relationship("UsuarioModel", back_populates="departamento")
+    #                                       ↑ sin lazy="selectin"
+
+class UsuarioModel(Base):
+    __tablename__ = "usuarios"
+    id              = Column(Integer, primary_key=True, autoincrement=True)
+    nombre          = Column(String, nullable=False)
+    email           = Column(String, unique=True, nullable=False)
+    password        = Column(String, nullable=False)
+    rol             = Column(String, default="user", nullable=False)
+    departamento_id = Column(Integer, ForeignKey("departamentos.id"), nullable=True)
+    departamento    = relationship("DepartamentoModel", back_populates="usuarios")
+    cursos          = relationship("CursoModel", secondary=usuario_curso,
+                                   back_populates="inscritos")
+    #                                              ↑ sin lazy="selectin"`},
+{t:"crud.py — funciones sincrónicas",f:"app/crud.py",l:"py",d:"Sin async def, sin await. La sintaxis es más directa: db.query().all() en lugar de await db.execute(select()).",
+c:`from sqlalchemy.orm import Session
+
+def obtener_usuarios(db: Session):        # def, no async def
+    return db.query(UsuarioModel).all()   # .query(), no select()
+
+def crear_usuario(db: Session, u: schemas.UsuarioCreate):
+    obj = UsuarioModel(nombre=u.nombre, email=u.email,
+                       password=encriptar_password(u.password),
+                       rol=u.rol, departamento_id=u.departamento_id)
+    db.add(obj)
+    db.commit()      # sin await
+    db.refresh(obj)  # sin await
+    return obj
+
+def inscribir_usuario(db: Session, usuario_id: int,
+                       curso_id: int, fecha_inscripcion):
+    curso = db.query(CursoModel).filter(CursoModel.id==curso_id).first()
+    if not curso: raise HTTPException(404, "Curso no encontrado")
+    if fecha_inscripcion > curso.fecha_inicio:
+        raise HTTPException(400, "Fecha de inscripción posterior al inicio")
+    from sqlalchemy import func, select as sa_select
+    cnt = db.execute(
+        sa_select(func.count()).select_from(usuario_curso)
+        .where(usuario_curso.c.curso_id==curso_id)
+    ).scalar()
+    if cnt >= curso.capacidad:
+        raise HTTPException(400, "Cupo máximo alcanzado")
+    dup = db.execute(
+        sa_select(usuario_curso)
+        .where(usuario_curso.c.usuario_id==usuario_id)
+        .where(usuario_curso.c.curso_id==curso_id)
+    ).first()
+    if dup: raise HTTPException(400, "Ya inscrito")
+    from sqlalchemy import insert as sa_insert
+    db.execute(sa_insert(usuario_curso).values(
+        usuario_id=usuario_id, curso_id=curso_id,
+        fecha_inscripcion=fecha_inscripcion))
+    db.commit()
+    return db.query(CursoModel).filter(CursoModel.id==curso_id).first()`},
+{t:"auth.py — validación síncrona",f:"app/auth.py",l:"py",d:"obtener_usuario_actual es una función normal. Usa db.query() directamente sin await.",
+c:`from sqlalchemy.orm import Session
+
+def obtener_usuario_actual(    # def, no async def
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+):
+    exc = HTTPException(status.HTTP_401_UNAUTHORIZED, "Token inválido",
+                        {"WWW-Authenticate": "Bearer"})
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email: raise exc
+    except jwt.PyJWTError: raise exc
+    u = db.query(UsuarioModel).filter(UsuarioModel.email==email).first()
+    if not u: raise exc
+    return u`},
+{t:"main.py — arranque síncrono",f:"app/main.py",l:"py",d:"Sin lifespan async. Base.metadata.create_all() funciona directamente con el engine síncrono.",
+c:`from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.database import engine, Base
+from app.routers import auth_routes, user_routes, department_routes
+from app.routers import direction_routes, project_routes, course_routes
+
+# Sin lifespan: create_all() funciona directo en modo síncrono
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="SENA MVC Backend — Síncrono")
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
+                   allow_methods=["*"], allow_headers=["*"],
+                   allow_credentials=True)
+
+app.include_router(auth_routes.router)
+app.include_router(user_routes.router)
+app.include_router(department_routes.router)
+app.include_router(direction_routes.router)
+app.include_router(project_routes.router)
+app.include_router(course_routes.router)
+
+@app.get("/")
+def inicio():                  # def, no async def
+    return {"mensaje": "Backend MVC Síncrono activo"}`}
+]
+];
+
+/* Solución estación 4 */
+const SOL4=[
+{t:"SQL final completo",f:"database.sql",l:"sql",
+c:`-- Orden correcto de creación (respeta FKs)
+CREATE TABLE IF NOT EXISTS direcciones (
+    id     SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) UNIQUE NOT NULL
+);
+CREATE TABLE IF NOT EXISTS departamentos (
+    id           SERIAL PRIMARY KEY,
+    nombre       VARCHAR(100) UNIQUE NOT NULL,
+    codigo       VARCHAR(10)  UNIQUE NOT NULL,
+    direccion_id INTEGER REFERENCES direcciones(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS usuarios (
+    id              SERIAL PRIMARY KEY,
+    nombre          VARCHAR(100) NOT NULL,
+    email           VARCHAR(150) UNIQUE NOT NULL,
+    password        VARCHAR(255) NOT NULL,
+    rol             VARCHAR(20) DEFAULT 'user' NOT NULL,
+    departamento_id INTEGER REFERENCES departamentos(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS cursos (
+    id           SERIAL PRIMARY KEY,
+    nombre       VARCHAR(150) NOT NULL,
+    descripcion  TEXT,
+    capacidad    INTEGER NOT NULL DEFAULT 30,
+    fecha_inicio DATE NOT NULL
+);
+CREATE TABLE IF NOT EXISTS usuario_curso (
+    usuario_id        INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+    curso_id          INTEGER REFERENCES cursos(id)   ON DELETE CASCADE,
+    fecha_inscripcion DATE NOT NULL DEFAULT CURRENT_DATE,
+    PRIMARY KEY (usuario_id, curso_id)
+);`},
+{t:"Endpoint desinscripción",f:"app/routers/course_routes.py",l:"py",
+c:`@router.delete("/{curso_id}/inscribir/{usuario_id}",
+              status_code=status.HTTP_204_NO_CONTENT)
+def desinscribir(curso_id: int, usuario_id: int,
+                 db: Session = Depends(get_db),
+                 me=Depends(obtener_usuario_actual)):
+    from sqlalchemy import delete as sa_delete
+    result = db.execute(
+        sa_delete(usuario_curso)
+        .where(usuario_curso.c.usuario_id == usuario_id)
+        .where(usuario_curso.c.curso_id   == curso_id)
+    )
+    db.commit()
+    if result.rowcount == 0:
+        raise HTTPException(404, "Inscripción no encontrada")`}
+];
+
+/* Solución final completa (estación 7) */
+const SOL7=[
+{t:"Guía de decisión: ¿async o síncrono?",f:"DECISION_GUIDE.md",l:"sh",
+c:`# ¿Cuándo usar modo SÍNCRONO?
+# ✅ Prototipo o prueba de concepto
+# ✅ Sistema interno con < 50 usuarios simultáneos
+# ✅ Proyecto académico o de clase
+# ✅ Primer proyecto FastAPI (más fácil de depurar)
+# ✅ Código más legible para equipos con poca experiencia en async
+
+# ¿Cuándo usar modo ASÍNCRONO (estaciones 1-7)?
+# ✅ API pública con muchos usuarios concurrentes
+# ✅ Microservicios en producción
+# ✅ Cuando integras otras operaciones I/O (emails, archivos, APIs externas)
+# ✅ Proyecto de etapa productiva o trabajo real
+# ✅ Cuando el throughput importa
+
+# REGLA PRÁCTICA:
+# Si dudas → empieza en async.
+# Es más fácil bajar a sync que migrar de sync a async en un proyecto grande.`},
+{t:"Test async completo con inscripción",f:"tests/test_api.py",l:"py",
+c:`import pytest
+from httpx import AsyncClient, ASGITransport
+from app.main import app
+
+@pytest.mark.asyncio
+async def test_inicio():
+    async with AsyncClient(transport=ASGITransport(app=app),
+                           base_url="http://test") as ac:
+        r = await ac.get("/")
+    assert r.status_code == 200
+
+@pytest.mark.asyncio
+async def test_login_fallido():
+    async with AsyncClient(transport=ASGITransport(app=app),
+                           base_url="http://test") as ac:
+        r = await ac.post("/login", data={
+            "username": "inexistente@sena.edu.co",
+            "password": "ClaveIncorrecta"
+        })
+    assert r.status_code == 400
+    assert r.json()["detail"] == "Correo o contraseña incorrectos"
+
+@pytest.mark.asyncio
+async def test_inscripcion_fecha_invalida():
+    # Asume curso con fecha_inicio=2026-09-01
+    async with AsyncClient(transport=ASGITransport(app=app),
+                           base_url="http://test") as ac:
+        # Login como admin
+        login_r = await ac.post("/login",
+            data={"username":"sofia@sena.edu.co","password":"sena2026"})
+        token = login_r.json().get("access_token","")
+        # Intentar inscripción con fecha posterior al inicio
+        r = await ac.post("/cursos/1/inscribir/1",
+            json={"fecha_inscripcion": "2026-09-15"},
+            headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 400
+    assert "fecha" in r.json()["detail"].lower()`}
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderPasos(pasos,containerId){
+  const c=document.getElementById(containerId);
+  if(!c) return;
+  pasos.forEach((p,i)=>{
+    const d=document.createElement("div");
+    d.className="paso";
+    d.innerHTML=`<div class="pcab"><span class="pnum">${i+1}</span><h3>${p.t}</h3>
+<label class="chk"><input type="checkbox" data-p="${containerId.slice(-1)}"> Completado</label></div>
+<div class="pbody"><p>${p.d}</p>${edHTML(p.f,p.c,p.l,p.blur)}</div>`;
+    c.appendChild(d);
+  });
+}
+
+function renderSol(pasos,containerId){
+  const c=document.getElementById(containerId);
+  if(!c) return;
+  pasos.forEach(p=>{
+    const d=document.createElement("div");
+    d.innerHTML=`<p style="font-weight:600;margin-bottom:6px">${p.t}</p>${edHTML(p.f,p.c,p.l,false)}<hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">`;
+    c.appendChild(d);
+  });
+}
+
+PASOS.forEach((ps,i)=>renderPasos(ps,`ps${i}`));
+renderSol(SOL4,"ps4-sol");
+renderSol(SOL7,"ps7-final");
+
+/* ============================================================
+   QUICES
+   ============================================================ */
+const QD=[
+[{e:"¿Por qué UsuarioResponse no incluye el password?",op:["PostgreSQL lo bloquea","Pydantic valida lo que entra y filtra lo que sale: el Response es el portero de salida","FastAPI lo elimina automáticamente"],ok:1,ex:"Los esquemas de salida son el filtro: ningún dato sensible debe viajar en la respuesta."},
+ {e:"¿Orden correcto 'de adentro hacia afuera'?",op:["Frontend→Rutas→Controlador→BD","BD→Conexión→Modelo→Esquemas→Controlador→Rutas→Frontend","Rutas→BD→Frontend"],ok:1,ex:"Se construye desde los cimientos de datos hacia las capas de presentación."},
+ {e:"¿Qué hace get_db()?",op:["Crea la tabla en PostgreSQL","Abre una sesión por petición HTTP y la cierra automáticamente al finalizar","Valida el token JWT"],ok:1,ex:"El patrón yield + finally garantiza que la sesión siempre se cierra, incluso si ocurre un error."}],
+[{e:"Creaste el módulo pero /departamentos no aparece en Swagger. ¿Causa más probable?",op:["PostgreSQL está apagado","Falta app.include_router(department_routes.router) en main.py","Pydantic no soporta dos módulos"],ok:1,ex:"Error clásico #1: el router existe pero no está registrado en la app principal."},
+ {e:"¿Por qué Departamentos nace sin FK con Usuarios?",op:["Es imposible relacionarlas","Pedagogía incremental: primero mecanizar el patrón limpio, luego conectar","Las FK solo funcionan en SQLite"],ok:1,ex:"Aprender el patrón con una entidad aislada antes de agregar complejidad relacional."},
+ {e:"En DepartamentoUpdate los campos usan 'str | None = None' porque…",op:["Lo exige PostgreSQL","Permite actualizar solo los campos enviados (actualizaciones parciales)","None los hace obligatorios"],ok:1,ex:"Con model_dump(exclude_unset=True) solo se modifican los campos presentes en el request."}],
+[{e:"Diferencia entre ForeignKey y relationship:",op:["Son sinónimos","ForeignKey es columna física en PostgreSQL; relationship es virtual solo en Python","relationship crea la columna y ForeignKey el JOIN"],ok:1,ex:"Una es física (existe en la BD), la otra es un atajo virtual del ORM."},
+ {e:"Con ON DELETE SET NULL, si borro el departamento 1, sus usuarios…",op:["Se borran en cascada","Quedan con departamento_id=NULL: huérfanos pero vivos","Bloquean el borrado"],ok:1,ex:"SET NULL preserva los registros relacionados y anula la referencia."},
+ {e:"¿Qué exige back_populates?",op:["Que ambas tablas tengan igual número de columnas","Que los nombres coincidan exactamente en ambos modelos","Solo se usa en el modelo padre"],ok:1,ex:"back_populates='X' en un lado debe apuntar al atributo real del otro lado."}],
+[{e:"¿Por qué Bcrypt del mismo password da hashes distintos cada vez?",op:["Bug de Bcrypt","El salt aleatorio incluido en cada hash","Depende de la hora del sistema"],ok:1,ex:"El salt aleatorio hace único cada hash. La verificación usa pwd_context.verify() que reconstruye el salt."},
+ {e:"401 vs 403:",op:["Son iguales","401=no sé quién eres (autenticación); 403=sé quién eres pero no tienes permiso (autorización)","403=no sé quién eres; 401=sin permiso"],ok:1,ex:"Autenticación (identidad) vs Autorización (permiso) son conceptos distintos con códigos distintos."},
+ {e:"¿Dónde va la SECRET_KEY en producción?",op:["En el código, visible en GitHub","En variable de entorno (.env) en .gitignore","En la tabla usuarios de PostgreSQL"],ok:1,ex:"Si la clave se filtra, cualquiera puede generar tokens válidos firmados como tu servidor."}],
+[{e:"Una relación N:M requiere:",op:["Una FK simple en una de las dos tablas","Una tercera tabla asociativa con FKs compuestas","Dos tablas con misma PK"],ok:1,ex:"Las FK simples no pueden modelar N:M. La tabla pivote almacena pares de FKs + atributos propios."},
+ {e:"¿Qué validación de negocio implementamos en inscribir_usuario?",op:["Solo verificar que el usuario exista","(1) fecha_inscripcion ≤ fecha_inicio del curso Y (2) inscritos < capacidad Y (3) no duplicado","Solo validar la capacidad"],ok:1,ex:"Las tres validaciones son reglas de negocio críticas que van en la capa Controlador (crud.py)."},
+ {e:"ON DELETE CASCADE en usuario_curso significa:",op:["Si borro el curso, la tabla pivote queda con registros huérfanos","Si borro un usuario o un curso, sus filas en la tabla pivote se eliminan automáticamente","Requiere borrar manualmente la tabla pivote primero"],ok:1,ex:"CASCADE en la tabla pivote garantiza limpieza automática de la relación cuando se borra cualquiera de los dos lados."}],
+[{e:"¿Por qué nunca subir el .env a GitHub?",op:["Porque PostgreSQL no lo acepta","Bots escanean commits en tiempo real buscando credenciales","GitHub limita el tamaño del .env"],ok:1,ex:"Una contraseña de BD expuesta en un repo público puede comprometerse en minutos."},
+ {e:"¿Para qué sirve .env.example?",op:["Reemplaza al .env real","Es una plantilla con los nombres de variable sin valores para documentar qué variables necesita el proyecto","Es el .env de producción"],ok:1,ex:".env.example SÍ se sube al repo; muestra la estructura sin exponer los valores reales."},
+ {e:"load_dotenv() debe llamarse…",op:["Al final de database.py","Antes de os.getenv() — al inicio del archivo","Solo en main.py"],ok:1,ex:"load_dotenv() carga las variables en el entorno del proceso. Si lo llamas después de os.getenv(), ya es tarde."}],
+[{e:"¿Qué hace TestClient de FastAPI/Starlette?",op:["Levanta un servidor real en el puerto 8000","Emula peticiones HTTP en memoria sin levantar servidor físico","Conecta a la BD de producción"],ok:1,ex:"El cliente de prueba intercepta las peticiones antes de que lleguen a la red, haciendo los tests rápidos y aislados."},
+ {e:"¿Cuándo falla test_login_fallido?",op:["Cuando el endpoint devuelve 400","Cuando el endpoint devuelve 200 con una contraseña incorrecta — el assert 400 falla","Cuando pytest no encuentra el archivo"],ok:1,ex:"El test espera status_code==400. Si la API devuelve 200, significa que no está validando la contraseña correctamente."},
+ {e:"pytest -v sirve para:",op:["Ejecutar solo un test específico","Ver el nombre de cada test y su resultado (PASSED/FAILED) en lugar del punto . o F","Borrar la caché de pytest"],ok:1,ex:"El modo verbose es útil para diagnosticar qué test específico falló en una suite grande."}],
+[{e:"¿Cuándo es preferible el modo síncrono?",op:["Siempre — es más simple","En APIs públicas con miles de usuarios simultáneos","En prototipos, sistemas internos o proyectos con menos de ~50 usuarios simultáneos"],ok:2,ex:"El modo síncrono es perfectamente válido para proyectos pequeños. El async brilla cuando hay muchas peticiones concurrentes que pasan tiempo esperando la BD."},
+ {e:"¿Qué diferencia hay entre db.query().all() (sync) y await db.execute(select()) (async)?",op:["Son exactamente iguales, solo cambia la sintaxis","La versión async libera el hilo mientras espera la respuesta de la BD; la sync bloquea el hilo hasta recibir la respuesta","La versión async usa una BD diferente"],ok:1,ex:"await cede el control del event loop mientras PostgreSQL procesa la query. En sync, el hilo queda bloqueado esperando, sin poder atender otras peticiones."},
+ {e:"¿Por qué en sync NO necesitas lazy='selectin' en los relationships?",op:["Porque sync no soporta relationships","En sync la sesión sigue abierta cuando el ORM carga la relación; en async la sesión puede cerrarse antes, por eso se necesita selectin","Porque selectin es una función solo de asyncpg"],ok:1,ex:"En modo síncrono la sesión está disponible durante toda la petición HTTP. En async, la sesión puede cerrarse antes de que se acceda a la relación, causando DetachedInstanceError."}]
+];
+
+QD.forEach((qs,ep)=>{
+  const c=document.getElementById(`q${ep}`);
+  if(!c) return;
+  let h=`<h3 style="margin-bottom:12px">Autoevaluación · Estación 0${ep+1}</h3>`;
+  qs.forEach((q,i)=>{
+    h+=`<div class="preg" data-ok="${q.ok}"><p class="enun">${i+1}. ${q.e}</p>`;
+    q.op.forEach((o,j)=>h+=`<label><input type="radio" name="q${ep}-${i}" value="${j}"><span>${o}</span></label>`);
+    h+=`<p class="exp">💡 ${q.ex}</p></div>`;
+  });
+  h+=`<button class="bcal" onclick="cal('q${ep}')">Calificar</button><p class="res"></p>`;
+  c.innerHTML=h;
+});
+
+function cal(id){
+  const c=document.getElementById(id);
+  let ok=0,tot=0;
+  c.querySelectorAll(".preg").forEach(p=>{
+    tot++; const O=+p.dataset.ok, sel=p.querySelector("input:checked");
+    p.querySelectorAll("label").forEach((l,j)=>{l.classList.remove("b","m"); if(j===O) l.classList.add("b");});
+    if(sel){ if(+sel.value===O) ok++; else sel.closest("label").classList.add("m"); }
+    p.querySelector(".exp").style.display="block";
+  });
+  const r=c.querySelector(".res"); r.style.display="block";
+  r.style.color=ok===tot?"var(--ok)":ok>=2?"var(--ambar)":"var(--err)";
+  r.textContent=ok===tot?`✅ ${ok}/${tot} — ¡Estación dominada!`:`${ok}/${tot} — Revisa las explicaciones.`;
+}
+
+/* ============================================================
+   NAVEGACIÓN
+   ============================================================ */
+let cur=0;
+document.querySelectorAll(".est").forEach(b=>b.addEventListener("click",()=>ir(+b.dataset.ep)));
+function ir(n){
+  cur=n;
+  document.querySelectorAll(".ep").forEach((s,i)=>s.classList.toggle("vis",i===n));
+  document.querySelectorAll(".est").forEach((b,i)=>{b.classList.toggle("on",i===n);});
+  document.getElementById("ba").disabled=n===0;
+  document.getElementById("bs").disabled=n===7;
+  window.scrollTo({top:0});
+  prog();
+}
+function go(d){const n=cur+d; if(n>=0&&n<=7) ir(n);}
+
+document.addEventListener("change",e=>{if(e.target.matches("input[data-p]")) prog();});
+function prog(){
+  for(let i=0;i<8;i++){
+    const boxes=[...document.querySelectorAll(`input[data-p="${i}"]`)];
+    if(!boxes.length) continue;
+    const pct=Math.round(boxes.filter(b=>b.checked).length/boxes.length*100);
+    document.getElementById(`p${i}`).textContent=pct+"%";
+    document.querySelectorAll(".est")[i].classList.toggle("done",pct===100);
+  }
+}
+
+/* ============================================================
+   COPIAR / REVELAR
+   ============================================================ */
+function cp(btn){
+  const pre=btn.closest(".ed").querySelector("pre");
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent="¡Copiado!"; setTimeout(()=>btn.textContent="Copiar",1500);
+  });
+}
+function rev(btn){
+  const velo=btn.parentElement;
+  if(!velo.dataset.ok){
+    velo.dataset.ok="1";
+    velo.querySelector("p").textContent="¿De verdad lo intentaste? El aprendizaje está en el intento, no en el resultado.";
+    btn.textContent="Sí, mostrar el código";
+    return;
+  }
+  const ed=velo.closest(".ed");
+  ed.classList.remove("blur");
+  ed.querySelector(".bcopy").disabled=false;
+  velo.remove();
+}
+
+/* ============================================================
+   SOLUCIONES DESPLEGABLES
+   ============================================================ */
+function toggleSol(id){
+  const el=document.getElementById(id);
+  const body=el.querySelector(".sol-body");
+  const ico=el.querySelector(".ico");
+  const abierto=body.style.display==="block";
+  body.style.display=abierto?"none":"block";
+  ico.style.transform=abierto?"":"rotate(180deg)";
+}
+
+/* ============================================================
+   DEMOS INTERACTIVOS
+   ============================================================ */
+function demoFK(caso){
+  const o=document.getElementById("ofk");
+  if(caso===1) o.innerHTML=`<span class="in">INSERT INTO usuarios (..., departamento_id) VALUES (..., 1);</span>
+<span class="ok">INSERT 0 1  ✔ El departamento 1 existe → PostgreSQL acepta el registro.</span>`;
+  else if(caso===999) o.innerHTML=`<span class="in">INSERT INTO usuarios (..., departamento_id) VALUES (..., 999);</span>
+<span class="er">ERROR:  inserción viola la llave foránea «fk_usuarios_departamentos»
+DETAIL: La llave (departamento_id)=(999) no está en la tabla «departamentos».</span>
+<span class="ok">→ La BD se defiende sola. Eso es integridad referencial.</span>`;
+  else o.innerHTML=`<span class="in">DELETE FROM departamentos WHERE id = 1;</span>
+<span class="ok">DELETE 1</span>
+<span class="in">SELECT id, nombre, departamento_id FROM usuarios;</span>
+ id | nombre | departamento_id
+----+--------+-----------------
+  1 | Ana    | <span class="wa">NULL</span>
+<span class="ok">→ ON DELETE SET NULL: los usuarios quedan huérfanos… pero vivos.</span>`;
+}
+
+let simTok=null;
+const SIM_USERS={"ana@sena.edu.co":{rol:"user",pass:"sena2026",nombre:"Ana"},
+                 "sofia@sena.edu.co":{rol:"admin",pass:"sena2026",nombre:"Sofía"}};
+function b64(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/,"");}
+function simLogin(){
+  const em=document.getElementById("sem").value.trim().toLowerCase();
+  const pw=document.getElementById("spw").value;
+  const o=document.getElementById("sjwt"); const tk=document.getElementById("stok");
+  const u=SIM_USERS[em];
+  if(!u||u.pass!==pw){simTok=null;tk.style.display="none";
+    o.innerHTML=`<span class="in">POST /login</span>\n<span class="er">HTTP 400 — Correo o contraseña incorrectos</span>`;return;}
+  const jwt=`${b64({alg:"HS256"})}.${b64({sub:em,rol:u.rol,exp:Date.now()/1000+1800})}.${b64({sig:"SENA"}).slice(0,22)}`;
+  simTok={jwt,rol:u.rol,nombre:u.nombre,email:em};
+  tk.style.display="block"; tk.textContent="access_token: "+jwt;
+  o.innerHTML=`<span class="in">POST /login — bcrypt.verify() ✔</span>
+<span class="ok">HTTP 200 OK — { "access_token": "...", "token_type": "bearer" }
+Payload: { "sub": "${em}", "rol": "${u.rol}", "exp": +30 min }</span>`;
+}
+function simGet(con){
+  const o=document.getElementById("sjwt");
+  if(!con){o.innerHTML=`<span class="in">GET /usuarios/  (sin Authorization)</span>\n<span class="er">HTTP 401 — No se pudo validar el token de acceso\n→ «No sé quién eres.»</span>`;return;}
+  if(!simTok){o.innerHTML=`<span class="er">Sin token. Haz POST /login primero.</span>`;return;}
+  if(simTok.rol!=="admin"){o.innerHTML=`<span class="in">GET /usuarios/  Bearer &lt;token de ${simTok.nombre}&gt;</span>
+<span class="er">HTTP 403 — Operación no permitida. Se requieren permisos de Administrador.
+→ «Sé quién eres (${simTok.nombre}, rol:user) — pero no tienes permiso.»</span>`;return;}
+  o.innerHTML=`<span class="in">GET /usuarios/  Bearer &lt;token de ${simTok.nombre}&gt;</span>
+<span class="ok">HTTP 200 OK  ✔  token válido + rol admin</span>
+[
+  {"id":1,"nombre":"Ana",  "email":"ana@sena.edu.co",  "rol":"user" },
+  {"id":2,"nombre":"Sofía","email":"sofia@sena.edu.co","rol":"admin"}
+]`;
+}
+function simOut(){simTok=null;document.getElementById("stok").style.display="none";
+  document.getElementById("sjwt").innerHTML=`<span class="wa">Token eliminado. Intenta el GET sin token de nuevo: recibirás 401.</span>`;}
+
+/* Inscripción demo */
+const inscCurso={capacidad:2,fecha_inicio:"2026-09-01",inscritos:[1]};
+function demoInsc(caso){
+  const o=document.getElementById("oinsc");
+  if(caso==="ok") o.innerHTML=`<span class="in">POST /cursos/1/inscribir/2  body: {"fecha_inscripcion":"2026-08-15"}</span>
+<span class="ok">✔ Validación 1: 2026-08-15 ≤ 2026-09-01 (fecha_inicio) — OK
+✔ Validación 2: inscritos (1) < capacidad (2) — OK
+✔ Validación 3: usuario 2 no está inscrito — OK
+HTTP 200 — Inscripción exitosa</span>`;
+  else if(caso==="fecha") o.innerHTML=`<span class="in">POST /cursos/1/inscribir/3  body: {"fecha_inscripcion":"2026-09-15"}</span>
+<span class="er">✗ Validación 1 FALLA: 2026-09-15 > 2026-09-01 (fecha_inicio del curso)
+HTTP 400 — La fecha de inscripción (2026-09-15) debe ser menor
+           o igual a la fecha de inicio del curso (2026-09-01)</span>`;
+  else if(caso==="cap") o.innerHTML=`<span class="in">POST /cursos/1/inscribir/3  body: {"fecha_inscripcion":"2026-08-20"}</span>
+<span class="er">✗ Validación 2 FALLA: inscritos (2) >= capacidad (2)
+HTTP 400 — El curso 'Python Avanzado' ha alcanzado su capacidad
+           máxima (2 inscritos)</span>`;
+  else o.innerHTML=`<span class="in">POST /cursos/1/inscribir/1  body: {"fecha_inscripcion":"2026-08-20"}</span>
+<span class="er">✗ Validación 3 FALLA: usuario 1 ya está inscrito en curso 1
+HTTP 400 — El usuario ya está inscrito en este curso</span>`;
+}
+
+/* pytest demo */
+function demoPytest(modo){
+  const o=document.getElementById("opy");
+  if(modo==="all") o.innerHTML=`<span class="in">$ pytest tests/</span>
+<span class="ok">===== test session starts ==============================
+platform win32 -- Python 3.12, pytest-8.x
+collected 6 items
+
+tests/test_api.py::test_raiz                    <span class="ok">PASSED</span>
+tests/test_api.py::test_login_exitoso           <span class="ok">PASSED</span>
+tests/test_api.py::test_login_fallido           <span class="ok">PASSED</span>
+tests/test_api.py::test_listar_usuarios_sin_token <span class="ok">PASSED</span>
+tests/test_api.py::test_listar_usuarios_rol_user  <span class="ok">PASSED</span>
+tests/test_api.py::test_inscripcion_fecha_invalida <span class="wa">SKIPPED</span> (pass)
+
+====== 5 passed, 1 skipped in 0.42s ==================</span>`;
+  else if(modo==="fail") o.innerHTML=`<span class="in">$ pytest tests/</span>
+<span class="er">===== test session starts ==============================
+collected 6 items
+
+tests/test_api.py::test_raiz            <span class="ok">PASSED</span>
+tests/test_api.py::test_login_exitoso   <span class="er">FAILED</span>
+
+===== FAILURES =========================================
+test_login_exitoso
+  AssertionError: assert 400 == 200
+  E     where 400 = &lt;Response [400 Bad Request]&gt;.status_code
+  → ¿El usuario admin@sena.edu.co existe en la BD de prueba?
+
+====== 1 failed, 1 passed in 0.31s ====================</span>`;
+  else o.innerHTML=`<span class="in">$ pytest -v tests/</span>
+<span class="ok">===== test session starts ==============================
+tests/test_api.py::test_raiz                     PASSED   [ 16%]
+tests/test_api.py::test_login_exitoso            PASSED   [ 33%]
+tests/test_api.py::test_login_fallido            PASSED   [ 50%]
+tests/test_api.py::test_listar_usuarios_sin_token PASSED  [ 66%]
+tests/test_api.py::test_listar_usuarios_rol_user  PASSED  [ 83%]
+tests/test_api.py::test_inscripcion_fecha_invalida SKIPPED [100%]
+
+====== 5 passed, 1 skipped in 0.44s ====================</span>`;
+}
+
+ir(0); prog();
+</script>
+</body>
+</html>

@@ -1,0 +1,2811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frontend Angular · ADSO 228118 · 4 Sesiones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F0F4F8;--tinta:#111D2B;--suave:#4A5B6E;--azul:#1A56A0;--teal:#0A8F82;--ambar:#B87A10;--ok:#1F8C4E;--err:#B83030;--term:#0B1520;--borde:#C8D5E2;--card:#fff;--radio:10px;--sh:0 2px 12px rgba(17,29,43,.07)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tinta);line-height:1.65;font-size:16px}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif}code,pre,.mono{font-family:'JetBrains Mono',Consolas,monospace}
+button{font-family:inherit;cursor:pointer}:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* HEADER */
+header{background:var(--term);color:#D7E2EF;padding:28px 20px 0;border-bottom:4px solid var(--teal)}
+.hi{max-width:1100px;margin:0 auto}
+.eyebrow{color:#5FD3C4;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+header h1{font-size:clamp(22px,3.8vw,40px);font-weight:700;margin:6px 0 4px;line-height:1.1}
+header h1 em{color:#7EB6FF;font-style:normal}
+.sub{color:#8FA8C0;font-size:14px;margin-bottom:20px;max-width:720px}
+
+/* TABS */
+.tabs{display:flex;max-width:1100px;margin:0 auto;overflow-x:auto;gap:2px}
+.tab{flex:1;min-width:130px;background:none;border:none;color:#8FA8C0;padding:14px 10px;text-align:center;border-top:3px solid transparent;transition:all .2s}
+.tab-num{display:block;font-family:'JetBrains Mono';font-weight:700;font-size:13px;margin-bottom:3px}
+.tab-lab{display:block;font-family:'Space Grotesk';font-weight:700;font-size:11.5px;line-height:1.2}
+.tab-h{display:block;font-size:10px;opacity:.7;margin-top:2px}
+.tab:hover{color:#fff;background:#162030}
+.tab.on{color:#fff;border-top-color:var(--tab-c,var(--teal));background:#0D1828}
+
+/* MAIN */
+main{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+.ses{display:none}.ses.vis{display:block;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ses-header{color:#fff;padding:18px 22px;border-radius:var(--radio);margin-bottom:28px;display:flex;align-items:center;justify-content:space-between}
+.ses-header h2{font-size:21px}.ses-header span{font-size:13px;opacity:.85}
+
+/* ESTACION */
+.est-block{margin-bottom:48px}
+.est-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:12px;border-bottom:3px solid var(--est-color,var(--teal))}
+.est-num{width:44px;height:44px;border-radius:12px;background:var(--est-color,var(--teal));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-weight:700;font-size:16px;flex-shrink:0}
+.est-titulo{font-size:22px}.est-tiempo{font-size:13px;color:var(--suave);font-family:'JetBrains Mono'}
+
+/* ACTO */
+.acto{margin-bottom:36px}
+.acab{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--borde);padding-bottom:7px;margin-bottom:16px}
+.anum{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:var(--teal);letter-spacing:.1em}
+.acab h2{font-size:20px}.lead{color:var(--suave);max-width:840px;margin-bottom:12px}
+
+/* PASO */
+.paso{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);margin-bottom:18px;overflow:hidden}
+.pcab{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--borde);background:#FAFCFE}
+.pnum{background:var(--azul);color:#fff;font-family:'JetBrains Mono';font-size:12px;font-weight:700;min-width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.pcab h3{font-size:15.5px;flex:1}
+.chk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--suave);cursor:pointer;user-select:none;white-space:nowrap}
+.chk input{width:16px;height:16px;accent-color:var(--ok);cursor:pointer}
+.pbody{padding:15px}.pbody p{margin-bottom:10px;max-width:860px;font-size:15px}
+.nota{border-radius:0 8px 8px 0;padding:10px 14px;font-size:13.5px;margin:10px 0;border-left:4px solid}
+.nota.v{background:#E8F5EE;border-color:var(--ok)}.nota.a{background:#FBF2E0;border-color:var(--ambar)}.nota.p{background:#FAEBE9;border-color:var(--err)}
+
+/* EDITOR */
+.ed{background:var(--term);border-radius:10px;overflow:hidden;margin:10px 0;border:1px solid #1E2C3F;position:relative}
+.ebar{display:flex;align-items:center;gap:8px;background:#162030;padding:7px 12px;border-bottom:1px solid #1E2C3F}
+.dots{display:flex;gap:5px}.dots span{width:10px;height:10px;border-radius:50%}
+.dots span:nth-child(1){background:#E5564C}.dots span:nth-child(2){background:#E5B554}.dots span:nth-child(3){background:#4FBF6B}
+.fich{font-family:'JetBrains Mono';font-size:11.5px;color:#8FA8C0;flex:1}
+.tag-n{background:#1E3A5F;color:#7EB6FF;font-size:10px;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono'}
+.bcopy{background:none;border:1px solid #1E2C3F;color:#8FA8C0;font-size:11px;padding:3px 9px;border-radius:6px;font-family:'JetBrains Mono'}
+.bcopy:hover{color:#fff;border-color:var(--teal)}
+.ed pre{padding:14px 16px;overflow-x:auto;font-size:12.8px;line-height:1.7;color:#D7E2EF}
+.k{color:#7EB6FF}.s{color:#8FD9A8}.c{color:#5B7084;font-style:italic}.n{color:#F0B76A}
+
+/* ANDAMIAJE */
+.blur pre{filter:blur(5px);pointer-events:none;user-select:none}
+.velo{position:absolute;inset:38px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(11,21,32,.55);text-align:center;padding:16px}
+.velo p{color:#D7E2EF;font-size:14px;max-width:400px;font-weight:500}
+.velo button{background:var(--ambar);border:none;color:#241A02;font-weight:700;padding:8px 18px;border-radius:8px;font-size:13px}
+
+/* DIAGRAMA */
+.dg{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);padding:14px;margin:12px 0;box-shadow:var(--sh)}
+.dg svg{width:100%;height:auto;display:block}
+.dg figcaption{font-size:12.5px;color:var(--suave);text-align:center;margin-top:8px}
+
+/* QUIZ */
+.quiz{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);padding:16px;margin-top:4px}
+.preg{margin-bottom:14px}.preg .enun{font-weight:600;margin-bottom:6px;font-size:15px}
+.preg label{display:flex;gap:7px;align-items:flex-start;padding:7px 10px;border:1px solid var(--borde);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:14px;transition:background .15s}
+.preg label:hover{background:#F4F8FB}.preg label.b{background:#E9F5EE;border-color:var(--ok)}.preg label.m{background:#FAEBE9;border-color:var(--err)}
+.preg input{margin-top:3px;accent-color:var(--azul)}.exp{display:none;font-size:13px;color:var(--suave);margin-top:4px}
+.bcal{background:var(--azul);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-weight:600;font-size:14px}
+.res{margin-top:9px;font-weight:600;display:none}
+
+/* SOL Y RETO */
+.sol{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);margin-top:18px;overflow:hidden}
+.sol-cab{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:#F5F8FB;border-bottom:1px solid var(--borde);cursor:pointer}
+.sol-cab h3{font-size:15px}.sol-cab .ico{font-size:16px;transition:transform .25s}.sol-body{display:none;padding:14px}
+.reto{background:linear-gradient(135deg,#0B1520,#122030);color:#E8F0F9;border-radius:var(--radio);padding:18px;margin-top:18px;border:1px solid #1E3450}
+.reto .ey{color:var(--ambar);font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.reto h3{font-size:17px;margin:5px 0 6px}.reto p{color:#A8BCCC;font-size:14px;max-width:780px}
+
+/* PROGRESO */
+.prog-bar{height:4px;background:var(--borde);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.prog-fill{height:100%;background:var(--teal);transition:width .3s}
+
+/* NAV */
+.nav-ses{display:flex;justify-content:space-between;margin-top:32px;gap:10px}
+.nav-ses button{background:var(--card);border:1px solid var(--borde);border-radius:10px;padding:10px 18px;font-weight:600;font-size:14px;color:var(--tinta);box-shadow:var(--sh)}
+.nav-ses button:hover{border-color:var(--teal)}.nav-ses button:disabled{opacity:.3;cursor:default}
+
+footer{background:var(--term);color:#5B7084;text-align:center;padding:22px 20px;font-size:13px}
+footer .hl{color:#5FD3C4}
+@media(max-width:680px){.tabs{gap:0}.tab-h{display:none}.tab-lab{font-size:10.5px}.est-titulo{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">
+    <span class="eyebrow">SENA CDMC · ADSO 228118 · Ruta Frontend</span>
+    <h1>Frontend con <em>Angular 19</em> · Standalone · Signals</h1>
+    <p class="sub">4 sesiones × 5 horas · 8 estaciones · Conectado al backend FastAPI asíncrono · Autenticación JWT · CRUD completo · N:M Cursos con validaciones · Deploy</p>
+  </div>
+  <nav class="tabs" aria-label="Sesiones">
+<button class="tab on" data-ses="0" style="--tab-c:#1A56A0">
+  <span class="tab-num">S1</span>
+  <span class="tab-lab">Arquitectura y Setup</span>
+  <span class="tab-h">5 h · Estaciones 01 y 02</span>
+</button>
+<button class="tab " data-ses="1" style="">
+  <span class="tab-num">S2</span>
+  <span class="tab-lab">Servicios y CRUD Usuarios</span>
+  <span class="tab-h">5 h · Estaciones 03 y 04</span>
+</button>
+<button class="tab " data-ses="2" style="">
+  <span class="tab-num">S3</span>
+  <span class="tab-lab">Cursos, Inscripciones y Validaciones</span>
+  <span class="tab-h">5 h · Estaciones 05 y 06</span>
+</button>
+<button class="tab " data-ses="3" style="">
+  <span class="tab-num">S4</span>
+  <span class="tab-lab">Estilos, Optimización y Deploy</span>
+  <span class="tab-h">5 h · Estaciones 07 y 08</span>
+</button></nav>
+</header>
+<div class="prog-bar" style="max-width:1100px;margin:12px auto 0;padding:0 20px"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+<main>
+<section class="ses vis" id="ses-0">
+  <div class="ses-header" style="background:#1A56A0">
+    <h2>Sesión 1 — Arquitectura y Setup</h2>
+    <span>5 h · Estaciones 01 y 02</span>
+  </div>
+  
+<div class="est-block" id="est-0-01">
+  <div class="est-header" style="--est-color:#1A56A0">
+    <div class="est-num">01</div>
+    <div>
+      <h2 class="est-titulo">Setup y Arquitectura</h2>
+      <span class="est-tiempo">⏱ 2.5 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Angular 19 usa arquitectura standalone, signals y componentes sin NgModule. Conocer la estructura antes de escribir una línea de código ahorra horas de refactoring.</p>
+    <figure class="dg"><svg viewBox="0 0 860 200" role="img" aria-label="Arquitectura Angular con backend FastAPI">
+  <defs><marker id="fl" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="60" width="140" height="80" rx="10" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+  <text x="80" y="96" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="13" fill="#1A56A0">Browser</text>
+  <text x="80" y="115" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">Angular SPA</text>
+  <rect x="210" y="30" width="440" height="140" rx="12" fill="#0B1520"/>
+  <text x="430" y="54" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#5FD3C4">Angular App — Estructura de carpetas</text>
+  <rect x="230" y="65" width="90" height="40" rx="7" fill="#162030" stroke="#7EB6FF" stroke-width="1.5"/>
+  <text x="275" y="82" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#E8F0F9">core/</text>
+  <text x="275" y="96" text-anchor="middle" font-size="9" fill="#8FA8C0">guards·interceptors</text>
+  <rect x="335" y="65" width="90" height="40" rx="7" fill="#162030" stroke="#5FD3C4" stroke-width="1.5"/>
+  <text x="380" y="82" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#E8F0F9">shared/</text>
+  <text x="380" y="96" text-anchor="middle" font-size="9" fill="#8FA8C0">models·services</text>
+  <rect x="440" y="65" width="90" height="40" rx="7" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+  <text x="485" y="82" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#E8F0F9">features/</text>
+  <text x="485" y="96" text-anchor="middle" font-size="9" fill="#8FA8C0">auth·users·depts·courses</text>
+  <rect x="545" y="65" width="90" height="40" rx="7" fill="#162030" stroke="#F0B76A" stroke-width="1.5"/>
+  <text x="590" y="82" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#E8F0F9">layout/</text>
+  <text x="590" y="96" text-anchor="middle" font-size="9" fill="#8FA8C0">navbar·sidebar</text>
+  <text x="430" y="148" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#5FD3C4">Signals · Standalone Components · HttpClient · Router</text>
+  <line x1="150" y1="100" x2="210" y2="100" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl)"/>
+  <line x1="650" y1="100" x2="720" y2="100" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl)"/>
+  <rect x="725" y="60" width="130" height="80" rx="10" fill="#EFF4F8" stroke="#0A8F82" stroke-width="2"/>
+  <text x="790" y="96" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#0A8F82">FastAPI</text>
+  <text x="790" y="113" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">:8000/api</text>
+</svg><figcaption></figcaption></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Instalar Angular CLI y crear el proyecto</h3>
+    <label class="chk"><input type="checkbox" data-p="001"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Angular 19 es standalone por defecto. El flag --style=scss activa SCSS y --ssr=false desactiva Server Side Rendering para simplificar el desarrollo inicial.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">terminal</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">npm</span> install -g @angular/cli@latest
+<span class="k">ng</span> new sena-frontend --style=scss --ssr=false --routing=true
+<span class="k">cd</span> sena-frontend
+<span class="k">ng</span> serve   <span class="c"># http://localhost:4200</span></pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>Estructura de carpetas profesional</h3>
+    <label class="chk"><input type="checkbox" data-p="001"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Feature-based folder structure: cada módulo de negocio vive en su propia carpeta con sus componentes, servicios y rutas. core/ agrupa lo transversal (guards, interceptors).</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">terminal</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">cd</span> src/app
+<span class="k">mkdir</span> -p core/guards core/interceptors
+<span class="k">mkdir</span> -p shared/models shared/services shared/components
+<span class="k">mkdir</span> -p features/auth features/dashboard
+<span class="k">mkdir</span> -p features/usuarios features/departamentos
+<span class="k">mkdir</span> -p features/cursos layout</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>Interfaces TypeScript — modelos del backend</h3>
+    <label class="chk"><input type="checkbox" data-p="001"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Una interfaz por entidad del backend. El frontend nunca trabaja con "any": TypeScript nos avisa si el JSON del backend no coincide con lo esperado.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/shared/models/index.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">// Mapea exactamente los schemas de FastAPI</span>
+
+<span class="k">export</span> <span class="k">interface</span> Departamento {
+  id: <span class="k">number</span>;
+  nombre: <span class="k">string</span>;
+  codigo: <span class="k">string</span>;
+  direccion?: Direccion;
+}
+
+<span class="k">export</span> <span class="k">interface</span> Direccion {
+  id: <span class="k">number</span>;
+  nombre: <span class="k">string</span>;
+}
+
+<span class="k">export</span> <span class="k">interface</span> Curso {
+  id: <span class="k">number</span>;
+  nombre: <span class="k">string</span>;
+  descripcion?: <span class="k">string</span>;
+  capacidad: <span class="k">number</span>;
+  fecha_inicio: <span class="k">string</span>;   <span class="c">// ISO date string</span>
+}
+
+<span class="k">export</span> <span class="k">interface</span> Usuario {
+  id: <span class="k">number</span>;
+  nombre: <span class="k">string</span>;
+  email: <span class="k">string</span>;
+  rol: <span class="s">'user'</span> | <span class="s">'admin'</span>;
+  departamento_id?: <span class="k">number</span>;
+  departamento?: Departamento;
+  cursos?: Curso[];
+}
+
+<span class="k">export</span> <span class="k">interface</span> LoginRequest {
+  username: <span class="k">string</span>;   <span class="c">// FastAPI OAuth2 usa 'username'</span>
+  password: <span class="k">string</span>;
+}
+
+<span class="k">export</span> <span class="k">interface</span> TokenResponse {
+  access_token: <span class="k">string</span>;
+  token_type: <span class="k">string</span>;
+}
+
+<span class="k">export</span> <span class="k">interface</span> InscripcionBody {
+  fecha_inscripcion: <span class="k">string</span>;  <span class="c">// YYYY-MM-DD</span>
+}
+
+<span class="k">export</span> <span class="k">interface</span> ApiError {
+  detail: <span class="k">string</span>;
+}</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>Environments — URL del backend</h3>
+    <label class="chk"><input type="checkbox" data-p="001"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>La URL base de la API en una sola variable. En producción (environment.prod.ts) apunta al servidor desplegado en Railway/Render.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/environments/environment.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">// src/environments/environment.ts (desarrollo)</span>
+<span class="k">export</span> <span class="k">const</span> environment = {
+  production: <span class="k">false</span>,
+  apiUrl: <span class="s">'http://localhost:8000'</span>
+};
+
+<span class="c">// src/environments/environment.prod.ts (producción)</span>
+<span class="k">export</span> <span class="k">const</span> environment = {
+  production: <span class="k">true</span>,
+  apiUrl: <span class="s">'https://tu-api.railway.app'</span>
+};</pre>
+
+</div>
+    
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    
+    
+    
+  </div>
+</div>
+<div class="est-block" id="est-0-02">
+  <div class="est-header" style="--est-color:#1A56A0">
+    <div class="est-num">02</div>
+    <div>
+      <h2 class="est-titulo">Autenticación JWT</h2>
+      <span class="est-tiempo">⏱ 2.5 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Todo el frontend depende del token: sin él no hay rutas protegidas, ni interceptor, ni headers correctos. Se construye primero para que las demás estaciones ya trabajen con seguridad.</p>
+    
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>AuthService — login, token y signal de usuario</h3>
+    <label class="chk"><input type="checkbox" data-p="002"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>signal() almacena el usuario actual reactivamente: cualquier componente que lo lea se actualiza automáticamente al hacer login o logout. El token se guarda en localStorage.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/auth/auth.service.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Injectable</span>, <span class="k">signal</span>, <span class="k">computed</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { <span class="k">HttpClient</span>, <span class="k">HttpHeaders</span> } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { <span class="k">Router</span> } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { <span class="k">tap</span> } <span class="k">from</span> <span class="s">'rxjs/operators'</span>;
+<span class="k">import</span> { environment } <span class="k">from</span> <span class="s">'../../../environments/environment'</span>;
+<span class="k">import</span> { LoginRequest, TokenResponse, Usuario } <span class="k">from</span> <span class="s">'../../shared/models'</span>;
+
+@<span class="k">Injectable</span>({ providedIn: <span class="s">'root'</span> })
+<span class="k">export</span> <span class="k">class</span> AuthService {
+  private http   = <span class="k">inject</span>(<span class="k">HttpClient</span>);
+  private router = <span class="k">inject</span>(<span class="k">Router</span>);
+
+  <span class="c">// Signal reactivo: toda la app reacciona al cambio de usuario</span>
+  currentUser  = <span class="k">signal</span>&lt;Usuario | <span class="k">null</span>&gt;(<span class="k">null</span>);
+  isLoggedIn   = <span class="k">computed</span>(() =&gt; <span class="k">this</span>.currentUser() !== <span class="k">null</span>);
+  isAdmin      = <span class="k">computed</span>(() =&gt; <span class="k">this</span>.currentUser()?.rol === <span class="s">'admin'</span>);
+
+  login(credentials: LoginRequest) {
+    <span class="c">// FastAPI OAuth2 espera form-data, no JSON</span>
+    <span class="k">const</span> body = <span class="k">new</span> URLSearchParams();
+    body.set(<span class="s">'username'</span>, credentials.username);
+    body.set(<span class="s">'password'</span>, credentials.password);
+
+    <span class="k">return</span> <span class="k">this</span>.http.post&lt;TokenResponse&gt;(
+      `${environment.apiUrl}/login`, body.toString(),
+      { headers: <span class="k">new</span> <span class="k">HttpHeaders</span>({<span class="s">'Content-Type'</span>:<span class="s">'application/x-www-form-urlencoded'</span>}) }
+    ).<span class="k">pipe</span>(
+      <span class="k">tap</span>(res =&gt; {
+        localStorage.setItem(<span class="s">'token'</span>, res.access_token);
+        <span class="k">this</span>.loadCurrentUser();
+      })
+    );
+  }
+
+  loadCurrentUser() {
+    <span class="c">// Decodifica el payload del JWT sin librería externa</span>
+    <span class="k">const</span> token = localStorage.getItem(<span class="s">'token'</span>);
+    <span class="k">if</span> (!token) <span class="k">return</span>;
+    try {
+      <span class="k">const</span> payload = JSON.parse(atob(token.split(<span class="s">'.'</span>)[1]));
+      <span class="c">// Reconstruir objeto usuario mínimo desde el payload</span>
+      <span class="k">this</span>.currentUser.set({ id: 0, nombre: <span class="s">''</span>, email: payload.sub,
+                             rol: payload.rol });
+    } catch { <span class="k">this</span>.logout(); }
+  }
+
+  logout() {
+    localStorage.removeItem(<span class="s">'token'</span>);
+    <span class="k">this</span>.currentUser.set(<span class="k">null</span>);
+    <span class="k">this</span>.router.navigate([<span class="s">'/login'</span>]);
+  }
+
+  getToken(): <span class="k">string</span> | <span class="k">null</span> {
+    <span class="k">return</span> localStorage.getItem(<span class="s">'token'</span>);
+  }
+}</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>JWT Interceptor — agrega Bearer a cada petición</h3>
+    <label class="chk"><input type="checkbox" data-p="002"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El interceptor funciona como un middleware Angular: intercepta TODAS las peticiones HTTP salientes y agrega el header Authorization automáticamente. Los componentes no tienen que preocuparse por el token.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/core/interceptors/auth.interceptor.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { HttpInterceptorFn } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'../../features/auth/auth.service'</span>;
+
+<span class="k">export</span> <span class="k">const</span> authInterceptor: HttpInterceptorFn = (req, next) =&gt; {
+  <span class="k">const</span> auth  = <span class="k">inject</span>(AuthService);
+  <span class="k">const</span> token = auth.getToken();
+
+  <span class="k">if</span> (token) {
+    <span class="c">// Clonar la petición con el header Authorization</span>
+    <span class="k">const</span> authReq = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+    <span class="k">return</span> next(authReq);
+  }
+  <span class="k">return</span> next(req);
+};</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>AuthGuard — proteger rutas</h3>
+    <label class="chk"><input type="checkbox" data-p="002"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>CanActivateFn es la API moderna funcional de Angular 17+. Si el usuario no tiene token, redirige al login antes de renderizar el componente.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/core/guards/auth.guard.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { CanActivateFn, <span class="k">Router</span> } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'../../features/auth/auth.service'</span>;
+
+<span class="k">export</span> <span class="k">const</span> authGuard: CanActivateFn = () =&gt; {
+  <span class="k">const</span> auth   = <span class="k">inject</span>(AuthService);
+  <span class="k">const</span> router = <span class="k">inject</span>(<span class="k">Router</span>);
+
+  <span class="k">if</span> (auth.isLoggedIn()) <span class="k">return</span> <span class="k">true</span>;
+  <span class="k">return</span> router.createUrlTree([<span class="s">'/login'</span>]);
+};
+
+<span class="c">// Guard adicional para rutas solo de admin</span>
+<span class="k">export</span> <span class="k">const</span> adminGuard: CanActivateFn = () =&gt; {
+  <span class="k">const</span> auth   = <span class="k">inject</span>(AuthService);
+  <span class="k">const</span> router = <span class="k">inject</span>(<span class="k">Router</span>);
+
+  <span class="k">if</span> (auth.isAdmin()) <span class="k">return</span> <span class="k">true</span>;
+  <span class="k">return</span> router.createUrlTree([<span class="s">'/dashboard'</span>]);
+};</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>LoginComponent — formulario reactivo</h3>
+    <label class="chk"><input type="checkbox" data-p="002"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Formulario reactivo con FormBuilder. Manejo de errores HTTP: 400 muestra mensaje de credenciales inválidas sin crashear la app.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/auth/login.component.ts + .html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">// login.component.ts</span>
+<span class="k">import</span> { <span class="k">Component</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { <span class="k">FormBuilder</span>, <span class="k">Validators</span>, ReactiveFormsModule } <span class="k">from</span> <span class="s">'@angular/forms'</span>;
+<span class="k">import</span> { <span class="k">Router</span> } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { CommonModule } <span class="k">from</span> <span class="s">'@angular/common'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'./auth.service'</span>;
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-login'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: <span class="s">'./login.component.html'</span>
+})
+<span class="k">export</span> <span class="k">class</span> LoginComponent {
+  private fb     = <span class="k">inject</span>(<span class="k">FormBuilder</span>);
+  private auth   = <span class="k">inject</span>(AuthService);
+  private router = <span class="k">inject</span>(<span class="k">Router</span>);
+
+  form = <span class="k">this</span>.fb.group({
+    username: [<span class="s">''</span>, [<span class="k">Validators</span>.required, <span class="k">Validators</span>.email]],
+    password: [<span class="s">''</span>, [<span class="k">Validators</span>.required, <span class="k">Validators</span>.minLength(4)]]
+  });
+
+  error   = <span class="s">''</span>;
+  loading = <span class="k">false</span>;
+
+  submit() {
+    <span class="k">if</span> (<span class="k">this</span>.form.invalid) <span class="k">return</span>;
+    <span class="k">this</span>.loading = <span class="k">true</span>;
+    <span class="k">this</span>.error   = <span class="s">''</span>;
+
+    <span class="k">this</span>.auth.login(<span class="k">this</span>.form.value as <span class="k">any</span>).<span class="k">subscribe</span>({
+      next: () =&gt; <span class="k">this</span>.router.navigate([<span class="s">'/dashboard'</span>]),
+      error: (e) =&gt; {
+        <span class="k">this</span>.error   = e.error?.detail ?? <span class="s">'Error de conexión'</span>;
+        <span class="k">this</span>.loading = <span class="k">false</span>;
+      }
+    });
+  }
+}</pre>
+
+</div>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">login.component.html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;!-- login.component.html --&gt;
+&lt;div <span class="k">class</span>=<span class="s">"login-wrapper"</span>&gt;
+  &lt;form [<span class="k">formGroup</span>]=<span class="s">"form"</span> (ngSubmit)=<span class="s">"submit()"</span> <span class="k">class</span>=<span class="s">"login-card"</span>&gt;
+    &lt;h1&gt;SENA · Backend Empresarial&lt;/h1&gt;
+    &lt;p <span class="k">class</span>=<span class="s">"sub"</span>&gt;Inicia sesión para continuar&lt;/p&gt;
+
+    &lt;div <span class="k">class</span>=<span class="s">"field"</span>&gt;
+      &lt;label&gt;Correo electrónico&lt;/label&gt;
+      &lt;input <span class="k">type</span>=<span class="s">"email"</span> <span class="k">formControlName</span>=<span class="s">"username"</span>
+             <span class="k">placeholder</span>=<span class="s">"ana@sena.edu.co"</span>&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"err"</span>
+            *<span class="k">ngIf</span>="form.get('username')?.touched &amp;&amp;
+                   form.get('username')?.invalid"&gt;
+        Ingresa un email válido
+      &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div <span class="k">class</span>=<span class="s">"field"</span>&gt;
+      &lt;label&gt;Contraseña&lt;/label&gt;
+      &lt;input <span class="k">type</span>=<span class="s">"password"</span> <span class="k">formControlName</span>=<span class="s">"password"</span>
+             <span class="k">placeholder</span>=<span class="s">"••••••"</span>&gt;
+    &lt;/div&gt;
+
+    &lt;p <span class="k">class</span>=<span class="s">"api-error"</span> *<span class="k">ngIf</span>=<span class="s">"error"</span>&gt;{{ error }}&lt;/p&gt;
+
+    &lt;button <span class="k">type</span>=<span class="s">"submit"</span> [disabled]=<span class="s">"loading || form.invalid"</span>&gt;
+      {{ loading ? 'Ingresando…' : 'Ingresar' }}
+    &lt;/button&gt;
+  &lt;/form&gt;
+&lt;/div&gt;</pre>
+
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>app.config.ts — registrar interceptor y rutas</h3>
+    <label class="chk"><input type="checkbox" data-p="002"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>En Angular standalone no existe AppModule. El app.config.ts es el punto de configuración global. Aquí se registran el HttpClient, el interceptor y el Router.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/app.config.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { ApplicationConfig } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { provideRouter } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { provideHttpClient, withInterceptors } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { authInterceptor } <span class="k">from</span> <span class="s">'./core/interceptors/auth.interceptor'</span>;
+<span class="k">import</span> { routes } <span class="k">from</span> <span class="s">'./app.routes'</span>;
+
+<span class="k">export</span> <span class="k">const</span> appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(
+      withInterceptors([authInterceptor])   <span class="c">// JWT en todas las peticiones</span>
+    )
+  ]
+};</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">6</span>
+    <h3>app.routes.ts — configuración de rutas</h3>
+    <label class="chk"><input type="checkbox" data-p="002"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Lazy loading: cada feature se carga solo cuando el usuario navega a ella. authGuard protege todas las rutas autenticadas. loadComponent carga el componente sin NgModule.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/app.routes.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { Routes } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { authGuard, adminGuard } <span class="k">from</span> <span class="s">'./core/guards/auth.guard'</span>;
+
+<span class="k">export</span> <span class="k">const</span> routes: Routes = [
+  { path: <span class="s">''</span>, redirectTo: <span class="s">'dashboard'</span>, pathMatch: <span class="s">'full'</span> },
+  {
+    path: <span class="s">'login'</span>,
+    loadComponent: () =&gt; <span class="k">import</span>(<span class="s">'./features/auth/login.component'</span>)
+                         .then(m =&gt; m.LoginComponent)
+  },
+  {
+    path: <span class="s">'dashboard'</span>,
+    canActivate: [authGuard],
+    loadComponent: () =&gt; <span class="k">import</span>(<span class="s">'./features/dashboard/dashboard.component'</span>)
+                         .then(m =&gt; m.DashboardComponent)
+  },
+  {
+    path: <span class="s">'usuarios'</span>,
+    canActivate: [authGuard],
+    loadComponent: () =&gt; <span class="k">import</span>(<span class="s">'./features/usuarios/usuarios.component'</span>)
+                         .then(m =&gt; m.UsuariosComponent)
+  },
+  {
+    path: <span class="s">'departamentos'</span>,
+    canActivate: [authGuard],
+    loadComponent: () =&gt; <span class="k">import</span>(<span class="s">'./features/departamentos/departamentos.component'</span>)
+                         .then(m =&gt; m.DepartamentosComponent)
+  },
+  {
+    path: <span class="s">'cursos'</span>,
+    canActivate: [authGuard],
+    loadComponent: () =&gt; <span class="k">import</span>(<span class="s">'./features/cursos/cursos.component'</span>)
+                         .then(m =&gt; m.CursosComponent)
+  },
+  { path: <span class="s">'**'</span>, redirectTo: <span class="s">'dashboard'</span> }
+];</pre>
+
+</div>
+    
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    <div id="quiz-0-02"><div class="quiz"><h3 style="margin-bottom:12px">Autoevaluación · Estación 02</h3><div class="preg" data-ok="1"><p class="enun">1. ¿Por qué el interceptor "clona" la petición en lugar de modificarla directamente?</p><label><input type="radio" name="q002-0" value="0"><span>Por convención de estilo</span></label><label><input type="radio" name="q002-0" value="1"><span>Las peticiones HTTP de Angular son inmutables; clone() es la única forma de modificarlas</span></label><label><input type="radio" name="q002-0" value="2"><span>Para evitar conflictos con el router</span></label><p class="exp">💡 HttpRequest es inmutable en Angular. clone() crea una copia con los headers adicionales sin tocar el original.</p></div><div class="preg" data-ok="1"><p class="enun">2. ¿Qué ventaja tiene signal() sobre una variable normal para currentUser?</p><label><input type="radio" name="q002-1" value="0"><span>Es más rápido en memoria</span></label><label><input type="radio" name="q002-1" value="1"><span>Cualquier componente que lea el signal se actualiza automáticamente cuando cambia — sin necesidad de Subject ni BehaviorSubject</span></label><label><input type="radio" name="q002-1" value="2"><span>Solo funciona con datos numéricos</span></label><p class="exp">💡 Los signals son reactivos: el cambio se propaga automáticamente a todos los consumidores, incluyendo la vista.</p></div><div class="preg" data-ok="1"><p class="enun">3. ¿Por qué el login envía form-data y no JSON?</p><label><input type="radio" name="q002-2" value="0"><span>Angular no soporta JSON en POST</span></label><label><input type="radio" name="q002-2" value="1"><span>FastAPI OAuth2PasswordRequestForm espera application/x-www-form-urlencoded, no JSON</span></label><label><input type="radio" name="q002-2" value="2"><span>Por razones de seguridad</span></label><p class="exp">💡 El endpoint /login de FastAPI usa OAuth2PasswordRequestForm que lee los campos del body como form-data con Content-Type: application/x-www-form-urlencoded.</p></div><button class="bcal" onclick="cal('quiz-0-02')">Calificar</button><p class="res"></p></div></div>
+    
+    
+<div class="reto">
+  <span class="ey">RETO ESTACIÓN 02</span>
+  <h3>Lleva el conocimiento más lejos</h3>
+  <p>Implementa un AdminGuard adicional que verifique el rol "admin" en el payload del JWT antes de mostrar la ruta /usuarios. Prueba que un usuario con rol "user" es redirigido al /dashboard.</p>
+</div>
+
+<div class="sol" id="rsol-0-02">
+  <div class="sol-cab" onclick="toggleSol('rsol-0-02')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">1. El guard ya existe — conectarlo a la ruta de usuarios</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/app.routes.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { authGuard, adminGuard } <span class="k">from</span> <span class="s">'./core/guards/auth.guard'</span>;
+
+<span class="k">export</span> <span class="k">const</span> routes: Routes = [
+  <span class="c">// ...</span>
+  {
+    path: <span class="s">'usuarios'</span>,
+    canActivate: [authGuard, adminGuard],  <span class="c">// ← agregar adminGuard aquí</span>
+    loadComponent: () =&gt; <span class="k">import</span>(<span class="s">'./features/usuarios/usuarios.component'</span>)
+                         .then(m =&gt; m.UsuariosComponent)
+  },
+];
+
+<span class="c">// El adminGuard ya está implementado en auth.guard.ts:</span>
+<span class="c">// export const adminGuard: CanActivateFn = () =&gt; {</span>
+<span class="c">//   const auth   = inject(AuthService);</span>
+<span class="c">//   const router = inject(Router);</span>
+<span class="c">//   if (auth.isAdmin()) return true;</span>
+<span class="c">//   return router.createUrlTree(['/dashboard']);</span>
+<span class="c">// };</span></pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">2. Verificación: qué ocurre según el rol</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">Comportamiento esperado</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c"># Usuario con rol "admin":</span>
+<span class="c"># → Puede navegar a /usuarios normalmente ✅</span>
+
+<span class="c"># Usuario con rol "user":</span>
+<span class="c"># → authGuard pasa (está autenticado) ✅</span>
+<span class="c"># → adminGuard falla (rol !== 'admin')</span>
+<span class="c"># → Redirige automáticamente a /dashboard ✅</span>
+
+<span class="c"># Sin token:</span>
+<span class="c"># → authGuard falla → redirige a /login ✅</span>
+
+<span class="c"># También ocultar el enlace en la navbar (ya implementado):</span>
+<span class="c"># &lt;li *ngIf="auth.isAdmin()"&gt;</span>
+<span class="c">#   &lt;a routerLink="/usuarios"&gt;Usuarios&lt;/a&gt;</span>
+<span class="c"># &lt;/li&gt;</span>
+<span class="c"># Nota: ocultar el enlace en la navbar NO es suficiente seguridad.</span>
+<span class="c"># El guard es la protección real; el *ngIf es solo UX.</span></pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  </div>
+</div>
+  </div>
+</div>
+  <div class="nav-ses">
+    <button onclick="goSes(-1)" disabled>← Sesión anterior</button>
+    <button onclick="goSes(1)"  >Siguiente sesión →</button>
+  </div>
+</section>
+<section class="ses " id="ses-1">
+  <div class="ses-header" style="background:#0A8F82">
+    <h2>Sesión 2 — Servicios y CRUD Usuarios</h2>
+    <span>5 h · Estaciones 03 y 04</span>
+  </div>
+  
+<div class="est-block" id="est-1-03">
+  <div class="est-header" style="--est-color:#0A8F82">
+    <div class="est-num">03</div>
+    <div>
+      <h2 class="est-titulo">Servicios HTTP y Departamentos</h2>
+      <span class="est-tiempo">⏱ 2 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Los servicios son la capa de datos del frontend: el equivalente angular del crud.py del backend. Se aprende el patrón con Departamentos (el módulo más simple) antes de aplicarlo a Usuarios y Cursos.</p>
+    
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>HttpErrorInterceptor — manejo global de errores</h3>
+    <label class="chk"><input type="checkbox" data-p="103"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Centraliza el manejo de errores HTTP: 401 redirige al login automáticamente, 403 muestra aviso de permisos, 5xx muestra error de servidor. Los componentes no necesitan manejar cada caso.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/core/interceptors/error.interceptor.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { HttpInterceptorFn } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { <span class="k">catchError</span>, throwError } <span class="k">from</span> <span class="s">'rxjs'</span>;
+<span class="k">import</span> { <span class="k">Router</span> } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'../../features/auth/auth.service'</span>;
+
+<span class="k">export</span> <span class="k">const</span> errorInterceptor: HttpInterceptorFn = (req, next) =&gt; {
+  <span class="k">const</span> router = <span class="k">inject</span>(<span class="k">Router</span>);
+  <span class="k">const</span> auth   = <span class="k">inject</span>(AuthService);
+
+  <span class="k">return</span> next(req).<span class="k">pipe</span>(
+    <span class="k">catchError</span>(err =&gt; {
+      switch (err.status) {
+        case 401:
+          auth.logout();   <span class="c">// token expirado → redirige al login</span>
+          break;
+        case 403:
+          console.warn(<span class="s">'Acceso denegado:'</span>, err.error?.detail);
+          router.navigate([<span class="s">'/dashboard'</span>]);
+          break;
+        case 0:
+          console.error(<span class="s">'Sin conexión con el backend'</span>);
+          break;
+      }
+      <span class="k">return</span> throwError(() =&gt; err);
+    })
+  );
+};</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>DepartamentosService — patrón CRUD completo</h3>
+    <label class="chk"><input type="checkbox" data-p="103"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Observable<T> para cada operación CRUD. El servicio no suscribe: devuelve el Observable para que el componente lo gestione. signal() almacena la lista localmente para evitar re-fetches innecesarios.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/shared/services/departamentos.service.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Injectable</span>, <span class="k">signal</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { <span class="k">HttpClient</span> } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { <span class="k">tap</span> } <span class="k">from</span> <span class="s">'rxjs/operators'</span>;
+<span class="k">import</span> { environment } <span class="k">from</span> <span class="s">'../../../environments/environment'</span>;
+<span class="k">import</span> { Departamento } <span class="k">from</span> <span class="s">'../models'</span>;
+
+@<span class="k">Injectable</span>({ providedIn: <span class="s">'root'</span> })
+<span class="k">export</span> <span class="k">class</span> DepartamentosService {
+  private http    = <span class="k">inject</span>(<span class="k">HttpClient</span>);
+  private baseUrl = `${environment.apiUrl}/departamentos`;
+
+  <span class="c">// Signal local: caché reactivo de la lista</span>
+  departamentos = <span class="k">signal</span>&lt;Departamento[]&gt;([]);
+
+  getAll() {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;Departamento[]&gt;(<span class="k">this</span>.baseUrl).<span class="k">pipe</span>(
+      <span class="k">tap</span>(lista =&gt; <span class="k">this</span>.departamentos.set(lista))
+    );
+  }
+
+  getById(id: <span class="k">number</span>) {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;Departamento&gt;(`${<span class="k">this</span>.baseUrl}/${id}`);
+  }
+
+  create(data: { nombre: <span class="k">string</span>; codigo: <span class="k">string</span> }) {
+    <span class="k">return</span> <span class="k">this</span>.http.post&lt;Departamento&gt;(<span class="k">this</span>.baseUrl, data).<span class="k">pipe</span>(
+      <span class="k">tap</span>(nuevo =&gt; <span class="k">this</span>.departamentos.update(l =&gt; [...l, nuevo]))
+    );
+  }
+
+  update(id: <span class="k">number</span>, data: Partial&lt;Departamento&gt;) {
+    <span class="k">return</span> <span class="k">this</span>.http.put&lt;Departamento&gt;(`${<span class="k">this</span>.baseUrl}/${id}`, data).<span class="k">pipe</span>(
+      <span class="k">tap</span>(actualizado =&gt;
+        <span class="k">this</span>.departamentos.update(l =&gt;
+          l.<span class="k">map</span>(d =&gt; d.id === id ? actualizado : d)
+        )
+      )
+    );
+  }
+
+  delete(id: <span class="k">number</span>) {
+    <span class="k">return</span> <span class="k">this</span>.http.delete(`${<span class="k">this</span>.baseUrl}/${id}`).<span class="k">pipe</span>(
+      <span class="k">tap</span>(() =&gt; <span class="k">this</span>.departamentos.update(l =&gt; l.filter(d =&gt; d.id !== id)))
+    );
+  }
+}</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>DepartamentosComponent — lista + formulario inline</h3>
+    <label class="chk"><input type="checkbox" data-p="103"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Componente standalone con signals. El estado de la UI (modo edición, loading, error) vive en signals locales. OnInit carga la lista. La tabla muestra los datos del signal departamentosService.departamentos().</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/departamentos/departamentos.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span>, <span class="k">OnInit</span>, <span class="k">signal</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { CommonModule } <span class="k">from</span> <span class="s">'@angular/common'</span>;
+<span class="k">import</span> { ReactiveFormsModule, <span class="k">FormBuilder</span>, <span class="k">Validators</span> } <span class="k">from</span> <span class="s">'@angular/forms'</span>;
+<span class="k">import</span> { DepartamentosService } <span class="k">from</span> <span class="s">'../../shared/services/departamentos.service'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'../auth/auth.service'</span>;
+<span class="k">import</span> { Departamento } <span class="k">from</span> <span class="s">'../../shared/models'</span>;
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-departamentos'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: <span class="s">'./departamentos.component.html'</span>
+})
+<span class="k">export</span> <span class="k">class</span> DepartamentosComponent <span class="k">implements</span> <span class="k">OnInit</span> {
+  private svc  = <span class="k">inject</span>(DepartamentosService);
+  auth         = <span class="k">inject</span>(AuthService);      <span class="c">// para isAdmin en la plantilla</span>
+
+  <span class="c">// Re-exportar el signal del servicio a la plantilla</span>
+  departamentos = <span class="k">this</span>.svc.departamentos;
+
+  editando  = <span class="k">signal</span>&lt;Departamento | <span class="k">null</span>&gt;(<span class="k">null</span>);
+  loading   = <span class="k">signal</span>(<span class="k">false</span>);
+  error     = <span class="k">signal</span>(<span class="s">''</span>);
+
+  private fb = <span class="k">inject</span>(<span class="k">FormBuilder</span>);
+  form = <span class="k">this</span>.fb.group({
+    nombre: [<span class="s">''</span>, <span class="k">Validators</span>.required],
+    codigo: [<span class="s">''</span>, [<span class="k">Validators</span>.required, <span class="k">Validators</span>.maxLength(10)]]
+  });
+
+  ngOnInit() {
+    <span class="k">this</span>.svc.getAll().<span class="k">subscribe</span>();
+  }
+
+  guardar() {
+    <span class="k">if</span> (<span class="k">this</span>.form.invalid) <span class="k">return</span>;
+    <span class="k">this</span>.loading.set(<span class="k">true</span>);
+    <span class="k">const</span> data = <span class="k">this</span>.form.value as { nombre: <span class="k">string</span>; codigo: <span class="k">string</span> };
+    <span class="k">const</span> op = <span class="k">this</span>.editando()
+      ? <span class="k">this</span>.svc.update(<span class="k">this</span>.editando()!.id, data)
+      : <span class="k">this</span>.svc.create(data);
+
+    op.<span class="k">subscribe</span>({
+      next: () =&gt; { <span class="k">this</span>.form.reset(); <span class="k">this</span>.editando.set(<span class="k">null</span>); <span class="k">this</span>.loading.set(<span class="k">false</span>); },
+      error: (e) =&gt; { <span class="k">this</span>.error.set(e.error?.detail ?? <span class="s">'Error'</span>); <span class="k">this</span>.loading.set(<span class="k">false</span>); }
+    });
+  }
+
+  editar(d: Departamento) {
+    <span class="k">this</span>.editando.set(d);
+    <span class="k">this</span>.form.patchValue({ nombre: d.nombre, codigo: d.codigo });
+  }
+
+  cancelar() {
+    <span class="k">this</span>.editando.set(<span class="k">null</span>);
+    <span class="k">this</span>.form.reset();
+  }
+
+  eliminar(id: <span class="k">number</span>) {
+    <span class="k">if</span> (!confirm(<span class="s">'¿Eliminar este departamento?'</span>)) <span class="k">return</span>;
+    <span class="k">this</span>.svc.delete(id).<span class="k">subscribe</span>({
+      error: (e) =&gt; <span class="k">this</span>.error.set(e.error?.detail ?? <span class="s">'Error al eliminar'</span>)
+    });
+  }
+}</pre>
+
+</div>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">departamentos.component.html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;div <span class="k">class</span>=<span class="s">"page"</span>&gt;
+  &lt;div <span class="k">class</span>=<span class="s">"page-header"</span>&gt;
+    &lt;h1&gt;Departamentos&lt;/h1&gt;
+    &lt;span <span class="k">class</span>=<span class="s">"badge"</span>&gt;{{ departamentos().length }} registros&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;p <span class="k">class</span>=<span class="s">"error-msg"</span> *<span class="k">ngIf</span>=<span class="s">"error()"</span>&gt;{{ error() }}&lt;/p&gt;
+
+  &lt;!-- Formulario — solo visible para admin --&gt;
+  &lt;form [<span class="k">formGroup</span>]=<span class="s">"form"</span> (ngSubmit)=<span class="s">"guardar()"</span>
+        *<span class="k">ngIf</span>=<span class="s">"auth.isAdmin()"</span> <span class="k">class</span>=<span class="s">"inline-form"</span>&gt;
+    &lt;input <span class="k">formControlName</span>=<span class="s">"nombre"</span> <span class="k">placeholder</span>=<span class="s">"Nombre del departamento"</span>&gt;
+    &lt;input <span class="k">formControlName</span>=<span class="s">"codigo"</span> <span class="k">placeholder</span>=<span class="s">"Código (ej: CONT)"</span> maxlength=<span class="s">"10"</span>&gt;
+    &lt;button <span class="k">type</span>=<span class="s">"submit"</span> [disabled]=<span class="s">"loading() || form.invalid"</span> <span class="k">class</span>=<span class="s">"btn-primary"</span>&gt;
+      {{ editando() ? 'Actualizar' : 'Crear' }}
+    &lt;/button&gt;
+    &lt;button <span class="k">type</span>=<span class="s">"button"</span> (click)=<span class="s">"cancelar()"</span> *<span class="k">ngIf</span>=<span class="s">"editando()"</span> <span class="k">class</span>=<span class="s">"btn-ghost"</span>&gt;
+      Cancelar
+    &lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;!-- Tabla --&gt;
+  &lt;table <span class="k">class</span>=<span class="s">"data-table"</span>&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Nombre&lt;/th&gt;&lt;th&gt;Código&lt;/th&gt;&lt;th *<span class="k">ngIf</span>=<span class="s">"auth.isAdmin()"</span>&gt;Acciones&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr *<span class="k">ngFor</span>=<span class="s">"let d of departamentos()"</span>&gt;
+        &lt;td&gt;{{ d.<span class="k">id</span> }}&lt;/td&gt;
+        &lt;td&gt;{{ d.nombre }}&lt;/td&gt;
+        &lt;td&gt;&lt;span <span class="k">class</span>=<span class="s">"chip"</span>&gt;{{ d.codigo }}&lt;/span&gt;&lt;/td&gt;
+        &lt;td *<span class="k">ngIf</span>=<span class="s">"auth.isAdmin()"</span>&gt;
+          &lt;button <span class="k">class</span>=<span class="s">"btn-icon"</span> (click)=<span class="s">"editar(d)"</span>&gt;✏️&lt;/button&gt;
+          &lt;button <span class="k">class</span>=<span class="s">"btn-icon danger"</span> (click)=<span class="s">"eliminar(d.id)"</span>&gt;🗑️&lt;/button&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</pre>
+
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    <div id="quiz-1-03"><div class="quiz"><h3 style="margin-bottom:12px">Autoevaluación · Estación 03</h3><div class="preg" data-ok="1"><p class="enun">1. ¿Por qué el servicio NO se suscribe internamente y devuelve el Observable?</p><label><input type="radio" name="q103-0" value="0"><span>Por convención de Angular</span></label><label><input type="radio" name="q103-0" value="1"><span>Para que el componente controle el ciclo de vida de la suscripción y pueda cancelarla o manejar errores en contexto</span></label><label><input type="radio" name="q103-0" value="2"><span>Los servicios no pueden llamar a subscribe()</span></label><p class="exp">💡 El componente sabe cuándo destruirse y cancela la suscripción. El servicio no sabe cuánto tiempo vivirá quien lo usa.</p></div><div class="preg" data-ok="1"><p class="enun">2. ¿Qué hace tap() en el pipe del Observable?</p><label><input type="radio" name="q103-1" value="0"><span>Transforma el valor retornado</span></label><label><input type="radio" name="q103-1" value="1"><span>Ejecuta un efecto secundario (actualizar el signal) sin modificar el valor que fluye por el Observable</span></label><label><input type="radio" name="q103-1" value="2"><span>Cancela el Observable si hay error</span></label><p class="exp">💡 tap() es un operador "de escucha": deja pasar el valor sin tocarlo y aprovecha para actualizar el caché local (el signal).</p></div><div class="preg" data-ok="1"><p class="enun">3. ¿Qué diferencia hay entre patchValue() y setValue() en un formulario reactivo?</p><label><input type="radio" name="q103-2" value="0"><span>Son idénticos</span></label><label><input type="radio" name="q103-2" value="1"><span>patchValue() actualiza solo los campos especificados; setValue() requiere especificar TODOS los campos del form</span></label><label><input type="radio" name="q103-2" value="2"><span>setValue() es para formularios nuevos</span></label><p class="exp">💡 patchValue() es más flexible para edición parcial. setValue() lanza error si falta algún campo del grupo.</p></div><button class="bcal" onclick="cal('quiz-1-03')">Calificar</button><p class="res"></p></div></div>
+    
+    
+<div class="reto">
+  <span class="ey">RETO ESTACIÓN 03</span>
+  <h3>Lleva el conocimiento más lejos</h3>
+  <p>Agrega un buscador en tiempo real (input + pipe filter) que filtre la tabla de departamentos por nombre sin hacer una nueva petición al backend. Usa signal() para el término de búsqueda.</p>
+</div>
+
+<div class="sol" id="rsol-1-03">
+  <div class="sol-cab" onclick="toggleSol('rsol-1-03')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">1. Agregar signal de búsqueda y computed en el componente</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/departamentos/departamentos.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span>, <span class="k">OnInit</span>, <span class="k">signal</span>, <span class="k">inject</span>, <span class="k">computed</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+
+<span class="c">// Dentro de la clase DepartamentosComponent:</span>
+
+  <span class="c">// Signal que almacena el texto del buscador</span>
+  busqueda = <span class="k">signal</span>(<span class="s">''</span>);
+
+  <span class="c">// computed(): se recalcula automáticamente cuando cambia</span>
+  <span class="c">// busqueda() o departamentos() — sin petición al backend</span>
+  departamentosFiltrados = <span class="k">computed</span>(() =&gt; {
+    <span class="k">const</span> term = <span class="k">this</span>.busqueda().toLowerCase().trim();
+    <span class="k">if</span> (!term) <span class="k">return</span> <span class="k">this</span>.departamentos();  <span class="c">// sin filtro: devuelve todo</span>
+    <span class="k">return</span> <span class="k">this</span>.departamentos().filter(d =&gt;
+      d.nombre.toLowerCase().includes(term) ||
+      d.codigo.toLowerCase().includes(term)
+    );
+  });</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">2. Input en la plantilla conectado al signal</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/departamentos/departamentos.component.html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;!-- Input del buscador — conectado al signal con (input) --&gt;
+&lt;div <span class="k">class</span>=<span class="s">"search-bar"</span>&gt;
+  &lt;input <span class="k">type</span>=<span class="s">"text"</span>
+         <span class="k">placeholder</span>=<span class="s">"Buscar por nombre o código…"</span>
+         [value]=<span class="s">"busqueda()"</span>
+         (input)=<span class="s">"busqueda.set($any($event.target).value)"</span>&gt;
+  &lt;button *<span class="k">ngIf</span>=<span class="s">"busqueda()"</span> (click)=<span class="s">"busqueda.set('')"</span>&gt;✕&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- Tabla: usar departamentosFiltrados() en vez de departamentos() --&gt;
+&lt;tbody&gt;
+  &lt;tr *<span class="k">ngFor</span>=<span class="s">"let d of departamentosFiltrados()"</span>&gt;
+    &lt;!-- ... --&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+
+&lt;!-- Mensaje cuando no hay resultados --&gt;
+&lt;p <span class="k">class</span>=<span class="s">"empty"</span> *<span class="k">ngIf</span>=<span class="s">"departamentosFiltrados().length === 0"</span>&gt;
+  Sin resultados para <span class="s">"{{ busqueda() }}"</span>
+&lt;/p&gt;</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">3. Estilos del buscador</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">styles.scss (o departamentos.component.scss)</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">.search-bar</span> {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+<span class="k">.search-bar</span> input {
+  flex: 1;
+  max-width: 320px;
+}
+<span class="k">.search-bar</span> button {
+  background: none;
+  border: none;
+  color: var(--suave);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+<span class="k">.search-bar</span> button<span class="k">:hover</span> { background: var(--borde); }
+<span class="k">.empty</span> { color: var(--suave); font-style: italic; padding: 16px 0; }</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  </div>
+</div>
+  </div>
+</div>
+<div class="est-block" id="est-1-04">
+  <div class="est-header" style="--est-color:#0A8F82">
+    <div class="est-num">04</div>
+    <div>
+      <h2 class="est-titulo">CRUD Usuarios y Roles</h2>
+      <span class="est-tiempo">⏱ 3 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Usuarios es el módulo más complejo del frontend: combina el objeto anidado departamento (FK) en la respuesta, el control de visibilidad por rol (admin vs user) y la relación N:M con cursos.</p>
+    
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>UsuariosService</h3>
+    <label class="chk"><input type="checkbox" data-p="104"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Misma estructura que DepartamentosService. El CREATE ahora incluye departamento_id opcional. La respuesta incluye el objeto departamento anidado que Angular mapea automáticamente con la interfaz Usuario.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/shared/services/usuarios.service.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Injectable</span>, <span class="k">signal</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { <span class="k">HttpClient</span> } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { <span class="k">tap</span> } <span class="k">from</span> <span class="s">'rxjs/operators'</span>;
+<span class="k">import</span> { environment } <span class="k">from</span> <span class="s">'../../../environments/environment'</span>;
+<span class="k">import</span> { Usuario } <span class="k">from</span> <span class="s">'../models'</span>;
+
+@<span class="k">Injectable</span>({ providedIn: <span class="s">'root'</span> })
+<span class="k">export</span> <span class="k">class</span> UsuariosService {
+  private http    = <span class="k">inject</span>(<span class="k">HttpClient</span>);
+  private baseUrl = `${environment.apiUrl}/usuarios`;
+
+  usuarios = <span class="k">signal</span>&lt;Usuario[]&gt;([]);
+
+  getAll() {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;Usuario[]&gt;(`${<span class="k">this</span>.baseUrl}/`).<span class="k">pipe</span>(
+      <span class="k">tap</span>(lista =&gt; <span class="k">this</span>.usuarios.set(lista))
+    );
+  }
+
+  getById(id: <span class="k">number</span>) {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;Usuario&gt;(`${<span class="k">this</span>.baseUrl}/${id}`);
+  }
+
+  create(data: { nombre: <span class="k">string</span>; email: <span class="k">string</span>; password: <span class="k">string</span>;
+                 rol?: <span class="k">string</span>; departamento_id?: <span class="k">number</span> }) {
+    <span class="k">return</span> <span class="k">this</span>.http.post&lt;Usuario&gt;(`${<span class="k">this</span>.baseUrl}/`, data).<span class="k">pipe</span>(
+      <span class="k">tap</span>(nuevo =&gt; <span class="k">this</span>.usuarios.update(l =&gt; [...l, nuevo]))
+    );
+  }
+
+  update(id: <span class="k">number</span>, data: Partial&lt;Usuario &amp; { password?: <span class="k">string</span> }&gt;) {
+    <span class="k">return</span> <span class="k">this</span>.http.put&lt;Usuario&gt;(`${<span class="k">this</span>.baseUrl}/${id}`, data).<span class="k">pipe</span>(
+      <span class="k">tap</span>(u =&gt; <span class="k">this</span>.usuarios.update(l =&gt; l.<span class="k">map</span>(x =&gt; x.id === id ? u : x)))
+    );
+  }
+
+  delete(id: <span class="k">number</span>) {
+    <span class="k">return</span> <span class="k">this</span>.http.delete(`${<span class="k">this</span>.baseUrl}/${id}`).<span class="k">pipe</span>(
+      <span class="k">tap</span>(() =&gt; <span class="k">this</span>.usuarios.update(l =&gt; l.filter(x =&gt; x.id !== id)))
+    );
+  }
+}</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>UsuariosComponent — con objeto anidado y selector de departamento</h3>
+    <label class="chk"><input type="checkbox" data-p="104"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El formulario incluye un <select> que lista los departamentos disponibles. Al guardar, se envía el departamento_id; la respuesta trae el objeto departamento anidado completo.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/usuarios/usuarios.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span>, <span class="k">OnInit</span>, <span class="k">signal</span>, <span class="k">inject</span>, <span class="k">computed</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { CommonModule } <span class="k">from</span> <span class="s">'@angular/common'</span>;
+<span class="k">import</span> { ReactiveFormsModule, <span class="k">FormBuilder</span>, <span class="k">Validators</span> } <span class="k">from</span> <span class="s">'@angular/forms'</span>;
+<span class="k">import</span> { UsuariosService }      <span class="k">from</span> <span class="s">'../../shared/services/usuarios.service'</span>;
+<span class="k">import</span> { DepartamentosService } <span class="k">from</span> <span class="s">'../../shared/services/departamentos.service'</span>;
+<span class="k">import</span> { AuthService }          <span class="k">from</span> <span class="s">'../auth/auth.service'</span>;
+<span class="k">import</span> { Usuario }              <span class="k">from</span> <span class="s">'../../shared/models'</span>;
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-usuarios'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: <span class="s">'./usuarios.component.html'</span>
+})
+<span class="k">export</span> <span class="k">class</span> UsuariosComponent <span class="k">implements</span> <span class="k">OnInit</span> {
+  private usuSvc  = <span class="k">inject</span>(UsuariosService);
+  private deptSvc = <span class="k">inject</span>(DepartamentosService);
+  auth            = <span class="k">inject</span>(AuthService);
+  private fb      = <span class="k">inject</span>(<span class="k">FormBuilder</span>);
+
+  usuarios      = <span class="k">this</span>.usuSvc.usuarios;
+  departamentos = <span class="k">this</span>.deptSvc.departamentos;
+
+  editando = <span class="k">signal</span>&lt;Usuario | <span class="k">null</span>&gt;(<span class="k">null</span>);
+  loading  = <span class="k">signal</span>(<span class="k">false</span>);
+  error    = <span class="k">signal</span>(<span class="s">''</span>);
+
+  <span class="c">// Búsqueda en tiempo real</span>
+  busqueda = <span class="k">signal</span>(<span class="s">''</span>);
+  usuariosFiltrados = <span class="k">computed</span>(() =&gt;
+    <span class="k">this</span>.usuarios().filter(u =&gt;
+      u.nombre.toLowerCase().includes(<span class="k">this</span>.busqueda().toLowerCase()) ||
+      u.email.toLowerCase().includes(<span class="k">this</span>.busqueda().toLowerCase())
+    )
+  );
+
+  form = <span class="k">this</span>.fb.group({
+    nombre:          [<span class="s">''</span>, <span class="k">Validators</span>.required],
+    email:           [<span class="s">''</span>, [<span class="k">Validators</span>.required, <span class="k">Validators</span>.email]],
+    password:        [<span class="s">''</span>],
+    rol:             [<span class="s">'user'</span>, <span class="k">Validators</span>.required],
+    departamento_id: [<span class="k">null</span> as <span class="k">number</span> | <span class="k">null</span>]
+  });
+
+  ngOnInit() {
+    <span class="k">this</span>.usuSvc.getAll().<span class="k">subscribe</span>();
+    <span class="k">this</span>.deptSvc.getAll().<span class="k">subscribe</span>();
+  }
+
+  guardar() {
+    <span class="k">if</span> (<span class="k">this</span>.form.invalid) <span class="k">return</span>;
+    <span class="k">this</span>.loading.set(<span class="k">true</span>);
+    <span class="k">const</span> raw = <span class="k">this</span>.form.value;
+    <span class="k">const</span> data: <span class="k">any</span> = { nombre: raw.nombre, email: raw.email,
+                        rol: raw.rol, departamento_id: raw.departamento_id };
+    <span class="c">// Solo incluir password si se escribió (para edición no obligatoria)</span>
+    <span class="k">if</span> (raw.password) data.password = raw.password;
+
+    <span class="k">const</span> op = <span class="k">this</span>.editando()
+      ? <span class="k">this</span>.usuSvc.update(<span class="k">this</span>.editando()!.id, data)
+      : <span class="k">this</span>.usuSvc.create(data);
+
+    op.<span class="k">subscribe</span>({
+      next: () =&gt; { <span class="k">this</span>.form.reset({ rol: <span class="s">'user'</span> });
+                    <span class="k">this</span>.editando.set(<span class="k">null</span>); <span class="k">this</span>.loading.set(<span class="k">false</span>); },
+      error: (e) =&gt; { <span class="k">this</span>.error.set(e.error?.detail ?? <span class="s">'Error'</span>);
+                      <span class="k">this</span>.loading.set(<span class="k">false</span>); }
+    });
+  }
+
+  editar(u: Usuario) {
+    <span class="k">this</span>.editando.set(u);
+    <span class="k">this</span>.form.patchValue({
+      nombre: u.nombre, email: u.email,
+      rol: u.rol, departamento_id: u.departamento_id ?? <span class="k">null</span>
+    });
+  }
+
+  cancelar() { <span class="k">this</span>.editando.set(<span class="k">null</span>); <span class="k">this</span>.form.reset({ rol: <span class="s">'user'</span> }); }
+  eliminar(id: <span class="k">number</span>) {
+    <span class="k">if</span> (!confirm(<span class="s">'¿Eliminar usuario?'</span>)) <span class="k">return</span>;
+    <span class="k">this</span>.usuSvc.delete(id).<span class="k">subscribe</span>({
+      error: (e) =&gt; <span class="k">this</span>.error.set(e.error?.detail ?? <span class="s">'Error'</span>)
+    });
+  }
+}</pre>
+
+</div>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">usuarios.component.html (fragmento clave — select anidado)</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;!-- Selector de departamento dentro del formulario --&gt;
+&lt;select <span class="k">formControlName</span>=<span class="s">"departamento_id"</span>&gt;
+  &lt;option [value]=<span class="s">"null"</span>&gt;Sin departamento&lt;/option&gt;
+  &lt;option *<span class="k">ngFor</span>=<span class="s">"let d of departamentos()"</span> [value]=<span class="s">"d.id"</span>&gt;
+    {{ d.nombre }} ({{ d.codigo }})
+  &lt;/option&gt;
+&lt;/select&gt;
+
+&lt;!-- Tabla con objeto anidado --&gt;
+&lt;tr *<span class="k">ngFor</span>=<span class="s">"let u of usuariosFiltrados()"</span>&gt;
+  &lt;td&gt;{{ u.nombre }}&lt;/td&gt;
+  &lt;td&gt;{{ u.email }}&lt;/td&gt;
+  &lt;td&gt;
+    &lt;span [<span class="k">class</span>]=<span class="s">"'role-badge ' + u.rol"</span>&gt;{{ u.rol }}&lt;/span&gt;
+  &lt;/td&gt;
+  &lt;td&gt;
+    &lt;!-- Acceder al objeto anidado directamente --&gt;
+    {{ u.departamento?.nombre ?? '—' }}
+  &lt;/td&gt;
+  &lt;td *<span class="k">ngIf</span>=<span class="s">"auth.isAdmin()"</span>&gt;
+    &lt;button <span class="k">class</span>=<span class="s">"btn-icon"</span> (click)=<span class="s">"editar(u)"</span>&gt;✏️&lt;/button&gt;
+    &lt;button <span class="k">class</span>=<span class="s">"btn-icon danger"</span> (click)=<span class="s">"eliminar(u.id)"</span>&gt;🗑️&lt;/button&gt;
+  &lt;/td&gt;
+&lt;/tr&gt;</pre>
+
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    <div id="quiz-1-04"><div class="quiz"><h3 style="margin-bottom:12px">Autoevaluación · Estación 04</h3><div class="preg" data-ok="1"><p class="enun">1. ¿Qué hace computed() en usuariosFiltrados?</p><label><input type="radio" name="q104-0" value="0"><span>Ejecuta la función una sola vez al iniciar</span></label><label><input type="radio" name="q104-0" value="1"><span>Crea un signal derivado que se recalcula automáticamente cuando cambia busqueda() o usuarios()</span></label><label><input type="radio" name="q104-0" value="2"><span>Es un alias de ngOnChanges</span></label><p class="exp">💡 computed() crea un signal de solo lectura que depende de otros signals. Se recalcula automáticamente cuando cualquiera de sus dependencias cambia.</p></div><div class="preg" data-ok="1"><p class="enun">2. ¿Por qué el password no se envía en el PUT de actualización si está vacío?</p><label><input type="radio" name="q104-1" value="0"><span>FastAPI lo ignora automáticamente</span></label><label><input type="radio" name="q104-1" value="1"><span>El backend tiene password como campo opcional en UsuarioUpdate; si no lo enviamos no lo sobreescribe</span></label><label><input type="radio" name="q104-1" value="2"><span>Angular bloquea campos vacíos en PUT</span></label><p class="exp">💡 UsuarioUpdate usa campos opcionales (str | None = None). Si no enviamos password, el backend no lo modifica gracias a model_dump(exclude_unset=True).</p></div><div class="preg" data-ok="1"><p class="enun">3. ¿Qué hace u.departamento?.nombre en la plantilla?</p><label><input type="radio" name="q104-2" value="0"><span>Lanza error si departamento es null</span></label><label><input type="radio" name="q104-2" value="1"><span>El operador ?. retorna undefined sin lanzar error si departamento es null o undefined</span></label><label><input type="radio" name="q104-2" value="2"><span>Convierte el objeto a string</span></label><p class="exp">💡 El operador de encadenamiento opcional ?. evita el TypeError cuando un usuario no tiene departamento asignado.</p></div><button class="bcal" onclick="cal('quiz-1-04')">Calificar</button><p class="res"></p></div></div>
+    
+    
+<div class="reto">
+  <span class="ey">RETO ESTACIÓN 04</span>
+  <h3>Lleva el conocimiento más lejos</h3>
+  <p>Agrega una columna "Cursos" en la tabla de usuarios que muestre el número de cursos en que está inscrito (u.cursos?.length ?? 0). Cuando el número sea mayor a 0, hazlo clickeable para mostrar un panel lateral con la lista de cursos.</p>
+</div>
+
+<div class="sol" id="rsol-1-04">
+  <div class="sol-cab" onclick="toggleSol('rsol-1-04')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">1. Signal para usuario seleccionado y panel lateral</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/usuarios/usuarios.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">// Agregar dentro de UsuariosComponent:</span>
+
+  <span class="c">// Signal que controla el panel lateral</span>
+  usuarioPanel = <span class="k">signal</span>&lt;Usuario | <span class="k">null</span>&gt;(<span class="k">null</span>);
+
+  abrirPanel(u: Usuario) {
+    <span class="c">// Solo abrir si tiene cursos</span>
+    <span class="k">if</span> ((u.cursos?.length ?? 0) &gt; 0) {
+      <span class="k">this</span>.usuarioPanel.set(u);
+    }
+  }
+
+  cerrarPanel() {
+    <span class="k">this</span>.usuarioPanel.set(<span class="k">null</span>);
+  }</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">2. Columna en la tabla y panel lateral en la plantilla</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/usuarios/usuarios.component.html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;!-- Columna Cursos en la tabla --&gt;
+&lt;th&gt;Cursos&lt;/th&gt;
+&lt;!-- ... dentro del *<span class="k">ngFor</span>: --&gt;
+&lt;td&gt;
+  &lt;span
+    [<span class="k">class</span>.clickeable]=<span class="s">"(u.cursos?.length ?? 0) &gt; 0"</span>
+    (click)=<span class="s">"abrirPanel(u)"</span>
+    title=<span class="s">"{{ (u.cursos?.length ?? 0) &gt; 0 ? 'Ver cursos' : '' }}"</span>&gt;
+    {{ u.cursos?.length ?? 0 }}
+  &lt;/span&gt;
+&lt;/td&gt;
+
+&lt;!-- Panel lateral (drawer) --&gt;
+&lt;div <span class="k">class</span>=<span class="s">"drawer-overlay"</span>
+     *<span class="k">ngIf</span>=<span class="s">"usuarioPanel()"</span>
+     (click)=<span class="s">"cerrarPanel()"</span>&gt;
+&lt;/div&gt;
+
+&lt;aside <span class="k">class</span>=<span class="s">"drawer"</span> *<span class="k">ngIf</span>=<span class="s">"usuarioPanel()"</span>&gt;
+  &lt;div <span class="k">class</span>=<span class="s">"drawer-header"</span>&gt;
+    &lt;h3&gt;Cursos de {{ usuarioPanel()?.nombre }}&lt;/h3&gt;
+    &lt;button (click)=<span class="s">"cerrarPanel()"</span>&gt;✕&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;ul <span class="k">class</span>=<span class="s">"curso-list"</span>&gt;
+    &lt;li *<span class="k">ngFor</span>=<span class="s">"let c of usuarioPanel()?.cursos"</span>&gt;
+      &lt;strong&gt;{{ c.nombre }}&lt;/strong&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"chip"</span>&gt;{{ c.fecha_inicio }}&lt;/span&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/aside&gt;</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">3. Estilos del panel lateral y badge clickeable</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">styles.scss</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">.clickeable</span> {
+  cursor: pointer;
+  background: var(--azul);
+  color: <span class="k">#fff</span>;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-block;
+  transition: filter <span class="k">.15s</span>;
+}
+<span class="k">.clickeable</span><span class="k">:hover</span> { filter: brightness(1<span class="k">.15</span>); }
+
+<span class="k">.drawer-overlay</span> {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,<span class="k">.35</span>);
+  z-index: 200;
+}
+<span class="k">.drawer</span> {
+  position: fixed; top: 0; right: 0;
+  width: 340px; height: 100vh;
+  background: var(--card);
+  box-shadow: -4px 0 20px rgba(0,0,0,<span class="k">.15</span>);
+  z-index: 201;
+  display: flex; flex-direction: column;
+}
+<span class="k">.drawer-header</span> {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--borde);
+  font-family: var(--font-display);
+}
+<span class="k">.drawer-header</span> button {
+  background: none; border: none;
+  font-size: 18px; cursor: pointer; color: var(--suave);
+}
+<span class="k">.curso-list</span> {
+  list-style: none; padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  overflow-y: auto;
+}
+<span class="k">.curso-list</span> li {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: var(--radio);
+  border: 1px solid var(--borde);
+}</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  </div>
+</div>
+  </div>
+</div>
+  <div class="nav-ses">
+    <button onclick="goSes(-1)" >← Sesión anterior</button>
+    <button onclick="goSes(1)"  >Siguiente sesión →</button>
+  </div>
+</section>
+<section class="ses " id="ses-2">
+  <div class="ses-header" style="background:#7B3FBF">
+    <h2>Sesión 3 — Cursos, Inscripciones y Validaciones</h2>
+    <span>5 h · Estaciones 05 y 06</span>
+  </div>
+  
+<div class="est-block" id="est-2-05">
+  <div class="est-header" style="--est-color:#7B3FBF">
+    <div class="est-num">05</div>
+    <div>
+      <h2 class="est-titulo">Módulo Cursos con validaciones</h2>
+      <span class="est-tiempo">⏱ 3 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Cursos es el módulo más complejo: la inscripción involucra validación de fecha (≤ fecha_inicio), control de capacidad, y una relación N:M que se muestra como lista anidada. El frontend debe manejar los 400 del backend con mensajes claros.</p>
+    
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>CursosService — CRUD + inscripción</h3>
+    <label class="chk"><input type="checkbox" data-p="205"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Además del CRUD estándar, el servicio expone inscribir() y desinscribir(). La fecha_inscripcion se valida en el componente ANTES de llamar al backend, y el backend la valida también (defensa en profundidad).</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/shared/services/cursos.service.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Injectable</span>, <span class="k">signal</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { <span class="k">HttpClient</span> } <span class="k">from</span> <span class="s">'@angular/common/http'</span>;
+<span class="k">import</span> { <span class="k">tap</span> } <span class="k">from</span> <span class="s">'rxjs/operators'</span>;
+<span class="k">import</span> { environment } <span class="k">from</span> <span class="s">'../../../environments/environment'</span>;
+<span class="k">import</span> { Curso } <span class="k">from</span> <span class="s">'../models'</span>;
+
+@<span class="k">Injectable</span>({ providedIn: <span class="s">'root'</span> })
+<span class="k">export</span> <span class="k">class</span> CursosService {
+  private http    = <span class="k">inject</span>(<span class="k">HttpClient</span>);
+  private baseUrl = `${environment.apiUrl}/cursos`;
+
+  cursos   = <span class="k">signal</span>&lt;Curso[]&gt;([]);
+  inscritos = <span class="k">signal</span>&lt;{ usuario_id: <span class="k">number</span>; fecha_inscripcion: <span class="k">string</span> }[]&gt;([]);
+
+  getAll() {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;Curso[]&gt;(<span class="k">this</span>.baseUrl).<span class="k">pipe</span>(
+      <span class="k">tap</span>(l =&gt; <span class="k">this</span>.cursos.set(l))
+    );
+  }
+
+  create(data: Omit&lt;Curso, <span class="s">'id'</span>&gt;) {
+    <span class="k">return</span> <span class="k">this</span>.http.post&lt;Curso&gt;(<span class="k">this</span>.baseUrl, data).<span class="k">pipe</span>(
+      <span class="k">tap</span>(c =&gt; <span class="k">this</span>.cursos.update(l =&gt; [...l, c]))
+    );
+  }
+
+  getInscritos(cursoId: <span class="k">number</span>) {
+    <span class="k">return</span> <span class="k">this</span>.http.get&lt;{ usuario_id: <span class="k">number</span>; fecha_inscripcion: <span class="k">string</span> }[]&gt;(
+      `${<span class="k">this</span>.baseUrl}/${cursoId}/usuarios`
+    ).<span class="k">pipe</span>(<span class="k">tap</span>(l =&gt; <span class="k">this</span>.inscritos.set(l)));
+  }
+
+  inscribir(cursoId: <span class="k">number</span>, usuarioId: <span class="k">number</span>, fecha: <span class="k">string</span>) {
+    <span class="k">return</span> <span class="k">this</span>.http.post(
+      `${<span class="k">this</span>.baseUrl}/${cursoId}/inscribir/${usuarioId}`,
+      { fecha_inscripcion: fecha }
+    );
+  }
+
+  desinscribir(cursoId: <span class="k">number</span>, usuarioId: <span class="k">number</span>) {
+    <span class="k">return</span> <span class="k">this</span>.http.delete(
+      `${<span class="k">this</span>.baseUrl}/${cursoId}/inscribir/${usuarioId}`
+    );
+  }
+}</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>CursosComponent — validación doble (frontend + backend)</h3>
+    <label class="chk"><input type="checkbox" data-p="205"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>La validación de fecha se hace en el componente con un Validator personalizado ANTES de llamar al backend. Si el backend igual la rechaza (400), el error se muestra en la UI. Doble capa de validación.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/cursos/cursos.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span>, <span class="k">OnInit</span>, <span class="k">signal</span>, <span class="k">inject</span>, <span class="k">computed</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { CommonModule } <span class="k">from</span> <span class="s">'@angular/common'</span>;
+<span class="k">import</span> { ReactiveFormsModule, <span class="k">FormBuilder</span>, <span class="k">Validators</span>,
+         AbstractControl, ValidationErrors } <span class="k">from</span> <span class="s">'@angular/forms'</span>;
+<span class="k">import</span> { CursosService }   <span class="k">from</span> <span class="s">'../../shared/services/cursos.service'</span>;
+<span class="k">import</span> { UsuariosService } <span class="k">from</span> <span class="s">'../../shared/services/usuarios.service'</span>;
+<span class="k">import</span> { AuthService }     <span class="k">from</span> <span class="s">'../auth/auth.service'</span>;
+<span class="k">import</span> { Curso }           <span class="k">from</span> <span class="s">'../../shared/models'</span>;
+
+<span class="c">// Validator personalizado: fecha_inscripcion &lt;= fecha_inicio</span>
+function fechaInscripcionValidator(control: AbstractControl): ValidationErrors | <span class="k">null</span> {
+  <span class="k">const</span> form   = control.parent;
+  <span class="k">if</span> (!form) <span class="k">return</span> <span class="k">null</span>;
+  <span class="k">const</span> fechaInsc  = form.get(<span class="s">'fecha_inscripcion'</span>)?.value;
+  <span class="k">const</span> fechaInicio = form.get(<span class="s">'fecha_inicio'</span>)?.value;
+  <span class="k">if</span> (fechaInsc &amp;&amp; fechaInicio &amp;&amp; fechaInsc &gt; fechaInicio) {
+    <span class="k">return</span> { fechaPosterior: <span class="k">true</span> };
+  }
+  <span class="k">return</span> <span class="k">null</span>;
+}
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-cursos'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: <span class="s">'./cursos.component.html'</span>
+})
+<span class="k">export</span> <span class="k">class</span> CursosComponent <span class="k">implements</span> <span class="k">OnInit</span> {
+  private cursoSvc = <span class="k">inject</span>(CursosService);
+  private usuSvc   = <span class="k">inject</span>(UsuariosService);
+  auth             = <span class="k">inject</span>(AuthService);
+  private fb       = <span class="k">inject</span>(<span class="k">FormBuilder</span>);
+
+  cursos    = <span class="k">this</span>.cursoSvc.cursos;
+  usuarios  = <span class="k">this</span>.usuSvc.usuarios;
+  inscritos = <span class="k">this</span>.cursoSvc.inscritos;
+
+  cursoSeleccionado = <span class="k">signal</span>&lt;Curso | <span class="k">null</span>&gt;(<span class="k">null</span>);
+  loading  = <span class="k">signal</span>(<span class="k">false</span>);
+  error    = <span class="k">signal</span>(<span class="s">''</span>);
+  exito    = <span class="k">signal</span>(<span class="s">''</span>);
+
+  formCurso = <span class="k">this</span>.fb.group({
+    nombre:      [<span class="s">''</span>, <span class="k">Validators</span>.required],
+    descripcion: [<span class="s">''</span>],
+    capacidad:   [30, [<span class="k">Validators</span>.required, <span class="k">Validators</span>.min(1)]],
+    fecha_inicio: [<span class="s">''</span>, <span class="k">Validators</span>.required]
+  });
+
+  formInscripcion = <span class="k">this</span>.fb.group({
+    usuario_id:       [<span class="k">null</span> as <span class="k">number</span> | <span class="k">null</span>, <span class="k">Validators</span>.required],
+    fecha_inscripcion:[<span class="s">''</span>, [<span class="k">Validators</span>.required, fechaInscripcionValidator]],
+    fecha_inicio:     [<span class="s">''</span>]  <span class="c">// campo oculto para el validator cruzado</span>
+  });
+
+  ngOnInit() {
+    <span class="k">this</span>.cursoSvc.getAll().<span class="k">subscribe</span>();
+    <span class="k">this</span>.usuSvc.getAll().<span class="k">subscribe</span>();
+  }
+
+  crearCurso() {
+    <span class="k">if</span> (<span class="k">this</span>.formCurso.invalid) <span class="k">return</span>;
+    <span class="k">this</span>.loading.set(<span class="k">true</span>);
+    <span class="k">this</span>.cursoSvc.create(<span class="k">this</span>.formCurso.value as <span class="k">any</span>).<span class="k">subscribe</span>({
+      next: () =&gt; { <span class="k">this</span>.formCurso.reset({ capacidad: 30 });
+                    <span class="k">this</span>.loading.set(<span class="k">false</span>); <span class="k">this</span>.exito.set(<span class="s">'Curso creado'</span>); },
+      error: (e) =&gt; { <span class="k">this</span>.error.set(e.error?.detail ?? <span class="s">'Error'</span>);
+                      <span class="k">this</span>.loading.set(<span class="k">false</span>); }
+    });
+  }
+
+  seleccionarCurso(c: Curso) {
+    <span class="k">this</span>.cursoSeleccionado.set(c);
+    <span class="k">this</span>.cursoSvc.getInscritos(c.id).<span class="k">subscribe</span>();
+    <span class="c">// Sincronizar la fecha del curso al formulario de inscripción</span>
+    <span class="k">this</span>.formInscripcion.patchValue({ fecha_inicio: c.fecha_inicio });
+  }
+
+  inscribir() {
+    <span class="k">if</span> (<span class="k">this</span>.formInscripcion.invalid) <span class="k">return</span>;
+    <span class="k">const</span> { usuario_id, fecha_inscripcion } = <span class="k">this</span>.formInscripcion.value;
+    <span class="k">const</span> cursoId = <span class="k">this</span>.cursoSeleccionado()!.id;
+    <span class="k">this</span>.loading.set(<span class="k">true</span>);
+
+    <span class="k">this</span>.cursoSvc.inscribir(cursoId, usuario_id!, fecha_inscripcion!).<span class="k">subscribe</span>({
+      next: () =&gt; {
+        <span class="k">this</span>.exito.set(<span class="s">'Inscripción exitosa'</span>);
+        <span class="k">this</span>.cursoSvc.getInscritos(cursoId).<span class="k">subscribe</span>();
+        <span class="k">this</span>.formInscripcion.reset({ fecha_inicio: fecha_inscripcion });
+        <span class="k">this</span>.loading.set(<span class="k">false</span>);
+      },
+      error: (e) =&gt; { <span class="k">this</span>.error.set(e.error?.detail ?? <span class="s">'Error'</span>);
+                      <span class="k">this</span>.loading.set(<span class="k">false</span>); }
+    });
+  }
+
+  desinscribir(usuarioId: <span class="k">number</span>) {
+    <span class="k">const</span> cursoId = <span class="k">this</span>.cursoSeleccionado()!.id;
+    <span class="k">this</span>.cursoSvc.desinscribir(cursoId, usuarioId).<span class="k">subscribe</span>({
+      next: () =&gt; <span class="k">this</span>.cursoSvc.getInscritos(cursoId).<span class="k">subscribe</span>(),
+      error: (e) =&gt; <span class="k">this</span>.error.set(e.error?.detail ?? <span class="s">'Error'</span>)
+    });
+  }
+
+  <span class="c">// Cupo disponible como computed</span>
+  cupoDisponible = <span class="k">computed</span>(() =&gt; {
+    <span class="k">const</span> c = <span class="k">this</span>.cursoSeleccionado();
+    <span class="k">return</span> c ? c.capacidad - <span class="k">this</span>.inscritos().length : 0;
+  });
+}</pre>
+
+</div>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">cursos.component.html (fragmento — validaciones visibles)</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;!-- Error de validación fecha en el formulario de inscripción --&gt;
+&lt;div <span class="k">class</span>=<span class="s">"field"</span>&gt;
+  &lt;label&gt;Fecha de inscripción&lt;/label&gt;
+  &lt;input <span class="k">type</span>=<span class="s">"date"</span> <span class="k">formControlName</span>=<span class="s">"fecha_inscripcion"</span>&gt;
+  &lt;span <span class="k">class</span>=<span class="s">"err"</span>
+        *<span class="k">ngIf</span>=<span class="s">"formInscripcion.get('fecha_inscripcion')?.errors?.['fechaPosterior']"</span>&gt;
+    La fecha de inscripción no puede ser posterior al inicio del curso
+    ({{ cursoSeleccionado()?.fecha_inicio }})
+  &lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Indicador de cupo --&gt;
+&lt;div <span class="k">class</span>=<span class="s">"cupo-bar"</span> *<span class="k">ngIf</span>=<span class="s">"cursoSeleccionado()"</span>&gt;
+  &lt;span [<span class="k">class</span>.cupo-ok]=<span class="s">"cupoDisponible() &gt; 0"</span>
+        [<span class="k">class</span>.cupo-lleno]=<span class="s">"cupoDisponible() === 0"</span>&gt;
+    {{ cupoDisponible() &gt; 0
+       ? 'Cupo disponible: ' + cupoDisponible()
+       : '🔴 Cupo lleno' }}
+  &lt;/span&gt;
+  &lt;button [disabled]="formInscripcion.invalid || cupoDisponible() === 0
+                      || loading()<span class="s">" (click)="</span>inscribir()"&gt;
+    Inscribir
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    <div id="quiz-2-05"><div class="quiz"><h3 style="margin-bottom:12px">Autoevaluación · Estación 05</h3><div class="preg" data-ok="1"><p class="enun">1. ¿Por qué validamos la fecha en el frontend si el backend también la valida?</p><label><input type="radio" name="q205-0" value="0"><span>El backend no valida fechas</span></label><label><input type="radio" name="q205-0" value="1"><span>Defensa en profundidad: el frontend da retroalimentación inmediata sin round-trip al servidor; el backend es la última línea de defensa</span></label><label><input type="radio" name="q205-0" value="2"><span>Angular ignora los errores 400 del backend</span></label><p class="exp">💡 Validación en el frontend = UX rápida. Validación en el backend = seguridad real. Ambas son necesarias.</p></div><div class="preg" data-ok="1"><p class="enun">2. ¿Qué hace computed(() => ...) para cupoDisponible?</p><label><input type="radio" name="q205-1" value="0"><span>Hace una nueva petición al backend para contar</span></label><label><input type="radio" name="q205-1" value="1"><span>Calcula el cupo restando inscritos() de la capacidad del curso, y se actualiza automáticamente cuando cambia la lista de inscritos</span></label><label><input type="radio" name="q205-1" value="2"><span>Almacena el resultado en localStorage</span></label><p class="exp">💡 computed() crea un valor derivado reactivo. Cuando inscritos() cambia (al inscribir o desinscribir), cupoDisponible() se recalcula automáticamente.</p></div><div class="preg" data-ok="1"><p class="enun">3. ¿Por qué formInscripcion tiene un campo oculto fecha_inicio?</p><label><input type="radio" name="q205-2" value="0"><span>Es requerido por el backend</span></label><label><input type="radio" name="q205-2" value="1"><span>El Validator personalizado necesita acceder a la fecha_inicio del curso para comparar; lo más simple es tenerla en el mismo FormGroup</span></label><label><input type="radio" name="q205-2" value="2"><span>Angular obliga a declarar todos los campos</span></label><p class="exp">💡 Un AbstractControl Validator accede a su FormGroup con control.parent. Tener fecha_inicio en el grupo permite la comparación cruzada sin romper la encapsulación.</p></div><button class="bcal" onclick="cal('quiz-2-05')">Calificar</button><p class="res"></p></div></div>
+    
+    
+<div class="reto">
+  <span class="ey">RETO ESTACIÓN 05</span>
+  <h3>Lleva el conocimiento más lejos</h3>
+  <p>Agrega una barra de progreso visual (barra CSS de ancho proporcional) que muestre el porcentaje de ocupación del curso seleccionado: inscritos / capacidad × 100. Cuando supere el 80%, cambia a color naranja; al 100%, a rojo.</p>
+</div>
+
+<div class="sol" id="rsol-2-05">
+  <div class="sol-cab" onclick="toggleSol('rsol-2-05')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">1. computed() para el porcentaje y clase CSS dinámica</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/cursos/cursos.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">// Agregar en CursosComponent (junto a cupoDisponible):</span>
+
+  porcentajeOcupacion = <span class="k">computed</span>(() =&gt; {
+    <span class="k">const</span> c = <span class="k">this</span>.cursoSeleccionado();
+    <span class="k">if</span> (!c || c.capacidad === 0) <span class="k">return</span> 0;
+    <span class="k">return</span> Math.round((<span class="k">this</span>.inscritos().length / c.capacidad) * 100);
+  });
+
+  claseBarra = <span class="k">computed</span>(() =&gt; {
+    <span class="k">const</span> pct = <span class="k">this</span>.porcentajeOcupacion();
+    <span class="k">if</span> (pct &gt;= 100) <span class="k">return</span> <span class="s">'barra-llena'</span>;   <span class="c">// rojo</span>
+    <span class="k">if</span> (pct &gt;= 80)  <span class="k">return</span> <span class="s">'barra-alerta'</span>;  <span class="c">// naranja</span>
+    <span class="k">return</span> <span class="s">'barra-ok'</span>;                       <span class="c">// verde</span>
+  });</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">2. HTML de la barra de progreso</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/cursos/cursos.component.html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;!-- Colocar debajo del indicador de cupo existente --&gt;
+&lt;div <span class="k">class</span>=<span class="s">"progreso-wrapper"</span> *<span class="k">ngIf</span>=<span class="s">"cursoSeleccionado()"</span>&gt;
+  &lt;div <span class="k">class</span>=<span class="s">"progreso-header"</span>&gt;
+    &lt;span&gt;Ocupación del curso&lt;/span&gt;
+    &lt;span <span class="k">class</span>=<span class="s">"pct-label"</span>
+          [<span class="k">class</span>.pct-alerta]=<span class="s">"porcentajeOcupacion() &gt;= 80"</span>
+          [<span class="k">class</span>.pct-lleno]=<span class="s">"porcentajeOcupacion() &gt;= 100"</span>&gt;
+      {{ inscritos().length }} / {{ cursoSeleccionado()?.capacidad }}
+      ({{ porcentajeOcupacion() }}%)
+    &lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div <span class="k">class</span>=<span class="s">"progreso-track"</span>&gt;
+    &lt;div <span class="k">class</span>=<span class="s">"progreso-fill"</span>
+         [<span class="k">class</span>]=<span class="s">"claseBarra()"</span>
+         [style.width.%]=<span class="s">"porcentajeOcupacion()"</span>&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">3. Estilos de la barra con transición CSS</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">styles.scss</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">.progreso-wrapper</span> {
+  margin: 14px 0;
+}
+<span class="k">.progreso-header</span> {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--suave);
+  margin-bottom: 6px;
+}
+<span class="k">.pct-alerta</span> { color: var(--ambar); font-weight: 600; }
+<span class="k">.pct-lleno</span>  { color: var(--err);   font-weight: 600; }
+
+<span class="k">.progreso-track</span> {
+  height: 10px;
+  background: var(--borde);
+  border-radius: 99px;
+  overflow: hidden;
+}
+<span class="k">.progreso-fill</span> {
+  height: 100%;
+  border-radius: 99px;
+  transition: width <span class="k">.4s</span> ease, background-color <span class="k">.3s</span> ease;
+}
+<span class="k">.barra-ok</span>     { background: var(--ok); }
+<span class="k">.barra-alerta</span> { background: var(--ambar); }
+<span class="k">.barra-llena</span>  { background: var(--err); }</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  </div>
+</div>
+  </div>
+</div>
+<div class="est-block" id="est-2-06">
+  <div class="est-header" style="--est-color:#7B3FBF">
+    <div class="est-num">06</div>
+    <div>
+      <h2 class="est-titulo">Layout, Navbar y Guards</h2>
+      <span class="est-tiempo">⏱ 2 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Sin layout el usuario no puede navegar. La navbar muestra u oculta opciones según el rol usando isAdmin(). Los guards ya están escritos — aquí se conectan visualmente.</p>
+    
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>NavbarComponent — reactivo al signal de usuario</h3>
+    <label class="chk"><input type="checkbox" data-p="206"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>La navbar no necesita ngOnChanges ni Subject: lee directamente el signal auth.currentUser() y reacciona automáticamente al login/logout. ngClass aplica clases CSS según la ruta activa.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/layout/navbar.component.ts + .html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { CommonModule } <span class="k">from</span> <span class="s">'@angular/common'</span>;
+<span class="k">import</span> { <span class="k">RouterModule</span> } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'../features/auth/auth.service'</span>;
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-navbar'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [CommonModule, <span class="k">RouterModule</span>],
+  template: `
+    &lt;nav <span class="k">class</span>="navbar" *ngIf="auth.isLoggedIn()"&gt;
+      &lt;div <span class="k">class</span>="brand"&gt;
+        &lt;span <span class="k">class</span>="logo"&gt;⚡&lt;/span&gt;
+        &lt;span&gt;SENA Backend&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;ul <span class="k">class</span>="nav-links"&gt;
+        &lt;li&gt;&lt;a routerLink="/dashboard" routerLinkActive="active"&gt;Dashboard&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a routerLink="/departamentos" routerLinkActive="active"&gt;Departamentos&lt;/a&gt;&lt;/li&gt;
+        &lt;li *ngIf="auth.isAdmin()"&gt;
+          &lt;a routerLink="/usuarios" routerLinkActive="active"&gt;Usuarios&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;a routerLink="/cursos" routerLinkActive="active"&gt;Cursos&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;div <span class="k">class</span>="user-info"&gt;
+        &lt;span <span class="k">class</span>="email"&gt;{{ auth.currentUser()?.email }}&lt;/span&gt;
+        &lt;span [<span class="k">class</span>]="<span class="s">'badge '</span> + auth.currentUser()?.rol"&gt;
+          {{ auth.currentUser()?.rol }}
+        &lt;/span&gt;
+        &lt;button (click)="auth.logout()" <span class="k">class</span>="btn-logout"&gt;Salir&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/nav&gt;
+  `
+})
+<span class="k">export</span> <span class="k">class</span> NavbarComponent {
+  auth = <span class="k">inject</span>(AuthService);
+}</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>DashboardComponent — resumen con signals</h3>
+    <label class="chk"><input type="checkbox" data-p="206"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El dashboard carga los counts de todas las entidades en paralelo con forkJoin. Muestra tarjetas de resumen reactivas. Solo admin ve el total de usuarios.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/dashboard/dashboard.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span>, <span class="k">OnInit</span>, <span class="k">signal</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { CommonModule } <span class="k">from</span> <span class="s">'@angular/common'</span>;
+<span class="k">import</span> { <span class="k">RouterModule</span> } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { forkJoin } <span class="k">from</span> <span class="s">'rxjs'</span>;
+<span class="k">import</span> { UsuariosService }      <span class="k">from</span> <span class="s">'../../shared/services/usuarios.service'</span>;
+<span class="k">import</span> { DepartamentosService } <span class="k">from</span> <span class="s">'../../shared/services/departamentos.service'</span>;
+<span class="k">import</span> { CursosService }        <span class="k">from</span> <span class="s">'../../shared/services/cursos.service'</span>;
+<span class="k">import</span> { AuthService }          <span class="k">from</span> <span class="s">'../auth/auth.service'</span>;
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-dashboard'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [CommonModule, <span class="k">RouterModule</span>],
+  templateUrl: <span class="s">'./dashboard.component.html'</span>
+})
+<span class="k">export</span> <span class="k">class</span> DashboardComponent <span class="k">implements</span> <span class="k">OnInit</span> {
+  private usuSvc  = <span class="k">inject</span>(UsuariosService);
+  private deptSvc = <span class="k">inject</span>(DepartamentosService);
+  private curSvc  = <span class="k">inject</span>(CursosService);
+  auth            = <span class="k">inject</span>(AuthService);
+
+  stats = <span class="k">signal</span>({ usuarios: 0, departamentos: 0, cursos: 0 });
+  loading = <span class="k">signal</span>(<span class="k">true</span>);
+
+  ngOnInit() {
+    <span class="c">// Cargar todo en paralelo</span>
+    forkJoin({
+      u: <span class="k">this</span>.usuSvc.getAll(),
+      d: <span class="k">this</span>.deptSvc.getAll(),
+      c: <span class="k">this</span>.curSvc.getAll()
+    }).<span class="k">subscribe</span>({
+      next: ({ u, d, c }) =&gt; {
+        <span class="k">this</span>.stats.set({ usuarios: u.length,
+                         departamentos: d.length,
+                         cursos: c.length });
+        <span class="k">this</span>.loading.set(<span class="k">false</span>);
+      },
+      error: () =&gt; <span class="k">this</span>.loading.set(<span class="k">false</span>)
+    });
+  }
+}</pre>
+
+</div>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">dashboard.component.html</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>&lt;div <span class="k">class</span>=<span class="s">"dashboard"</span>&gt;
+  &lt;h1&gt;Dashboard&lt;/h1&gt;
+  &lt;p <span class="k">class</span>=<span class="s">"welcome"</span>&gt;Bienvenido, {{ auth.currentUser()?.email }}&lt;/p&gt;
+
+  &lt;div <span class="k">class</span>=<span class="s">"stats-grid"</span> *<span class="k">ngIf</span>=<span class="s">"!loading()"</span>&gt;
+    &lt;div <span class="k">class</span>=<span class="s">"stat-card"</span> *<span class="k">ngIf</span>=<span class="s">"auth.isAdmin()"</span> <span class="k">routerLink</span>=<span class="s">"/usuarios"</span>&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"stat-num"</span>&gt;{{ stats().usuarios }}&lt;/span&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"stat-label"</span>&gt;Usuarios&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div <span class="k">class</span>=<span class="s">"stat-card"</span> <span class="k">routerLink</span>=<span class="s">"/departamentos"</span>&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"stat-num"</span>&gt;{{ stats().departamentos }}&lt;/span&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"stat-label"</span>&gt;Departamentos&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div <span class="k">class</span>=<span class="s">"stat-card"</span> <span class="k">routerLink</span>=<span class="s">"/cursos"</span>&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"stat-num"</span>&gt;{{ stats().cursos }}&lt;/span&gt;
+      &lt;span <span class="k">class</span>=<span class="s">"stat-label"</span>&gt;Cursos&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div <span class="k">class</span>=<span class="s">"loading"</span> *<span class="k">ngIf</span>=<span class="s">"loading()"</span>&gt;Cargando estadísticas…&lt;/div&gt;
+&lt;/div&gt;</pre>
+
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    <div id="quiz-2-06"><div class="quiz"><h3 style="margin-bottom:12px">Autoevaluación · Estación 06</h3><div class="preg" data-ok="1"><p class="enun">1. ¿Por qué la navbar no necesita ngOnChanges para reaccionar al logout?</p><label><input type="radio" name="q206-0" value="0"><span>ngOnChanges está deprecado en Angular 19</span></label><label><input type="radio" name="q206-0" value="1"><span>Lee auth.currentUser() que es un signal: la vista se actualiza automáticamente cuando el signal cambia</span></label><label><input type="radio" name="q206-0" value="2"><span>La navbar recarga la página completa</span></label><p class="exp">💡 Los signals son observables integrados en el sistema de detección de cambios de Angular. La plantilla que accede a un signal() se actualiza automáticamente cuando cambia.</p></div><div class="preg" data-ok="1"><p class="enun">2. ¿Qué hace forkJoin en el Dashboard?</p><label><input type="radio" name="q206-1" value="0"><span>Ejecuta las peticiones en serie</span></label><label><input type="radio" name="q206-1" value="1"><span>Ejecuta todas las peticiones en paralelo y emite cuando TODAS han completado</span></label><label><input type="radio" name="q206-1" value="2"><span>Une los arrays de respuesta en uno solo</span></label><p class="exp">💡 forkJoin lanza todas las peticiones simultáneamente y emite un objeto con todos los resultados cuando el último completa. Más eficiente que encadenarlas en serie.</p></div><div class="preg" data-ok="1"><p class="enun">3. ¿Qué hace routerLinkActive='active' en los enlaces de la navbar?</p><label><input type="radio" name="q206-2" value="0"><span>Navega automáticamente</span></label><label><input type="radio" name="q206-2" value="1"><span>Agrega la clase CSS "active" al enlace cuando la ruta actual coincide con su routerLink</span></label><label><input type="radio" name="q206-2" value="2"><span>Deshabilita el enlace si la ruta no existe</span></label><p class="exp">💡 routerLinkActive observa la URL activa y agrega/quita la clase especificada dinámicamente, sin necesidad de lógica en el componente.</p></div><button class="bcal" onclick="cal('quiz-2-06')">Calificar</button><p class="res"></p></div></div>
+    
+    
+<div class="reto">
+  <span class="ey">RETO ESTACIÓN 06</span>
+  <h3>Lleva el conocimiento más lejos</h3>
+  <p>Implementa un componente NotFoundComponent para la ruta ** y agrega un breadcrumb simple en el DashboardComponent que muestre: "Inicio > Dashboard". Usa ActivatedRoute para construirlo dinámicamente.</p>
+</div>
+
+<div class="sol" id="rsol-2-06">
+  <div class="sol-cab" onclick="toggleSol('rsol-2-06')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">1. NotFoundComponent standalone</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/features/not-found/not-found.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { <span class="k">RouterModule</span> } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-not-found'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [<span class="k">RouterModule</span>],
+  template: `
+    &lt;div <span class="k">class</span>="not-found"&gt;
+      &lt;span <span class="k">class</span>="code"&gt;404&lt;/span&gt;
+      &lt;h1&gt;Página no encontrada&lt;/h1&gt;
+      &lt;p&gt;La ruta que buscas no existe en esta aplicación.&lt;/p&gt;
+      &lt;a routerLink="/dashboard" <span class="k">class</span>="btn-primary"&gt;
+        Volver al Dashboard
+      &lt;/a&gt;
+    &lt;/div&gt;
+  `,
+  styles: [`
+    .not-found {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 60vh; text-align: center; gap: 16px;
+    }
+    .code {
+      font-size: 96px; font-weight: 700;
+      font-family: <span class="k">var</span>(--font-display);
+      color: <span class="k">var</span>(--borde); line-height: 1;
+    }
+    h1 { font-size: 28px; }
+    p  { color: <span class="k">var</span>(--suave); }
+  `]
+})
+<span class="k">export</span> <span class="k">class</span> NotFoundComponent {}</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">2. Registrar en app.routes.ts</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/app.routes.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">export</span> <span class="k">const</span> routes: Routes = [
+  <span class="c">// ... rutas existentes ...</span>
+  {
+    path: <span class="s">'**'</span>,   <span class="c">// ← debe ser la ÚLTIMA ruta</span>
+    loadComponent: () =&gt; <span class="k">import</span>(<span class="s">'./features/not-found/not-found.component'</span>)
+                         .then(m =&gt; m.NotFoundComponent)
+  }
+];</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">3. BreadcrumbComponent reutilizable con ActivatedRoute</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/shared/components/breadcrumb.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Component</span>, <span class="k">inject</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+<span class="k">import</span> { CommonModule } <span class="k">from</span> <span class="s">'@angular/common'</span>;
+<span class="k">import</span> { <span class="k">RouterModule</span>, <span class="k">ActivatedRoute</span>, <span class="k">Router</span>,
+         NavigationEnd } <span class="k">from</span> <span class="s">'@angular/router'</span>;
+<span class="k">import</span> { filter, <span class="k">map</span> } <span class="k">from</span> <span class="s">'rxjs/operators'</span>;
+<span class="k">import</span> { toSignal } <span class="k">from</span> <span class="s">'@angular/core/rxjs-interop'</span>;
+
+@<span class="k">Component</span>({
+  selector: <span class="s">'app-breadcrumb'</span>,
+  standalone: <span class="k">true</span>,
+  imports: [CommonModule, <span class="k">RouterModule</span>],
+  template: `
+    &lt;nav <span class="k">class</span>="breadcrumb" aria-label="breadcrumb"&gt;
+      &lt;ol&gt;
+        &lt;li&gt;&lt;a routerLink="/dashboard"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+        &lt;li *ngFor="<span class="k">let</span> crumb <span class="k">of</span> migas(); <span class="k">let</span> last = last"&gt;
+          &lt;span <span class="k">class</span>="sep"&gt;›&lt;/span&gt;
+          &lt;a *ngIf="!last" [routerLink]="crumb.url"&gt;{{ crumb.label }}&lt;/a&gt;
+          &lt;span *ngIf="last" <span class="k">class</span>="activo"&gt;{{ crumb.label }}&lt;/span&gt;
+        &lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/nav&gt;
+  `,
+  styles: [`
+    .breadcrumb ol { display: flex; align-items: center;
+                     gap: 6px; list-style: none;
+                     font-size: 13px; color: <span class="k">var</span>(--suave); }
+    .sep { opacity: .5; }
+    .activo { color: <span class="k">var</span>(--tinta); font-weight: 600; }
+    a { color: <span class="k">var</span>(--azul); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  `]
+})
+<span class="k">export</span> <span class="k">class</span> BreadcrumbComponent {
+  private router = <span class="k">inject</span>(<span class="k">Router</span>);
+
+  <span class="c">// Construye las migas desde la URL activa</span>
+  migas = toSignal(
+    <span class="k">this</span>.router.events.<span class="k">pipe</span>(
+      filter(e =&gt; e instanceof NavigationEnd),
+      <span class="k">map</span>(() =&gt; {
+        <span class="k">const</span> partes = <span class="k">this</span>.router.url.split(<span class="s">'/'</span>).filter(Boolean);
+        <span class="k">const</span> labels: Record&lt;<span class="k">string</span>, <span class="k">string</span>&gt; = {
+          dashboard: <span class="s">'Dashboard'</span>, usuarios: <span class="s">'Usuarios'</span>,
+          departamentos: <span class="s">'Departamentos'</span>, cursos: <span class="s">'Cursos'</span>
+        };
+        <span class="k">return</span> partes.<span class="k">map</span>((p, i) =&gt; ({
+          label: labels[p] ?? p,
+          url: <span class="s">'/'</span> + partes.slice(0, i + 1).join(<span class="s">'/'</span>)
+        }));
+      })
+    ),
+    { initialValue: [] }
+  );
+}
+
+<span class="c">// Uso en cualquier componente:</span>
+<span class="c">// imports: [BreadcrumbComponent]</span>
+<span class="c">// &lt;app-breadcrumb&gt;&lt;/app-breadcrumb&gt;</span></pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  </div>
+</div>
+  </div>
+</div>
+  <div class="nav-ses">
+    <button onclick="goSes(-1)" >← Sesión anterior</button>
+    <button onclick="goSes(1)"  >Siguiente sesión →</button>
+  </div>
+</section>
+<section class="ses " id="ses-3">
+  <div class="ses-header" style="background:#1F8C4E">
+    <h2>Sesión 4 — Estilos, Optimización y Deploy</h2>
+    <span>5 h · Estaciones 07 y 08</span>
+  </div>
+  
+<div class="est-block" id="est-3-07">
+  <div class="est-header" style="--est-color:#1F8C4E">
+    <div class="est-num">07</div>
+    <div>
+      <h2 class="est-titulo">SCSS global y componentes pulidos</h2>
+      <span class="est-tiempo">⏱ 2.5 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Un frontend sin estilos no se puede entregar. Esta estación aplica el sistema de diseño completo: variables SCSS, componentes reutilizables y responsive design. Se trabaja de global a particular.</p>
+    
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Sistema de variables SCSS</h3>
+    <label class="chk"><input type="checkbox" data-p="307"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Variables globales: colores, tipografía, espaciado y sombras. Definir el sistema una vez evita "magia" hardcodeada en los componentes.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/styles.scss</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">/* ===== VARIABLES GLOBALES ===== */</span>
+<span class="k">:root</span> {
+  --azul:   <span class="k">#1A56A0</span>;
+  --teal:   <span class="k">#0A8F82</span>;
+  --verde:  <span class="k">#1F8C4E</span>;
+  --ambar:  <span class="k">#B87A10</span>;
+  --rojo:   <span class="k">#B83030</span>;
+  --bg:     <span class="k">#F0F4F8</span>;
+  --card:   <span class="k">#FFFFFF</span>;
+  --tinta:  <span class="k">#111D2B</span>;
+  --suave:  <span class="k">#4A5B6E</span>;
+  --borde:  <span class="k">#C8D5E2</span>;
+  --radio:  10px;
+  --sh:     0 2px 12px rgba(17,29,43,<span class="k">.07</span>);
+  --font-display: <span class="s">'Space Grotesk'</span>, system-ui;
+  --font-body:    <span class="s">'Inter'</span>, system-ui;
+  --font-mono:    <span class="s">'JetBrains Mono'</span>, monospace;
+}
+
+<span class="c">/* ===== RESET Y BASE ===== */</span>
+*, *:<span class="k">:before</span>, *:<span class="k">:after</span> { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--bg);
+       color: var(--tinta); line-height: 1<span class="k">.65</span>; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+
+<span class="c">/* ===== LAYOUT ===== */</span>
+<span class="k">.app-layout</span> { display: flex; flex-direction: column; min-height: 100vh; }
+<span class="k">.page-content</span> { flex: 1; padding: 28px 24px; max-width: 1100px;
+                margin: 0 auto; width: 100%; }
+
+<span class="c">/* ===== NAVBAR ===== */</span>
+<span class="k">.navbar</span> { background: <span class="k">#0B1520</span>; color: <span class="k">#D7E2EF</span>; padding: 0 24px;
+          display: flex; align-items: center; gap: 24px;
+          height: 60px; position: sticky; top: 0; z-index: 100;
+          box-shadow: 0 2px 8px rgba(0,0,0,<span class="k">.3</span>); }
+<span class="k">.navbar</span> <span class="k">.brand</span> { font-family: var(--font-display); font-weight: 700;
+                 font-size: 17px; display: flex; align-items: center; gap: 8px; }
+<span class="k">.navbar</span> <span class="k">.nav-links</span> { display: flex; gap: 4px; list-style: none; flex: 1; }
+<span class="k">.navbar</span> <span class="k">.nav-links</span> a { color: <span class="k">#8FA8C0</span>; padding: 6px 14px; border-radius: 8px;
+                        text-decoration: none; font-size: 14<span class="k">.5px</span>; font-weight: 500;
+                        transition: all <span class="k">.18s</span>; }
+<span class="k">.navbar</span> <span class="k">.nav-links</span> a<span class="k">.active</span>,
+<span class="k">.navbar</span> <span class="k">.nav-links</span> a<span class="k">:hover</span> { background: <span class="k">#162030</span>; color: <span class="k">#fff</span>; }
+<span class="k">.navbar</span> <span class="k">.user-info</span> { display: flex; align-items: center; gap: 10px; }
+<span class="k">.navbar</span> <span class="k">.email</span> { font-size: 13px; color: <span class="k">#8FA8C0</span>; }
+<span class="k">.badge</span> { padding: 3px 10px; border-radius: 20px; font-size: 11px;
+         font-family: var(--font-mono); font-weight: 600; }
+<span class="k">.badge</span><span class="k">.admin</span> { background: <span class="k">#2A1A5E</span>; color: <span class="k">#C39AFF</span>; }
+<span class="k">.badge</span><span class="k">.user</span>  { background: <span class="k">#0A2A22</span>; color: <span class="k">#5FD3C4</span>; }
+
+<span class="c">/* ===== PÁGINA ===== */</span>
+<span class="k">.page</span> { padding: 0; }
+<span class="k">.page-header</span> { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+<span class="k">.page-header</span> h1 { font-size: 26px; }
+<span class="k">.page-header</span> <span class="k">.badge</span> { background: var(--bg); border: 1px solid var(--borde);
+                      color: var(--suave); }
+
+<span class="c">/* ===== TABLA ===== */</span>
+<span class="k">.data-table</span> { width: 100%; border-collapse: collapse;
+              background: var(--card); border-radius: var(--radio);
+              box-shadow: var(--sh); overflow: hidden; }
+<span class="k">.data-table</span> th { background: <span class="k">#F5F8FB</span>; padding: 11px 14px; text-align: left;
+                 font-size: 13px; font-weight: 600; color: var(--suave);
+                 border-bottom: 2px solid var(--borde); }
+<span class="k">.data-table</span> td { padding: 11px 14px; border-bottom: 1px solid var(--borde);
+                 font-size: 14<span class="k">.5px</span>; }
+<span class="k">.data-table</span> tr<span class="k">:last-child</span> td { border-bottom: none; }
+<span class="k">.data-table</span> tr<span class="k">:hover</span> { background: <span class="k">#F8FAFC</span>; }
+
+<span class="c">/* ===== FORMULARIO INLINE ===== */</span>
+<span class="k">.inline-form</span> { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;
+               background: var(--card); padding: 18px; border-radius: var(--radio);
+               box-shadow: var(--sh); margin-bottom: 20px; border: 1px solid var(--borde); }
+<span class="k">.field</span> { display: flex; flex-direction: column; gap: 5px; }
+<span class="k">.field</span> label { font-size: 13px; font-weight: 600; color: var(--suave); }
+input, select, textarea {
+  padding: 8px 12px; border: 1<span class="k">.5px</span> solid var(--borde); border-radius: 8px;
+  font-family: var(--font-body); font-size: 14<span class="k">.5px</span>; color: var(--tinta);
+  background: var(--card); transition: border-color <span class="k">.18s</span>; }
+input<span class="k">:focus</span>, select<span class="k">:focus</span> { border-color: var(--teal); outline: none; }
+
+<span class="c">/* ===== BOTONES ===== */</span>
+<span class="k">.btn-primary</span> { background: var(--azul); color: <span class="k">#fff</span>; border: none;
+               padding: 9px 20px; border-radius: 8px; font-weight: 600;
+               cursor: pointer; font-size: 14<span class="k">.5px</span>; transition: filter <span class="k">.18s</span>; }
+<span class="k">.btn-primary</span><span class="k">:hover</span> { filter: brightness(1<span class="k">.1</span>); }
+<span class="k">.btn-primary</span><span class="k">:disabled</span> { opacity: <span class="k">.45</span>; cursor: default; }
+<span class="k">.btn-ghost</span>   { background: none; border: 1<span class="k">.5px</span> solid var(--borde); color: var(--tinta);
+               padding: 9px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; }
+<span class="k">.btn-icon</span>    { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; }
+<span class="k">.btn-icon</span><span class="k">.danger</span><span class="k">:hover</span> { filter: saturate(2); }
+<span class="k">.btn-logout</span>  { background: none; border: 1px solid <span class="k">#2C405B</span>; color: <span class="k">#8FA8C0</span>;
+               padding: 5px 12px; border-radius: 7px; cursor: pointer; font-size: 13px; }
+
+<span class="c">/* ===== CHIPS Y ESTADOS ===== */</span>
+<span class="k">.chip</span> { background: var(--bg); border: 1px solid var(--borde); padding: 2px 9px;
+        border-radius: 20px; font-size: 12px; font-family: var(--font-mono); }
+<span class="k">.role-badge</span> { padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+<span class="k">.role-badge</span><span class="k">.admin</span> { background: <span class="k">#EDE8F9</span>; color: <span class="k">#7B3FBF</span>; }
+<span class="k">.role-badge</span><span class="k">.user</span>  { background: <span class="k">#E6F5F3</span>; color: <span class="k">#0A8F82</span>; }
+<span class="k">.error-msg</span> { background: <span class="k">#FAEBE9</span>; border-left: 4px solid var(--rojo);
+             padding: 10px 14px; border-radius: 0 8px 8px 0; color: var(--rojo);
+             font-size: 14px; margin-bottom: 14px; }
+<span class="k">.success-msg</span> { background: <span class="k">#E6F5EE</span>; border-left: 4px solid var(--verde);
+               padding: 10px 14px; border-radius: 0 8px 8px 0;
+               color: var(--verde); font-size: 14px; margin-bottom: 14px; }
+
+<span class="c">/* ===== CUPO BAR ===== */</span>
+<span class="k">.cupo-bar</span> { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+<span class="k">.cupo-ok</span>   { color: var(--verde); font-weight: 600; }
+<span class="k">.cupo-lleno</span>{ color: var(--rojo);  font-weight: 600; }
+
+<span class="c">/* ===== DASHBOARD STATS ===== */</span>
+<span class="k">.stats-grid</span> { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+              gap: 16px; margin: 24px 0; }
+<span class="k">.stat-card</span>  { background: var(--card); border-radius: var(--radio); box-shadow: var(--sh);
+              padding: 24px; text-align: center; cursor: pointer; border: 1px solid var(--borde);
+              transition: transform <span class="k">.18s</span>, box-shadow <span class="k">.18s</span>; }
+<span class="k">.stat-card</span><span class="k">:hover</span> { transform: translateY(-2px);
+                   box-shadow: 0 6px 20px rgba(17,29,43,<span class="k">.12</span>); }
+<span class="k">.stat-num</span>   { display: block; font-size: 48px; font-weight: 700;
+              font-family: var(--font-display); color: var(--azul); }
+<span class="k">.stat-label</span> { font-size: 14px; color: var(--suave); font-weight: 500; }
+
+<span class="c">/* ===== LOGIN ===== */</span>
+<span class="k">.login-wrapper</span> { min-height: 100vh; display: flex; align-items: center;
+                 justify-content: center; background: <span class="k">#0B1520</span>; padding: 20px; }
+<span class="k">.login-card</span> { background: var(--card); border-radius: 16px; padding: 40px;
+              width: 100%; max-width: 420px; box-shadow: 0 8px 40px rgba(0,0,0,<span class="k">.3</span>); }
+<span class="k">.login-card</span> h1 { font-size: 22px; margin-bottom: 4px; }
+<span class="k">.login-card</span> <span class="k">.sub</span> { color: var(--suave); font-size: 14px; margin-bottom: 28px; }
+<span class="k">.api-error</span> { color: var(--rojo); font-size: 14px; margin: 8px 0; }
+
+<span class="c">/* ===== RESPONSIVE ===== */</span>
+@media (max-width: 700px) {
+  <span class="k">.navbar</span> <span class="k">.nav-links</span> a { padding: 6px 10px; font-size: 13px; }
+  <span class="k">.navbar</span> <span class="k">.email</span> { display: none; }
+  <span class="k">.inline-form</span> { flex-direction: column; }
+  <span class="k">.data-table</span> th<span class="k">:nth-child</span>(n+4),
+  <span class="k">.data-table</span> td<span class="k">:nth-child</span>(n+4) { display: none; }
+}</pre>
+
+</div>
+    
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    <div id="quiz-3-07"><div class="quiz"><h3 style="margin-bottom:12px">Autoevaluación · Estación 07</h3><div class="preg" data-ok="1"><p class="enun">1. ¿Por qué usar variables CSS (--azul) en vez de el valor hex directamente?</p><label><input type="radio" name="q307-0" value="0"><span>Las variables CSS son más rápidas</span></label><label><input type="radio" name="q307-0" value="1"><span>Permiten cambiar el tema global desde un solo lugar; un cambio en :root actualiza todos los componentes que usan esa variable</span></label><label><input type="radio" name="q307-0" value="2"><span>Es solo una convención de Angular</span></label><p class="exp">💡 Las variables CSS son la base de cualquier sistema de diseño. Cambiar --azul en :root actualiza automáticamente navbar, botones, badges y todo lo que la usa.</p></div><div class="preg" data-ok="1"><p class="enun">2. ¿Qué hace el display:none en td:nth-child(n+4) en mobile?</p><label><input type="radio" name="q307-1" value="0"><span>Borra las columnas de la tabla</span></label><label><input type="radio" name="q307-1" value="1"><span>Oculta las columnas 4 en adelante en pantallas pequeñas para que la tabla sea usable sin scroll horizontal</span></label><label><input type="radio" name="q307-1" value="2"><span>Elimina los datos del componente</span></label><p class="exp">💡 Responsive table: en móvil solo se muestran las columnas esenciales. Los datos siguen en el componente, solo la presentación cambia.</p></div><div class="preg" data-ok="1"><p class="enun">3. ¿Por qué position:sticky en la navbar?</p><label><input type="radio" name="q307-2" value="0"><span>Para que siempre quede al centro de la página</span></label><label><input type="radio" name="q307-2" value="1"><span>La navbar queda fija en la parte superior mientras el usuario hace scroll, sin necesidad de position:fixed que saca el elemento del flujo</span></label><label><input type="radio" name="q307-2" value="2"><span>Es requerido por Angular Router</span></label><p class="exp">💡 sticky mantiene el elemento en el flujo del documento (no genera huecos como fixed) y queda pegado al top cuando el scroll lo alcanza.</p></div><button class="bcal" onclick="cal('quiz-3-07')">Calificar</button><p class="res"></p></div></div>
+    
+    
+<div class="reto">
+  <span class="ey">RETO ESTACIÓN 07</span>
+  <h3>Lleva el conocimiento más lejos</h3>
+  <p>Agrega un modo oscuro al sistema de diseño: un botón en la navbar que alterne una clase "dark" en el <html> y redefina las variables CSS en html.dark { --bg: #0B1520; --card: #162030; ... }.</p>
+</div>
+
+<div class="sol" id="rsol-3-07">
+  <div class="sol-cab" onclick="toggleSol('rsol-3-07')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">1. ThemeService — signal reactivo de tema</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/core/theme.service.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { <span class="k">Injectable</span>, <span class="k">signal</span>, <span class="k">effect</span> } <span class="k">from</span> <span class="s">'@angular/core'</span>;
+
+@<span class="k">Injectable</span>({ providedIn: <span class="s">'root'</span> })
+<span class="k">export</span> <span class="k">class</span> ThemeService {
+  <span class="c">// Recuperar preferencia guardada (o preferencia del sistema)</span>
+  private inicial: <span class="s">'dark'</span> | <span class="s">'light'</span> =
+    (localStorage.getItem(<span class="s">'tema'</span>) as <span class="k">any</span>) ??
+    (window.matchMedia(<span class="s">'(prefers-color-scheme: dark)'</span>).matches
+      ? <span class="s">'dark'</span> : <span class="s">'light'</span>);
+
+  tema = <span class="k">signal</span>&lt;<span class="s">'dark'</span> | <span class="s">'light'</span>&gt;(<span class="k">this</span>.inicial);
+
+  constructor() {
+    <span class="c">// effect() reacciona automáticamente cuando tema() cambia</span>
+    <span class="k">effect</span>(() =&gt; {
+      <span class="k">const</span> t = <span class="k">this</span>.tema();
+      document.documentElement.classList.toggle(<span class="s">'dark'</span>, t === <span class="s">'dark'</span>);
+      localStorage.setItem(<span class="s">'tema'</span>, t);
+    });
+    <span class="c">// Aplicar al arranque</span>
+    document.documentElement.classList.toggle(<span class="s">'dark'</span>, <span class="k">this</span>.inicial === <span class="s">'dark'</span>);
+  }
+
+  toggle() {
+    <span class="k">this</span>.tema.update(t =&gt; t === <span class="s">'dark'</span> ? <span class="s">'light'</span> : <span class="s">'dark'</span>);
+  }
+}</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">2. Botón en NavbarComponent</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/app/layout/navbar.component.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">import</span> { ThemeService } <span class="k">from</span> <span class="s">'../core/theme.service'</span>;
+
+<span class="c">// Dentro del componente:</span>
+  theme = <span class="k">inject</span>(ThemeService);
+
+<span class="c">// En la plantilla (agregar junto al botón de logout):</span>
+<span class="c">// &lt;button (click)="theme.toggle()" class="btn-logout" title="Cambiar tema"&gt;</span>
+<span class="c">//   {{ theme.tema() === 'dark' ? '☀️' : '🌙' }}</span>
+<span class="c">// &lt;/button&gt;</span></pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">3. Variables CSS para modo oscuro en styles.scss</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/styles.scss</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">/* Agregar al final de styles.scss */</span>
+
+html<span class="k">.dark</span> {
+  --bg:    <span class="k">#0B1520</span>;
+  --card:  <span class="k">#111D2B</span>;
+  --tinta: <span class="k">#E8F0F9</span>;
+  --suave: <span class="k">#8FA8C0</span>;
+  --borde: <span class="k">#1E2C3F</span>;
+  --sh:    0 2px 12px rgba(0,0,0,<span class="k">.3</span>);
+}
+
+<span class="c">/* Campos de formulario en modo oscuro */</span>
+html<span class="k">.dark</span> input,
+html<span class="k">.dark</span> select,
+html<span class="k">.dark</span> textarea {
+  background: <span class="k">#0B1520</span>;
+  color: <span class="k">#E8F0F9</span>;
+  border-color: <span class="k">#1E2C3F</span>;
+}
+
+<span class="c">/* Transición suave al cambiar tema */</span>
+body, <span class="k">.data-table</span>, <span class="k">.paso</span>, <span class="k">.stat-card</span>, <span class="k">.inline-form</span> {
+  transition: background-color <span class="k">.25s</span> ease, color <span class="k">.2s</span> ease,
+              border-color <span class="k">.2s</span> ease;
+}</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  </div>
+</div>
+  </div>
+</div>
+<div class="est-block" id="est-3-08">
+  <div class="est-header" style="--est-color:#1F8C4E">
+    <div class="est-num">08</div>
+    <div>
+      <h2 class="est-titulo">Build, proxy y deploy</h2>
+      <span class="est-tiempo">⏱ 2.5 h</span>
+    </div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Un frontend que solo funciona en localhost no se puede entregar. Esta estación configura el proxy de desarrollo, optimiza el build de producción y despliega en GitHub Pages o Netlify.</p>
+    
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Proxy de desarrollo — evitar CORS en local</h3>
+    <label class="chk"><input type="checkbox" data-p="308"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Durante el desarrollo Angular corre en :4200 y FastAPI en :8000. El proxy redirige las peticiones /api/* al backend sin modificar el código. En producción se configura en el servidor.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">proxy.conf.json + angular.json</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c"># proxy.conf.json (raíz del proyecto)</span>
+{
+  <span class="s">"/api"</span>: {
+    <span class="s">"target"</span>: <span class="s">"http://localhost:8000"</span>,
+    <span class="s">"secure"</span>: false,
+    <span class="s">"pathRewrite"</span>: { <span class="s">"^/api"</span>: <span class="s">""</span> },
+    <span class="s">"changeOrigin"</span>: true,
+    <span class="s">"logLevel"</span>: <span class="s">"debug"</span>
+  }
+}
+
+<span class="c"># angular.json — agregar en serve.options:</span>
+<span class="s">"proxyConfig"</span>: <span class="s">"proxy.conf.json"</span>
+
+<span class="c"># Ahora environment.ts apunta a /api en vez de localhost:8000</span>
+export const environment = {
+  production: false,
+  apiUrl: <span class="s">'/api'</span>    // el proxy lo redirige al :8000
+};
+
+<span class="c"># Arrancar con proxy:</span>
+<span class="k">ng</span> serve --proxy-config proxy.conf.json</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>Build de producción y optimizaciones</h3>
+    <label class="chk"><input type="checkbox" data-p="308"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>ng build --configuration production activa tree-shaking, minificación y lazy loading. El output va a dist/sena-frontend/ listo para servir con cualquier servidor estático.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">terminal</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c"># Build de producción</span>
+<span class="k">ng</span> build --configuration production
+
+<span class="c"># Verificar el tamaño del bundle</span>
+<span class="k">npx</span> source-map-explorer dist/sena-frontend/browser/*.js
+
+<span class="c"># Las optimizaciones que aplica Angular 19 automáticamente:</span>
+<span class="c"># - Tree-shaking: elimina código no usado</span>
+<span class="c"># - Minificación: comprime JS y CSS</span>
+<span class="c"># - Lazy loading: cada ruta es un chunk separado</span>
+<span class="c"># - OnPush change detection por defecto con signals</span></pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>Deploy en GitHub Pages</h3>
+    <label class="chk"><input type="checkbox" data-p="308"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>gh-pages es la forma más rápida de desplegar un SPA de Angular de forma gratuita. El base-href debe coincidir con el nombre del repositorio.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">terminal</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">npm</span> install -g angular-cli-ghpages
+
+<span class="c"># Build apuntando al subdirectorio de GitHub Pages</span>
+<span class="k">ng</span> build --base-href <span class="s">"https://lporras567.github.io/sena-frontend/"</span>
+
+<span class="c"># Desplegar</span>
+<span class="k">npx</span> angular-cli-ghpages --dir=dist/sena-frontend/browser
+
+<span class="c"># URL final:</span>
+<span class="c"># https://lporras567.github.io/sena-frontend/</span>
+
+<span class="c"># ⚠️ GitHub Pages no soporta SPA routing directamente.</span>
+<span class="c"># Agregar un archivo 404.html que redirija al index.html:</span>
+cp dist/sena-frontend/browser/index.html dist/sena-frontend/browser/404.html</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>Deploy en Netlify (alternativa con routing)</h3>
+    <label class="chk"><input type="checkbox" data-p="308"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Netlify maneja el routing de SPAs nativamente con el archivo _redirects. Es la opción más sencilla para Angular Router.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">netlify.toml</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c"># public/_redirects (dentro de src/assets/ para que se copie al build)</span>
+/*    /index.html   200
+
+<span class="c"># netlify.toml (raíz del proyecto)</span>
+[build]
+  command = <span class="s">"ng build --configuration production"</span>
+  publish = <span class="s">"dist/sena-frontend/browser"</span>
+
+[build.environment]
+  NODE_VERSION = <span class="s">"20"</span>
+
+<span class="c"># Variables de entorno en Netlify Dashboard:</span>
+<span class="c"># VITE_API_URL = https://tu-api.railway.app</span>
+
+<span class="c"># Deploy desde CLI:</span>
+<span class="k">npm</span> install -g netlify-cli
+netlify deploy --prod --dir=dist/sena-frontend/browser</pre>
+
+</div>
+    
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>environment.prod.ts — apuntar al backend en producción</h3>
+    <label class="chk"><input type="checkbox" data-p="308"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>La única diferencia entre dev y prod es la URL del backend. Angular reemplaza automáticamente environment.ts por environment.prod.ts al hacer el build de producción.</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">src/environments/environment.prod.ts</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c">// src/environments/environment.prod.ts</span>
+<span class="k">export</span> <span class="k">const</span> environment = {
+  production: <span class="k">true</span>,
+  <span class="c">// URL del backend desplegado en Railway o Render</span>
+  apiUrl: <span class="s">'https://sena-backend-api.railway.app'</span>
+};
+
+<span class="c">// El interceptor de CORS en FastAPI ya tiene allow_origins=["*"]</span>
+<span class="c">// pero en producción es mejor especificar el origen:</span>
+<span class="c">// allow_origins=["https://lporras567.github.io"]</span></pre>
+
+</div>
+    
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · PRUEBA Y RETO</span></div>
+    <div id="quiz-3-08"><div class="quiz"><h3 style="margin-bottom:12px">Autoevaluación · Estación 08</h3><div class="preg" data-ok="1"><p class="enun">1. ¿Por qué se necesita un 404.html en GitHub Pages para Angular?</p><label><input type="radio" name="q308-0" value="0"><span>GitHub Pages requiere ese archivo por regla</span></label><label><input type="radio" name="q308-0" value="1"><span>GitHub Pages no entiende el routing del lado del cliente: cuando recargas /usuarios devuelve 404. El 404.html redirige al index.html que carga el router de Angular</span></label><label><input type="radio" name="q308-0" value="2"><span>Angular Router genera errores en producción</span></label><p class="exp">💡 Las SPAs manejan el routing en el navegador (client-side). Cualquier URL directa que no sea / devuelve 404 en servidores estáticos. La solución es redirigir todas las rutas al index.html.</p></div><div class="preg" data-ok="1"><p class="enun">2. ¿Qué es tree-shaking en el build de producción?</p><label><input type="radio" name="q308-1" value="0"><span>Elimina los archivos .ts del bundle</span></label><label><input type="radio" name="q308-1" value="1"><span>Analiza el grafo de imports y elimina el código que nunca se llama — reduce el tamaño del bundle final</span></label><label><input type="radio" name="q308-1" value="2"><span>Reorganiza el árbol de componentes</span></label><p class="exp">💡 Tree-shaking es una optimización de los bundlers modernos: si importas solo uno de los 300 operadores de RxJS, solo ese entra en el bundle.</p></div><div class="preg" data-ok="1"><p class="enun">3. ¿Qué ventaja tiene usar signals en OnPush change detection?</p><label><input type="radio" name="q308-2" value="0"><span>No hay diferencia</span></label><label><input type="radio" name="q308-2" value="1"><span>Angular 19 detecta automáticamente los cambios de signals sin necesidad de marcar el componente manualmente con ChangeDetectorRef.markForCheck()</span></label><label><input type="radio" name="q308-2" value="2"><span>Los signals desactivan la detección de cambios</span></label><p class="exp">💡 Los signals están integrados en el scheduler de Angular. Los componentes que usan signals se actualizan quirúrgicamente solo cuando sus signals cambian, sin revisar el árbol completo.</p></div><button class="bcal" onclick="cal('quiz-3-08')">Calificar</button><p class="res"></p></div></div>
+    
+<div class="sol" id="sol-3-08">
+  <div class="sol-cab" onclick="toggleSol('sol-3-08')">
+    <h3>📂 Ver solución completa: GitHub Actions CI/CD</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body"><div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">github/workflows/deploy.yml</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>name: Deploy Angular to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: <span class="s">'20'</span>
+          cache: <span class="s">'npm'</span>
+
+      - name: Install dependencies
+        run: <span class="k">npm</span> ci
+
+      - name: Build production
+        run: <span class="k">ng</span> build --configuration production --base-href <span class="s">"/sena-frontend/"</span>
+
+      - name: Copy index.html to 404.html
+        run: cp dist/sena-frontend/browser/index.html dist/sena-frontend/browser/404.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/sena-frontend/browser</pre>
+
+</div></div>
+</div>
+    
+<div class="reto">
+  <span class="ey">RETO ESTACIÓN 08</span>
+  <h3>Lleva el conocimiento más lejos</h3>
+  <p>Configura un pipeline de CI/CD en GitHub Actions que: al hacer push a main, ejecute ng build --configuration production y despliegue automáticamente a GitHub Pages usando las GitHub Actions de Angular. Incluye el archivo .github/workflows/deploy.yml.</p>
+</div>
+
+<div class="sol" id="rsol-3-08">
+  <div class="sol-cab" onclick="toggleSol('rsol-3-08')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">1. Crear el directorio y el archivo workflow</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">terminal</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="k">mkdir</span> -p .github/workflows
+touch .github/workflows/deploy.yml</pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">2. Pipeline completo con caché de npm</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">.github/workflows/deploy.yml</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre>name: Deploy Angular → GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  <span class="c"># Permite ejecutar el workflow manualmente desde GitHub UI</span>
+  workflow_dispatch:
+
+<span class="c"># Permisos necesarios para publicar en gh-pages</span>
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      <span class="c"># 1. Checkout del código</span>
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      <span class="c"># 2. Node.js 20 con caché de npm (más rápido en re-ejecuciones)</span>
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: <span class="s">'20'</span>
+          cache: <span class="s">'npm'</span>
+
+      <span class="c"># 3. Instalar dependencias (usa package-lock.json)</span>
+      - name: Install dependencies
+        run: <span class="k">npm</span> ci
+
+      <span class="c"># 4. Build de producción con el base-href correcto</span>
+      - name: Build
+        run: |
+          <span class="k">ng</span> build --configuration production \
+                   --base-href <span class="s">"/sena-frontend/"</span>
+        <span class="c"># Reemplazar "sena-frontend" con el nombre real de tu repo</span>
+
+      <span class="c"># 5. Copiar index.html como 404.html para el SPA routing</span>
+      - name: Fix SPA routing (404.html)
+        run: cp dist/sena-frontend/browser/index.html \
+                dist/sena-frontend/browser/404.html
+
+      <span class="c"># 6. Deploy a la rama gh-pages</span>
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/sena-frontend/browser
+          <span class="c"># Mensaje del commit en la rama gh-pages</span>
+          commit_message: <span class="s">"Deploy: ${{ github.sha }}"</span>
+
+<span class="c"># Resultado: cada push a main despliega automáticamente</span>
+<span class="c"># URL: https://lporras567.github.io/sena-frontend/</span></pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  
+    <p style="font-weight:600;margin-bottom:6px;font-size:14px">3. Verificar que GitHub Pages está activado</p>
+    <div class="ed " >
+<div class="ebar"><div class="dots"><span></span><span></span><span></span></div>
+<span class="fich">GitHub → Settings → Pages</span>
+<button class="bcopy" onclick="cp(this)">Copiar</button></div>
+<pre><span class="c"># En tu repositorio de GitHub:</span>
+<span class="c"># Settings → Pages → Build and deployment</span>
+<span class="c"># Source: Deploy from a branch</span>
+<span class="c"># Branch: gh-pages  /  (root)</span>
+<span class="c"># Guardar</span>
+
+<span class="c"># La primera ejecución del workflow crea la rama gh-pages.</span>
+<span class="c"># Las siguientes actualizan el contenido automáticamente.</span>
+
+<span class="c"># Para ver el estado del workflow:</span>
+<span class="c"># GitHub → Actions → "Deploy Angular → GitHub Pages"</span>
+<span class="c"># Cada push a main aparece como una ejecución con ✅ o ❌</span></pre>
+
+</div>
+    <hr style="border:none;border-top:1px solid var(--borde);margin:14px 0">
+  </div>
+</div>
+  </div>
+</div>
+  <div class="nav-ses">
+    <button onclick="goSes(-1)" >← Sesión anterior</button>
+    <button onclick="goSes(1)"  disabled>Siguiente sesión →</button>
+  </div>
+</section></main>
+<footer>Curso interactivo · Frontend Angular 4 sesiones · ADSO 228118 · SENA CDMC Itagüí · <span class="hl">Ing. Luis Eladio Porras Camargo</span></footer>
+<script>
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hi(code, lang){
+  const s = esc(code);
+  const kwTs  = 'import|export|from|class|interface|extends|implements|const|let|var|return|if|else|for|of|in|async|await|new|this|true|false|null|undefined|void|string|number|boolean|any|Observable|Promise|inject|signal|computed|effect|Injectable|Component|OnInit|Input|Output|EventEmitter|NgModule|RouterModule|HttpClient|HttpHeaders|Router|ActivatedRoute|FormBuilder|FormGroup|Validators|switchMap|catchError|tap|map|pipe|subscribe';
+  const kwHtml= 'ng-container|ngIf|ngFor|ngClass|ngModel|routerLink|routerLinkActive|formGroup|formControlName|class|id|type|placeholder|src|alt|href';
+  const kwBash= 'ng|npm|npx|cd|mkdir|echo|cat|git';
+  let re;
+  if(lang==='ts')   re=new RegExp('(//[^\\n]*)|(\'(?:[^\'\\n])*\'|"(?:[^"\\n])*"`(?:[^`])*`)|\\b('+kwTs+')\\b','g');
+  else if(lang==='html') re=new RegExp('(<!--[\\s\\S]*?-->)|("(?:[^"\\n])*")|\\b('+kwHtml+')\\b','g');
+  else if(lang==='sh')   re=new RegExp('(#[^\\n]*)|("(?:[^"\\n])*"|\'(?:[^\'\\n])*\')|\\b('+kwBash+')\\b','g');
+  else if(lang==='css')  re=new RegExp('(/\\*[\\s\\S]*?\\*/)|(\'(?:[^\'\\n])*\'|"(?:[^"\\n])*")|([.#][\\w-]+|:[\\w-]+)','g');
+  else re=new RegExp('(#[^\\n]*)','g');
+  return s.replace(re,(m,c,str,k)=>{
+    if(c!==undefined)   return '<span class="c">'+c+'</span>';
+    if(str!==undefined) return '<span class="s">'+str+'</span>';
+    if(k!==undefined)   return '<span class="k">'+k+'</span>';
+    return m;
+  });
+}
+function ed(f,c,l,b,badge){const bl=b?'blur':'',d=b?'data-blur="1"':'';return`<div class="ed ${bl}" ${d}><div class="ebar"><div class="dots"><span></span><span></span><span></span></div><span class="fich">${f}</span>${badge?'<span class="tag-n">'+badge+'</span>':''}<button class="bcopy" onclick="cp(this)"${b?' disabled':''}>Copiar</button></div><pre>${hi(c,l)}</pre>${b?'<div class="velo"><p>🔒 Inténtalo primero.</p><button onclick=\"rev(this)\">Ya lo intenté — revelar</button></div>':''}</div>`;}
+let cur=0;
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>irSes(+b.dataset.ses)));
+function irSes(n){cur=n;document.querySelectorAll('.ses').forEach((s,i)=>s.classList.toggle('vis',i===n));document.querySelectorAll('.tab').forEach((b,i)=>{b.classList.toggle('on',i===n);if(i===n)b.style.setProperty('--tab-c','#1A56A0','#0A8F82','#7B3FBF','#1F8C4E' .split(',')[n]);});window.scrollTo({top:0});actualizarProg();}
+function goSes(d){const n=cur+d;if(n>=0&&n<=3)irSes(n);}
+function actualizarProg(){const tots=[...document.querySelectorAll('input[type=checkbox]')];const hech=tots.filter(c=>c.checked).length;document.getElementById('pf').style.width=(tots.length?Math.round(hech/tots.length*100):0)+'%';}
+document.addEventListener('change',e=>{if(e.target.matches('input[type=checkbox]'))actualizarProg();});
+function cal(id){const c=document.getElementById(id);let ok=0,tot=0;c.querySelectorAll('.preg').forEach(p=>{tot++;const O=+p.dataset.ok,sel=p.querySelector('input:checked');p.querySelectorAll('label').forEach((l,j)=>{l.classList.remove('b','m');if(j===O)l.classList.add('b');});if(sel){if(+sel.value===O)ok++;else sel.closest('label').classList.add('m');}p.querySelector('.exp').style.display='block';});const r=c.querySelector('.res');r.style.display='block';r.style.color=ok===tot?'var(--ok)':ok>=2?'var(--ambar)':'var(--err)';r.textContent=ok===tot?'✅ '+ok+'/'+tot+' — ¡Estación dominada!':ok+'/'+tot+' — Revisa las explicaciones.';}
+function toggleSol(id){const el=document.getElementById(id);const b=el.querySelector('.sol-body');const i=el.querySelector('.ico');const ab=b.style.display==='block';b.style.display=ab?'none':'block';i.style.transform=ab?'':'rotate(180deg)';}
+function cp(btn){const pre=btn.closest('.ed').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='¡Copiado!';setTimeout(()=>btn.textContent='Copiar',1500);});}
+function rev(btn){const v=btn.parentElement;if(!v.dataset.ok){v.dataset.ok='1';v.querySelector('p').textContent='¿De verdad lo intentaste?';btn.textContent='Sí, mostrar el código';return;}const e=v.closest('.ed');e.classList.remove('blur');e.querySelector('.bcopy').disabled=false;v.remove();}
+// Fijar tab activo con color correcto al inicio
+(function(){const colors=["#1A56A0","#0A8F82","#7B3FBF","#1F8C4E"];document.querySelectorAll('.tab').forEach((b,i)=>{if(b.classList.contains('on'))b.style.setProperty('--tab-c',colors[i]);b.addEventListener('click',()=>b.style.setProperty('--tab-c',colors[i]));});})();
+</script>
+</body>
+</html>

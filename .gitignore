@@ -1,0 +1,35 @@
+﻿# ── Python / Backend ──
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.env.*
+!.env.example
+backend/venv/
+backend/.venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Node / Angular / Frontend ──
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.sass-cache/
+
+# ── Docker ──
+.dockerignore
+
+# ── IDEs ──
+.vscode/settings.json
+.idea/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ──
+*.log
+logs/

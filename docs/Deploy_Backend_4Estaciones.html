@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deploy Backend · Sin Docker · Docker · Nginx · CI/CD · ADSO 228118</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F0F4F8;--tinta:#111D2B;--suave:#4A5B6E;--azul:#1A56A0;--teal:#0A8F82;--ambar:#B87A10;--ok:#1F8C4E;--err:#B83030;--term:#0B1520;--borde:#C8D5E2;--card:#fff;--radio:10px;--sh:0 2px 12px rgba(17,29,43,.07)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tinta);line-height:1.65;font-size:16px}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif}code,pre{font-family:'JetBrains Mono',Consolas,monospace}
+button{font-family:inherit;cursor:pointer}:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* HEADER */
+header{background:var(--term);color:#D7E2EF;padding:28px 20px 0;border-bottom:4px solid var(--teal)}
+.hi{max-width:1100px;margin:0 auto}
+.eyebrow{color:#5FD3C4;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+header h1{font-size:clamp(21px,3.6vw,38px);font-weight:700;margin:6px 0 4px;line-height:1.1}
+header h1 em{color:#7EB6FF;font-style:normal}
+.sub{color:#8FA8C0;font-size:14px;margin-bottom:20px;max-width:720px}
+
+/* TABS */
+.tabs{display:flex;max-width:1100px;margin:0 auto;overflow-x:auto}
+.tab{flex:1;min-width:140px;background:none;border:none;color:#8FA8C0;padding:14px 8px;
+     text-align:center;border-top:3px solid transparent;transition:all .2s}
+.tnum{display:block;font-family:'JetBrains Mono';font-weight:700;font-size:14px;margin-bottom:3px}
+.tlab{display:block;font-family:'Space Grotesk';font-weight:700;font-size:12px;line-height:1.2}
+.tsub{display:block;font-size:10px;opacity:.65;margin-top:2px}
+.th{display:block;font-size:10px;font-family:'JetBrains Mono';color:#5FD3C4;margin-top:3px}
+.tab:hover{color:#fff;background:#0D1828}
+.tab.on{color:#fff;border-top-color:var(--tc,var(--teal));background:#0D1828}
+
+/* PROGRESO */
+.pbar{height:4px;background:var(--borde);max-width:1100px;margin:10px auto 0;overflow:hidden}
+.pfill{height:100%;background:var(--teal);transition:width .3s}
+
+/* MAIN */
+main{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+.est{display:none}.est.vis{display:block;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ESTACION HEADER */
+.est-hdr{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;
+         background:var(--card);border-radius:var(--radio);border-left:5px solid var(--ec,var(--teal));
+         box-shadow:var(--sh);margin-bottom:28px}
+.est-badge{width:48px;height:48px;border-radius:12px;background:var(--ec,var(--teal));
+           color:#fff;display:flex;align-items:center;justify-content:center;
+           font-family:'JetBrains Mono';font-weight:700;font-size:18px;flex-shrink:0}
+.est-hdr h2{font-size:23px}.est-sub{font-size:13px;color:var(--suave)}
+.est-t{margin-left:auto;font-family:'JetBrains Mono';font-size:12px;color:var(--suave);white-space:nowrap}
+
+/* ACTOS */
+.acto{margin-bottom:38px}
+.acab{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--borde);
+      padding-bottom:7px;margin-bottom:16px}
+.anum{font-family:'JetBrains Mono';font-size:11.5px;font-weight:600;color:var(--teal);letter-spacing:.1em}
+.acab h2{font-size:20px}.lead{color:var(--suave);max-width:840px;margin-bottom:12px;font-size:15px}
+
+/* DIAGRAMA */
+.dg{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);
+    padding:14px;margin:12px 0;box-shadow:var(--sh)}
+.dg svg{width:100%;height:auto;display:block}
+
+/* PASO */
+.paso{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);
+      box-shadow:var(--sh);margin-bottom:18px;overflow:hidden}
+.pcab{display:flex;align-items:center;gap:10px;padding:11px 15px;
+      border-bottom:1px solid var(--borde);background:#FAFCFE}
+.pnum{background:var(--azul);color:#fff;font-family:'JetBrains Mono';font-size:12px;
+      font-weight:700;min-width:28px;height:28px;border-radius:7px;
+      display:flex;align-items:center;justify-content:center}
+.pcab h3{font-size:15.5px;flex:1}
+.chk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--suave);
+     cursor:pointer;user-select:none;white-space:nowrap}
+.chk input{width:16px;height:16px;accent-color:var(--ok);cursor:pointer}
+.pbody{padding:15px}.pbody p{margin-bottom:10px;max-width:860px;font-size:15px}
+
+/* EDITOR */
+.ed{background:var(--term);border-radius:10px;overflow:hidden;margin:10px 0;border:1px solid #1E2C3F}
+.ebar{display:flex;align-items:center;gap:8px;background:#162030;padding:7px 12px;border-bottom:1px solid #1E2C3F}
+.dots{display:flex;gap:5px}.dots span{width:10px;height:10px;border-radius:50%}
+.dots span:nth-child(1){background:#E5564C}.dots span:nth-child(2){background:#E5B554}.dots span:nth-child(3){background:#4FBF6B}
+.fich{font-family:'JetBrains Mono';font-size:11.5px;color:#8FA8C0;flex:1}
+.tag-n{background:#1E3A5F;color:#7EB6FF;font-size:10px;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono'}
+.bcopy{background:none;border:1px solid #1E2C3F;color:#8FA8C0;font-size:11px;padding:3px 9px;
+       border-radius:6px;font-family:'JetBrains Mono';cursor:pointer}
+.bcopy:hover{color:#fff;border-color:var(--teal)}
+.ed pre{padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.72;color:#D7E2EF;tab-size:2}
+.k{color:#7EB6FF}.s{color:#8FD9A8}.c{color:#5B7084;font-style:italic}.n{color:#F0B76A}
+
+/* RETO + SOL */
+.reto{background:linear-gradient(135deg,#0B1520,#122030);color:#E8F0F9;
+      border-radius:var(--radio);padding:18px;margin-top:18px;border:1px solid #1E3450}
+.ey{color:var(--ambar);font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.reto h3{font-size:17px;margin:5px 0 6px}.reto p{color:#A8BCCC;font-size:14.5px;max-width:800px}
+.sol{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);
+     box-shadow:var(--sh);margin-top:14px;overflow:hidden}
+.sol-cab{display:flex;align-items:center;justify-content:space-between;
+         padding:11px 15px;background:#F5F8FB;border-bottom:1px solid var(--borde);cursor:pointer}
+.sol-cab h3{font-size:15px}.ico{font-size:16px;transition:transform .25s}
+.sol-body{display:none;padding:16px}
+.sol-step-title{font-weight:600;margin:0 0 6px;font-size:14px}
+.sol-div{border:none;border-top:1px solid var(--borde);margin:14px 0}
+
+/* NAV */
+.nav-e{display:flex;justify-content:space-between;margin-top:32px;gap:10px}
+.nav-e button{background:var(--card);border:1px solid var(--borde);border-radius:10px;
+              padding:10px 18px;font-weight:600;font-size:14px;color:var(--tinta);box-shadow:var(--sh)}
+.nav-e button:hover{border-color:var(--teal)}.nav-e button:disabled{opacity:.3;cursor:default}
+
+/* NOTA */
+.nota{border-radius:0 8px 8px 0;padding:10px 14px;font-size:13.5px;margin:10px 0;border-left:4px solid}
+.nota.v{background:#E8F5EE;border-color:var(--ok)}.nota.a{background:#FBF2E0;border-color:var(--ambar)}
+.nota.p{background:#FAEBE9;border-color:var(--err)}
+
+footer{background:var(--term);color:#5B7084;text-align:center;padding:22px 20px;font-size:13px}
+footer .hl{color:#5FD3C4}
+@media(max-width:680px){.tab{min-width:90px}.tsub,.th{display:none}.est-t{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">
+    <span class="eyebrow">SENA CDMC · ADSO 228118 · Ruta Deploy</span>
+    <h1>Deploy del Backend <em>FastAPI</em> — 4 Estaciones</h1>
+    <p class="sub">Sin Docker · Docker + Nginx · Docker + Traefik + SSL automático · CI/CD con GitHub Actions</p>
+  </div>
+  <nav class="tabs" aria-label="Estaciones">
+<button class="tab on" data-est="0"
+        style="--tc:#1A56A0">
+  <span class="tnum">01</span>
+  <span class="tlab">Deploy sin Docker</span>
+  <span class="tsub">Ubuntu 24.04</span>
+  <span class="th">~2.5 h</span>
+</button>
+<button class="tab " data-est="1"
+        style="">
+  <span class="tnum">02</span>
+  <span class="tlab">Docker — Contenedores</span>
+  <span class="tsub">Dockerfile</span>
+  <span class="th">~2 h</span>
+</button>
+<button class="tab " data-est="2"
+        style="">
+  <span class="tnum">03</span>
+  <span class="tlab">Docker + SSL automático con Traefik</span>
+  <span class="tsub">Traefik como reverse proxy</span>
+  <span class="th">~1.5 h</span>
+</button>
+<button class="tab " data-est="3"
+        style="">
+  <span class="tnum">04</span>
+  <span class="tlab">CI/CD — Deploy automático</span>
+  <span class="tsub">GitHub Actions</span>
+  <span class="th">~1.5 h</span>
+</button></nav>
+</header>
+<div class="pbar" style="padding:0 20px"><div class="pfill" id="pf" style="width:0%"></div></div>
+<main>
+<section class="est vis" id="est-0">
+  <div class="est-hdr" style="--ec:#1A56A0">
+    <div class="est-badge">01</div>
+    <div>
+      <h2>Deploy sin Docker</h2>
+      <span class="est-sub">Ubuntu 24.04 · PostgreSQL · Uvicorn · Nginx como proxy reverso</span>
+    </div>
+    <span class="est-t">⏱ ~2.5 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">En producción real la combinación más frecuente en servidores VPS (DigitalOcean, Hetzner, Linode) es Ubuntu + PostgreSQL nativo + Uvicorn gestionado por systemd + Nginx como proxy reverso. Aprender este flujo sin Docker te da control total sobre el servidor y es la base para entender qué hace Docker por ti.</p>
+    <figure class="dg"><svg viewBox="0 0 860 180" role="img" aria-label="Arquitectura sin Docker">
+  <defs><marker id="fl1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="60" width="110" height="60" rx="9" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+  <text x="65" y="88" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#1A56A0">Internet</text>
+  <text x="65" y="106" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">:80 / :443</text>
+  <line x1="120" y1="90" x2="185" y2="90" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl1)"/>
+  <rect x="190" y="40" width="480" height="100" rx="10" fill="#0B1520" stroke="#1E2C3F" stroke-width="1.5"/>
+  <text x="430" y="60" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#5FD3C4">Ubuntu 24.04 VPS</text>
+  <rect x="210" y="68" width="120" height="56" rx="8" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+  <text x="270" y="91" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#E8F0F9">Nginx</text>
+  <text x="270" y="107" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">proxy reverso</text>
+  <line x1="330" y1="96" x2="365" y2="96" stroke="#5FD3C4" stroke-width="2" marker-end="url(#fl1)"/>
+  <rect x="370" y="68" width="140" height="56" rx="8" fill="#162030" stroke="#7EB6FF" stroke-width="1.5"/>
+  <text x="440" y="88" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#E8F0F9">Uvicorn</text>
+  <text x="440" y="104" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:8000 (systemd)</text>
+  <line x1="510" y1="96" x2="545" y2="96" stroke="#5FD3C4" stroke-width="2" marker-end="url(#fl1)"/>
+  <rect x="550" y="68" width="100" height="56" rx="8" fill="#162030" stroke="#336791" stroke-width="1.5"/>
+  <text x="600" y="91" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#336791">PostgreSQL</text>
+  <text x="600" y="107" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:5432 local</text>
+  <line x1="670" y1="90" x2="730" y2="90" stroke="#4A5B6E" stroke-width="1.5" stroke-dasharray="4"/>
+  <rect x="735" y="60" width="110" height="60" rx="9" fill="#EFF4F8" stroke="#1F8C4E" stroke-width="2"/>
+  <text x="790" y="86" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#1F8C4E">Frontend</text>
+  <text x="790" y="103" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#4A5B6E">Angular /dist</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Actualizar servidor e instalar dependencias del sistema</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="0"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Partimos de un VPS Ubuntu 24.04 limpio. Instalamos Python, PostgreSQL y Nginx en un solo bloque.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (servidor Ubuntu)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Actualizar paquetes</span>
+sudo apt update &amp;&amp; sudo apt upgrade -y
+
+<span class="c"># Python 3.12, pip, venv y git</span>
+sudo apt install -y python3.12 python3.12-venv python3-pip git
+
+<span class="c"># PostgreSQL 16</span>
+sudo apt install -y postgresql postgresql-contrib
+
+<span class="c"># Nginx</span>
+sudo apt install -y nginx
+
+<span class="c"># Verificar que todo quedó instalado</span>
+python3 --version      <span class="c"># Python 3.12.x</span>
+psql --version         <span class="c"># psql 16.x</span>
+nginx -v               <span class="c"># nginx/1.x</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>Configurar PostgreSQL — usuario y base de datos</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="0"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>PostgreSQL crea el usuario postgres por defecto. Creamos un usuario dedicado para la aplicación y la base de datos.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (servidor)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Iniciar PostgreSQL si no está corriendo</span>
+sudo systemctl enable postgresql
+sudo systemctl start postgresql
+
+<span class="c"># Ingresar como superusuario de PostgreSQL</span>
+sudo -u postgres psql
+
+-- Dentro del prompt psql:
+CREATE USER sena_user WITH PASSWORD <span class="s">'sena_pass_segura_2026'</span>;
+CREATE DATABASE sena_mvc_db OWNER sena_user;
+GRANT ALL PRIVILEGES ON DATABASE sena_mvc_db TO sena_user;
+\q
+
+<span class="c"># Verificar conexión con el nuevo usuario</span>
+psql -U sena_user -d sena_mvc_db -h localhost -c <span class="s">"SELECT 1;"</span>
+<span class="c"># Debe responder: ?column? = 1</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>Clonar el proyecto y configurar el entorno virtual</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="0"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Clonamos el repositorio en /opt/ (ubicación estándar para aplicaciones de producción en Linux) y creamos el venv.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (servidor)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Clonar el repositorio</span>
+sudo mkdir -p /opt/sena-backend
+sudo chown $USER:$USER /opt/sena-backend
+cd /opt/sena-backend
+git clone https://github.com/tu-usuario/sena_mvc_project.git .
+
+<span class="c"># Crear y activar entorno virtual</span>
+python3 -m venv venv
+source venv/bin/activate
+
+<span class="c"># Instalar dependencias</span>
+pip install --upgrade pip
+pip install -r requirements.txt
+
+<span class="c"># Verificar que FastAPI arranca</span>
+uvicorn app.main:app --host 127.0.0.1 --port 8000
+<span class="c"># Ctrl+C para detener — si no hay error, continuamos</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>Crear el archivo .env de producción</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="0"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>En producción el .env nunca va al repositorio. Se crea directamente en el servidor con permisos restringidos.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">/opt/sena-backend/.env</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Crear el .env con permisos solo para el propietario</span>
+nano /opt/sena-backend/.env
+
+<span class="c"># Contenido del .env de producción:</span>
+DB_USER=sena_user
+DB_PASSWORD=sena_pass_segura_2026
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=sena_mvc_db
+JWT_SECRET_KEY=CAMBIA_ESTO_POR_UNA_CLAVE_MUY_LARGA_Y_ALEATORIA_EN_PRODUCCION
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+<span class="c"># Restringir permisos: solo el propietario puede leer/escribir</span>
+chmod 600 /opt/sena-backend/.env
+
+<span class="c"># Verificar permisos</span>
+ls -la /opt/sena-backend/.env
+<span class="c"># -rw------- 1 ubuntu ubuntu ... .env</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>Crear el servicio systemd — Uvicorn como demonio</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="0"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>systemd convierte Uvicorn en un servicio del sistema: arranca automáticamente al iniciar el servidor, se reinicia si falla y guarda logs en journald.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">/etc/systemd/system/sena-backend.service</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Crear el archivo de servicio</span>
+sudo nano /etc/systemd/system/sena-backend.service
+
+<span class="c"># Contenido del archivo:</span>
+[Unit]
+Description=SENA Backend FastAPI - MVC Async
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/sena-backend
+EnvironmentFile=/opt/sena-backend/.env
+ExecStart=/opt/sena-backend/venv/bin/uvicorn app.main:app     --host 127.0.0.1     --port 8000     --workers 2
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+<span class="c"># Activar y arrancar el servicio</span>
+sudo systemctl daemon-reload
+sudo systemctl enable sena-backend
+sudo systemctl start sena-backend
+
+<span class="c"># Verificar que está corriendo</span>
+sudo systemctl status sena-backend
+<span class="c"># Debe mostrar: Active: active (running)</span>
+
+<span class="c"># Ver los logs en tiempo real</span>
+sudo journalctl -u sena-backend -f</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">6</span>
+    <h3>Configurar Nginx como proxy reverso</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="0"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Nginx recibe las peticiones en el puerto 80 (o 443 con SSL) y las reenvía a Uvicorn en el puerto 8000 interno. También sirve el frontend Angular desde /dist.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">/etc/nginx/sites-available/sena-backend</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Crear configuración de Nginx</span>
+sudo nano /etc/nginx/sites-available/sena-backend
+
+<span class="c"># Contenido:</span>
+server {
+    listen 80;
+    server_name tu-dominio.com www.tu-dominio.com;
+    <span class="c"># Para IP directa: server_name _;</span>
+
+    <span class="c"># ── API Backend ──</span>
+    location /api/ {
+        proxy_pass         http://127.0.0.1:8000/;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection 'upgrade';
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 60s;
+    }
+
+    <span class="c"># ── Frontend Angular ──</span>
+    location / {
+        root   /opt/sena-backend/frontend/dist/sena-frontend/browser;
+        index  index.html;
+        <span class="c"># SPA routing: redirigir todo al index.html</span>
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+<span class="c"># Activar el sitio</span>
+sudo ln -s /etc/nginx/sites-available/sena-backend            /etc/nginx/sites-enabled/
+
+<span class="c"># Verificar configuración</span>
+sudo nginx -t
+<span class="c"># nginx: configuration file ... syntax is ok</span>
+<span class="c"># nginx: configuration file ... test is successful</span>
+
+<span class="c"># Recargar Nginx</span>
+sudo systemctl reload nginx</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">7</span>
+    <h3>SSL con Certbot (HTTPS gratuito)</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="0"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Certbot de Let's Encrypt genera y renueva automáticamente un certificado SSL gratuito. Solo funciona con dominio real (no con IP).</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (servidor)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Instalar Certbot para Nginx</span>
+sudo apt install -y certbot python3-certbot-nginx
+
+<span class="c"># Obtener certificado (reemplazar con tu dominio real)</span>
+sudo certbot --nginx -d tu-dominio.com -d www.tu-dominio.com
+
+<span class="c"># Certbot modifica automáticamente la config de Nginx para HTTPS</span>
+<span class="c"># y programa la renovación automática cada 90 días</span>
+
+<span class="c"># Verificar renovación automática</span>
+sudo certbot renew --dry-run
+<span class="c"># Debe decir: All renewals succeeded</span>
+
+<span class="c"># Ver el certificado instalado</span>
+sudo certbot certificates</pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 01</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>El servidor está corriendo pero los logs muestran muchas peticiones lentas. Configura Gunicorn como process manager en vez de Uvicorn directamente: instala gunicorn, crea un archivo gunicorn.conf.py con 4 workers y ajusta el ExecStart del servicio systemd para usar gunicorn con el worker class uvicorn.workers.UvicornWorker.</p>
+    </div>
+    <div class="sol" id="rsol-0">
+  <div class="sol-cab" onclick="toggleSol('rsol-0')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">1. Instalar Gunicorn en el venv</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>cd /opt/sena-backend
+source venv/bin/activate
+pip install gunicorn
+pip freeze &gt; requirements.txt</pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">2. Archivo de configuración de Gunicorn</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">/opt/sena-backend/gunicorn.conf.py</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="k">import</span> multiprocessing
+
+<span class="c"># Número de workers: regla empírica = (2 × CPUs) + 1</span>
+workers = multiprocessing.cpu_count() * <span class="n">2</span> + <span class="n">1</span>
+
+<span class="c"># Worker class: Uvicorn para compatibilidad con FastAPI async</span>
+worker_class = <span class="s">"uvicorn.workers.UvicornWorker"</span>
+
+<span class="c"># Dirección de escucha (solo localhost, Nginx hace el proxy)</span>
+bind = <span class="s">"127.0.0.1:8000"</span>
+
+<span class="c"># Timeouts</span>
+timeout  = <span class="n">60</span>
+keepalive = <span class="n">5</span>
+
+<span class="c"># Logging</span>
+accesslog = <span class="s">"/var/log/sena-backend/access.log"</span>
+errorlog  = <span class="s">"/var/log/sena-backend/error.log"</span>
+loglevel  = <span class="s">"info"</span>
+
+<span class="c"># Reinicio automático al cambiar el código (solo dev)</span>
+<span class="c"># reload = True</span></pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">3. Actualizar el servicio systemd</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">/etc/systemd/system/sena-backend.service</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>[Service]
+<span class="c"># Reemplazar la línea ExecStart anterior por:</span>
+ExecStart=/opt/sena-backend/venv/bin/gunicorn app.main:app     --config /opt/sena-backend/gunicorn.conf.py
+
+<span class="c"># Crear directorio de logs</span>
+sudo mkdir -p /var/log/sena-backend
+sudo chown ubuntu:ubuntu /var/log/sena-backend
+
+<span class="c"># Recargar systemd y reiniciar</span>
+sudo systemctl daemon-reload
+sudo systemctl restart sena-backend
+sudo systemctl status sena-backend</pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" disabled>← Estación anterior</button>
+    <button onclick="goE(1)"  >Siguiente estación →</button>
+  </div>
+</section>
+<section class="est " id="est-1">
+  <div class="est-hdr" style="--ec:#0A8F82">
+    <div class="est-badge">02</div>
+    <div>
+      <h2>Docker — Contenedores</h2>
+      <span class="est-sub">Dockerfile · docker-compose · Red de contenedores · Volúmenes para persistencia</span>
+    </div>
+    <span class="est-t">⏱ ~2 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Docker empaqueta la aplicación y todas sus dependencias en un contenedor aislado: el mismo imagen corre igual en tu máquina, en el servidor y en la nube. docker-compose orquesta los tres contenedores (FastAPI, PostgreSQL, Nginx) como si fueran un solo servicio. Esto elimina el "funciona en mi máquina" para siempre.</p>
+    <figure class="dg"><svg viewBox="0 0 860 200" role="img" aria-label="Arquitectura Docker">
+  <defs><marker id="fl2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="70" width="100" height="60" rx="9" fill="#EFF4F8" stroke="#0A8F82" stroke-width="2"/>
+  <text x="60" y="97" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#0A8F82">Internet</text>
+  <text x="60" y="114" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">:80</text>
+  <line x1="110" y1="100" x2="160" y2="100" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl2)"/>
+  <rect x="165" y="20" width="670" height="160" rx="12" fill="#0B1520" stroke="#0A8F82" stroke-width="2"/>
+  <text x="500" y="42" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#5FD3C4">Docker Network: sena-net</text>
+  <rect x="185" y="55" width="155" height="110" rx="9" fill="#162030" stroke="#0A8F82" stroke-width="2"/>
+  <text x="263" y="80" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">nginx</text>
+  <text x="263" y="97" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:80 → backend:8000</text>
+  <text x="263" y="113" text-anchor="middle" font-size="9" fill="#8FA8C0">sirve /app/frontend</text>
+  <text x="263" y="148" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#F0B76A">imagen: nginx:alpine</text>
+  <line x1="340" y1="110" x2="385" y2="110" stroke="#5FD3C4" stroke-width="2" marker-end="url(#fl2)"/>
+  <rect x="390" y="55" width="155" height="110" rx="9" fill="#162030" stroke="#7EB6FF" stroke-width="2"/>
+  <text x="468" y="80" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">backend</text>
+  <text x="468" y="97" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:8000 (interno)</text>
+  <text x="468" y="113" text-anchor="middle" font-size="9" fill="#8FA8C0">FastAPI + Uvicorn</text>
+  <text x="468" y="148" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#F0B76A">imagen: Python 3.12-slim</text>
+  <line x1="545" y1="110" x2="590" y2="110" stroke="#5FD3C4" stroke-width="2" marker-end="url(#fl2)"/>
+  <rect x="595" y="55" width="220" height="110" rx="9" fill="#162030" stroke="#336791" stroke-width="2"/>
+  <text x="705" y="80" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#336791">db</text>
+  <text x="705" y="97" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:5432 (interno)</text>
+  <text x="705" y="113" text-anchor="middle" font-size="9" fill="#8FA8C0">PostgreSQL 16</text>
+  <text x="705" y="130" text-anchor="middle" font-size="9" fill="#8FA8C0">volumen: postgres_data</text>
+  <text x="705" y="148" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#F0B76A">imagen: postgres:16-alpine</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Instalar Docker y Docker Compose en Ubuntu</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="1"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Docker oficial se instala desde el repositorio de Docker, no del apt de Ubuntu (que tiene una versión desactualizada).</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (servidor o local)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Instalar Docker Engine (método oficial)</span>
+curl -fsSL https://get.docker.com | sudo bash
+
+<span class="c"># Agregar tu usuario al grupo docker (evitar usar sudo en cada comando)</span>
+sudo usermod -aG docker $USER
+newgrp docker   <span class="c"># aplicar sin cerrar sesión</span>
+
+<span class="c"># Verificar instalación</span>
+docker --version         <span class="c"># Docker version 27.x</span>
+docker compose version   <span class="c"># Docker Compose version v2.x</span>
+
+<span class="c"># Prueba rápida</span>
+docker run hello-world</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>Dockerfile — imagen del backend</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="1"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>El Dockerfile describe cómo construir la imagen del backend. Usamos Python 3.12-slim (imagen mínima) y una construcción en dos etapas para reducir el tamaño final.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">Dockerfile</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Dockerfile (en la raíz del proyecto sena_mvc_project/)</span>
+
+<span class="c"># ── Etapa 1: instalar dependencias ──</span>
+FROM python:3.12-slim AS deps
+
+WORKDIR /app
+
+<span class="c"># Copiar solo requirements primero (caché de Docker)</span>
+<span class="c"># Si requirements.txt no cambia, Docker reutiliza esta capa</span>
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip &amp;&amp;     pip install --no-cache-dir -r requirements.txt
+
+<span class="c"># ── Etapa 2: imagen final ──</span>
+FROM python:3.12-slim
+
+WORKDIR /app
+
+<span class="c"># Copiar dependencias instaladas desde la etapa anterior</span>
+COPY --from=deps /usr/local/lib/python3.12/site-packages                  /usr/local/lib/python3.12/site-packages
+COPY --from=deps /usr/local/bin /usr/local/bin
+
+<span class="c"># Copiar el código de la aplicación</span>
+COPY ./app ./app
+
+<span class="c"># Usuario no-root por seguridad</span>
+RUN adduser --disabled-password --gecos <span class="s">""</span> appuser
+USER appuser
+
+<span class="c"># Puerto que expone el contenedor (documentación)</span>
+EXPOSE 8000
+
+<span class="c"># Comando de arranque con Gunicorn + UvicornWorker</span>
+CMD [<span class="s">"gunicorn"</span>, <span class="s">"app.main:app"</span>,      <span class="s">"--worker-class"</span>, <span class="s">"uvicorn.workers.UvicornWorker"</span>,      <span class="s">"--bind"</span>, <span class="s">"0.0.0.0:8000"</span>,      <span class="s">"--workers"</span>, <span class="s">"2"</span>,      <span class="s">"--timeout"</span>, <span class="s">"60"</span>]</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>.dockerignore — excluir archivos innecesarios</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="1"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>El .dockerignore funciona como el .gitignore pero para Docker: evita copiar archivos que no deben entrar en la imagen.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">.dockerignore</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># .dockerignore</span>
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+.git/
+.gitignore
+tests/
+*.md
+*.log
+.pytest_cache/
+dist/
+node_modules/</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>docker-compose.yml — orquestar los 3 contenedores</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="1"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Un solo archivo define los tres servicios (backend, db, nginx), la red que los conecta y el volumen para que los datos de PostgreSQL persistan aunque el contenedor se reinicie.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">docker-compose.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="k">services</span>:
+
+  <span class="c"># ── Base de datos PostgreSQL ──</span>
+  db:
+    <span class="k">image</span>: postgres:16-alpine
+    <span class="k">container_name</span>: sena-db
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">environment</span>:
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB:       ${DB_NAME}
+    <span class="k">volumes</span>:
+      - postgres_data:/var/lib/postgresql/data
+      <span class="c"># Script de inicialización (opcional)</span>
+      <span class="c"># - ./database.sql:/docker-entrypoint-initdb.d/init.sql</span>
+    <span class="k">networks</span>:
+      - sena-net
+    healthcheck:
+      test: [<span class="s">"CMD-SHELL"</span>, <span class="s">"pg_isready -U ${DB_USER} -d ${DB_NAME}"</span>]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  <span class="c"># ── Backend FastAPI ──</span>
+  backend:
+    <span class="k">build</span>:
+      <span class="k">context</span>: .
+      <span class="k">dockerfile</span>: Dockerfile
+    <span class="k">container_name</span>: sena-backend
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">env_file</span>:
+      - .env
+    <span class="k">environment</span>:
+      <span class="c"># En Docker, "db" es el hostname del contenedor PostgreSQL</span>
+      DB_HOST: db
+    <span class="k">depends_on</span>:
+      db:
+        condition: service_healthy   <span class="c"># espera que PostgreSQL esté listo</span>
+    <span class="k">networks</span>:
+      - sena-net
+    expose:
+      - <span class="s">"8000"</span>   <span class="c"># solo visible dentro de la red Docker, no al exterior</span>
+
+  <span class="c"># ── Nginx ──</span>
+  nginx:
+    <span class="k">image</span>: nginx:alpine
+    <span class="k">container_name</span>: sena-nginx
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">ports</span>:
+      - <span class="s">"80:80"</span>
+      - <span class="s">"443:443"</span>
+    <span class="k">volumes</span>:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      <span class="c"># Frontend Angular (build de producción)</span>
+      - ./frontend/dist/sena-frontend/browser:/usr/share/nginx/html:ro
+      <span class="c"># Certificados SSL (si usas Certbot manual)</span>
+      <span class="c"># - /etc/letsencrypt:/etc/letsencrypt:ro</span>
+    <span class="k">depends_on</span>:
+      - backend
+    <span class="k">networks</span>:
+      - sena-net
+
+<span class="k">volumes</span>:
+  postgres_data:   <span class="c"># volumen nombrado: persiste aunque el contenedor muera</span>
+
+<span class="k">networks</span>:
+  sena-net:
+    driver: bridge</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>nginx/nginx.conf — configuración para el contenedor</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="1"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Esta configuración va dentro del contenedor nginx. El servidor upstream se llama "backend" porque ese es el nombre del servicio en docker-compose, no localhost.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">nginx/nginx.conf</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># nginx/nginx.conf</span>
+upstream backend_api {
+    server backend:8000;   <span class="c"># "backend" = nombre del servicio en docker-compose</span>
+}
+
+server {
+    listen 80;
+    server_name _;   <span class="c"># cualquier hostname</span>
+
+    <span class="c"># ── API ──</span>
+    location /api/ {
+        proxy_pass         http://backend_api/;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    <span class="c"># ── Swagger UI (acceso directo en desarrollo) ──</span>
+    location /docs {
+        proxy_pass http://backend_api/docs;
+        proxy_set_header Host $host;
+    }
+
+    location /openapi.json {
+        proxy_pass http://backend_api/openapi.json;
+        proxy_set_header Host $host;
+    }
+
+    <span class="c"># ── Frontend Angular ──</span>
+    location / {
+        root  /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;   <span class="c"># SPA routing</span>
+    }
+}</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">6</span>
+    <h3>Levantar todo con Docker Compose</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="1"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Un solo comando construye las imágenes y levanta los tres contenedores. La primera vez tarda más por la descarga de imágenes base.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (raíz del proyecto)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Construir imágenes y levantar en segundo plano</span>
+docker compose up --build -d
+
+<span class="c"># Ver el estado de los contenedores</span>
+docker compose ps
+<span class="c"># NAME            STATUS          PORTS</span>
+<span class="c"># sena-db         Up (healthy)    5432/tcp</span>
+<span class="c"># sena-backend    Up              8000/tcp</span>
+<span class="c"># sena-nginx      Up              0.0.0.0:80-&gt;80/tcp</span>
+
+<span class="c"># Ver logs de todos los servicios</span>
+docker compose logs -f
+
+<span class="c"># Ver logs de un servicio específico</span>
+docker compose logs -f backend
+
+<span class="c"># Verificar que la API responde</span>
+curl http://localhost/api/
+<span class="c"># {"mensaje": "Backend MVC Asíncrono activo"}</span>
+
+<span class="c"># Acceder a Swagger UI</span>
+<span class="c"># http://localhost/docs</span></pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 02</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>La imagen del backend pesa demasiado. Analiza el tamaño con "docker images" y optimiza el Dockerfile usando multi-stage build para que la imagen final no incluya pip ni los archivos de compilación. El objetivo es que la imagen quede por debajo de 200 MB.</p>
+    </div>
+    <div class="sol" id="rsol-1">
+  <div class="sol-cab" onclick="toggleSol('rsol-1')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">1. Ver el tamaño actual de la imagen</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>docker images sena_mvc_project-backend
+<span class="c"># REPOSITORY                    TAG     IMAGE ID    SIZE</span>
+<span class="c"># sena_mvc_project-backend      latest  abc123...   ~350 MB</span>
+
+<span class="c"># Ver el tamaño por capa (detalle)</span>
+docker history sena_mvc_project-backend</pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">2. Dockerfile optimizado con multi-stage build</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">Dockerfile</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># ── Etapa 1: builder — solo para instalar dependencias ──</span>
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+RUN pip install --upgrade pip
+COPY requirements.txt .
+<span class="c"># Instalar en directorio temporal para copiar luego</span>
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+<span class="c"># ── Etapa 2: imagen final mínima ──</span>
+FROM python:3.12-slim
+
+WORKDIR /app
+
+<span class="c"># Copiar SOLO los paquetes instalados (sin pip, sin compiladores)</span>
+COPY --from=builder /install /usr/local
+
+<span class="c"># Copiar el código de la aplicación</span>
+COPY ./app ./app
+
+<span class="c"># Usuario no-root</span>
+RUN adduser --disabled-password --gecos <span class="s">""</span> appuser &amp;&amp;     chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+CMD [<span class="s">"gunicorn"</span>, <span class="s">"app.main:app"</span>,      <span class="s">"--worker-class"</span>, <span class="s">"uvicorn.workers.UvicornWorker"</span>,      <span class="s">"--bind"</span>, <span class="s">"0.0.0.0:8000"</span>, <span class="s">"--workers"</span>, <span class="s">"2"</span>]</pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">3. Reconstruir y verificar el nuevo tamaño</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Reconstruir la imagen</span>
+docker compose build --no-cache backend
+
+<span class="c"># Verificar el nuevo tamaño</span>
+docker images sena_mvc_project-backend
+<span class="c"># Debe quedar en ~140-180 MB</span>
+
+<span class="c"># Comparar con "dive" (herramienta opcional para inspeccionar capas)</span>
+docker run --rm -it   -v /var/run/docker.sock:/var/run/docker.sock   wagoodman/dive sena_mvc_project-backend</pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" >← Estación anterior</button>
+    <button onclick="goE(1)"  >Siguiente estación →</button>
+  </div>
+</section>
+<section class="est " id="est-2">
+  <div class="est-hdr" style="--ec:#7B3FBF">
+    <div class="est-badge">03</div>
+    <div>
+      <h2>Docker + SSL automático con Traefik</h2>
+      <span class="est-sub">Traefik como reverse proxy · Let's Encrypt automático · Labels en docker-compose</span>
+    </div>
+    <span class="est-t">⏱ ~1.5 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Nginx requiere configurar SSL manualmente con Certbot. Traefik es un proxy reverso diseñado para contenedores: detecta automáticamente los servicios de Docker mediante labels y gestiona los certificados SSL de Let's Encrypt sin intervención manual. Es el estándar en entornos de producción con Docker.</p>
+    <figure class="dg"><svg viewBox="0 0 860 200" role="img" aria-label="Arquitectura con Traefik">
+  <defs><marker id="fl3" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="70" width="100" height="60" rx="9" fill="#EFF4F8" stroke="#7B3FBF" stroke-width="2"/>
+  <text x="60" y="97" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#7B3FBF">Internet</text>
+  <text x="60" y="114" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">:80/:443</text>
+  <line x1="110" y1="100" x2="155" y2="100" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl3)"/>
+  <rect x="160" y="55" width="160" height="90" rx="9" fill="#162030" stroke="#C39AFF" stroke-width="2"/>
+  <text x="240" y="82" text-anchor="middle" font-size="12" font-family="Space Grotesk" font-weight="700" fill="#C39AFF">Traefik v3</text>
+  <text x="240" y="99" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">proxy reverso</text>
+  <text x="240" y="115" text-anchor="middle" font-size="9" fill="#8FA8C0">SSL Let's Encrypt</text>
+  <text x="240" y="131" text-anchor="middle" font-size="9" fill="#5FD3C4">auto-descubrimiento</text>
+  <line x1="320" y1="85" x2="365" y2="70" stroke="#C39AFF" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#fl3)"/>
+  <line x1="320" y1="115" x2="365" y2="130" stroke="#C39AFF" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#fl3)"/>
+  <rect x="370" y="40" width="140" height="60" rx="8" fill="#162030" stroke="#7EB6FF" stroke-width="1.5"/>
+  <text x="440" y="66" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">backend</text>
+  <text x="440" y="84" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:8000 · labels</text>
+  <rect x="370" y="120" width="140" height="60" rx="8" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+  <text x="440" y="146" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">frontend</text>
+  <text x="440" y="164" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">nginx · labels</text>
+  <line x1="510" y1="70" x2="555" y2="100" stroke="#5FD3C4" stroke-width="1.5" marker-end="url(#fl3)"/>
+  <line x1="510" y1="150" x2="555" y2="120" stroke="#5FD3C4" stroke-width="1.5" marker-end="url(#fl3)"/>
+  <rect x="560" y="70" width="120" height="60" rx="8" fill="#162030" stroke="#336791" stroke-width="1.5"/>
+  <text x="620" y="96" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#336791">db</text>
+  <text x="620" y="113" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">PostgreSQL</text>
+  <rect x="700" y="55" width="145" height="90" rx="9" fill="#0B1520" stroke="#C39AFF" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="773" y="78" text-anchor="middle" font-size="10" font-family="Space Grotesk" font-weight="700" fill="#C39AFF">Traefik Dashboard</text>
+  <text x="773" y="94" text-anchor="middle" font-size="9" fill="#8FA8C0">:8080 (admin)</text>
+  <text x="773" y="110" text-anchor="middle" font-size="9" fill="#8FA8C0">monitoreo</text>
+  <text x="773" y="126" text-anchor="middle" font-size="9" fill="#8FA8C0">de rutas</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Estructura de archivos para Traefik</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="2"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Traefik necesita un archivo de configuración estática y una carpeta para almacenar los certificados SSL. Los certificados se persisten en un volumen para no regenerarlos en cada reinicio.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (raíz del proyecto)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Estructura de archivos a crear</span>
+mkdir -p traefik
+touch traefik/traefik.yml
+touch traefik/acme.json
+chmod 600 traefik/acme.json   <span class="c"># ← OBLIGATORIO: Let's Encrypt falla si no es 600</span>
+
+<span class="c"># La estructura queda así:</span>
+<span class="c"># sena_mvc_project/</span>
+<span class="c"># ├── app/</span>
+<span class="c"># ├── traefik/</span>
+<span class="c"># │   ├── traefik.yml    ← config estática de Traefik</span>
+<span class="c"># │   └── acme.json      ← almacén de certificados SSL (vacío al inicio)</span>
+<span class="c"># ├── Dockerfile</span>
+<span class="c"># ├── docker-compose.yml</span>
+<span class="c"># └── .env</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>traefik/traefik.yml — configuración estática</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="2"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>La configuración estática define los puntos de entrada (puertos), el proveedor Docker y el resolutor de certificados. Solo se lee al arrancar Traefik.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">traefik/traefik.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># traefik/traefik.yml</span>
+
+<span class="c"># ── Puntos de entrada ──</span>
+entryPoints:
+  web:
+    address: <span class="s">":80"</span>
+    <span class="c"># Redirigir HTTP → HTTPS automáticamente</span>
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: <span class="s">":443"</span>
+    http:
+      tls:
+        certResolver: letsencrypt
+
+<span class="c"># ── Proveedor: Docker ──</span>
+providers:
+  docker:
+    endpoint: <span class="s">"unix:///var/run/docker.sock"</span>
+    exposedByDefault: false   <span class="c"># solo exponer servicios con label enable=true</span>
+    network: sena-net
+
+<span class="c"># ── Certificados SSL con Let's Encrypt ──</span>
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: tu-email@ejemplo.com     <span class="c"># ← cambiar por email real</span>
+      storage: /acme.json
+      httpChallenge:
+        entryPoint: web
+
+<span class="c"># ── Dashboard de Traefik (solo en desarrollo) ──</span>
+api:
+  dashboard: true
+  insecure: true   <span class="c"># quitar en producción</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>docker-compose.yml con Traefik y labels</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="2"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>El secreto de Traefik es la sección "labels": cada servicio le dice a Traefik su hostname, su puerto y su router. No hay que tocar nginx.conf.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">docker-compose.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="k">services</span>:
+
+  <span class="c"># ── Traefik ──</span>
+  traefik:
+    <span class="k">image</span>: traefik:v3.0
+    <span class="k">container_name</span>: sena-traefik
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">ports</span>:
+      - <span class="s">"80:80"</span>
+      - <span class="s">"443:443"</span>
+      - <span class="s">"8080:8080"</span>   <span class="c"># dashboard (quitar en producción)</span>
+    <span class="k">volumes</span>:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+    <span class="k">networks</span>:
+      - sena-net
+
+  <span class="c"># ── Base de datos ──</span>
+  db:
+    <span class="k">image</span>: postgres:16-alpine
+    <span class="k">container_name</span>: sena-db
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">environment</span>:
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB:       ${DB_NAME}
+    <span class="k">volumes</span>:
+      - postgres_data:/var/lib/postgresql/data
+    <span class="k">networks</span>:
+      - sena-net
+    healthcheck:
+      test: [<span class="s">"CMD-SHELL"</span>, <span class="s">"pg_isready -U ${DB_USER} -d ${DB_NAME}"</span>]
+      interval: 10s
+      retries: 5
+
+  <span class="c"># ── Backend FastAPI ──</span>
+  backend:
+    <span class="k">build</span>: .
+    <span class="k">container_name</span>: sena-backend
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">env_file</span>: .env
+    <span class="k">environment</span>:
+      DB_HOST: db
+    <span class="k">depends_on</span>:
+      db:
+        condition: service_healthy
+    <span class="k">networks</span>:
+      - sena-net
+    <span class="c"># ← Traefik lee estos labels y configura el routing automáticamente</span>
+    labels:
+      - <span class="s">"traefik.enable=true"</span>
+      <span class="c"># Router para /api</span>
+      - <span class="s">"traefik.http.routers.backend.rule=Host(`api.tu-dominio.com`)"</span>
+      - <span class="s">"traefik.http.routers.backend.entrypoints=websecure"</span>
+      - <span class="s">"traefik.http.routers.backend.tls=true"</span>
+      - <span class="s">"traefik.http.routers.backend.tls.certresolver=letsencrypt"</span>
+      <span class="c"># Puerto interno del contenedor</span>
+      - <span class="s">"traefik.http.services.backend.loadbalancer.server.port=8000"</span>
+
+  <span class="c"># ── Frontend Angular ──</span>
+  frontend:
+    <span class="k">image</span>: nginx:alpine
+    <span class="k">container_name</span>: sena-frontend
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">volumes</span>:
+      - ./frontend/dist/sena-frontend/browser:/usr/share/nginx/html:ro
+    <span class="k">networks</span>:
+      - sena-net
+    labels:
+      - <span class="s">"traefik.enable=true"</span>
+      - <span class="s">"traefik.http.routers.frontend.rule=Host(`tu-dominio.com`)"</span>
+      - <span class="s">"traefik.http.routers.frontend.entrypoints=websecure"</span>
+      - <span class="s">"traefik.http.routers.frontend.tls=true"</span>
+      - <span class="s">"traefik.http.routers.frontend.tls.certresolver=letsencrypt"</span>
+      - <span class="s">"traefik.http.services.frontend.loadbalancer.server.port=80"</span>
+
+<span class="k">volumes</span>:
+  postgres_data:
+
+<span class="k">networks</span>:
+  sena-net:
+    driver: bridge</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>Levantar y verificar</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="2"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>La primera vez que arranca, Traefik contacta Let's Encrypt para obtener el certificado. El proceso tarda entre 30 segundos y 2 minutos.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal (raíz del proyecto)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Levantar con Traefik</span>
+docker compose up -d
+
+<span class="c"># Verificar que todos los contenedores corren</span>
+docker compose ps
+
+<span class="c"># Ver logs de Traefik (incluye el proceso de obtención del certificado)</span>
+docker compose logs -f traefik
+
+<span class="c"># El certificado está listo cuando aparezca en los logs:</span>
+<span class="c"># "Obtained certificate" o "Certificate obtained"</span>
+
+<span class="c"># Dashboard de Traefik (solo si está habilitado)</span>
+<span class="c"># http://localhost:8080  — muestra routers, servicios y certificados</span>
+
+<span class="c"># Verificar HTTPS</span>
+curl -I https://api.tu-dominio.com/
+<span class="c"># HTTP/2 200</span>
+
+<span class="c"># Ver el certificado</span>
+curl -I https://api.tu-dominio.com/ -v 2&gt;&amp;1 | grep -A5 <span class="s">"SSL certificate"</span></pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 03</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>Agrega autenticación básica al dashboard de Traefik para que no sea accesible públicamente. Usa el middleware BasicAuth de Traefik con un usuario "admin" y una contraseña hasheada con htpasswd.</p>
+    </div>
+    <div class="sol" id="rsol-2">
+  <div class="sol-cab" onclick="toggleSol('rsol-2')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">1. Generar la contraseña hasheada</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">terminal</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Instalar apache2-utils para htpasswd</span>
+sudo apt install -y apache2-utils
+
+<span class="c"># Generar hash de la contraseña (reemplazar "mi_contrasena")</span>
+htpasswd -nb admin mi_contrasena
+<span class="c"># Resultado: admin:$apr1$xyz...</span>
+
+<span class="c"># El hash tiene $ que hay que escapar como $$ en docker-compose</span></pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">2. Agregar el middleware BasicAuth al servicio Traefik</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">docker-compose.yml (sección labels de traefik)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>  traefik:
+    <span class="c"># ... resto de la config igual ...</span>
+    labels:
+      - <span class="s">"traefik.enable=true"</span>
+      <span class="c"># Definir el middleware de autenticación básica</span>
+      <span class="c"># Nota: escapar $ como $$ en docker-compose</span>
+      - <span class="s">"traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$xyz$$hashdelresultado"</span>
+      <span class="c"># Router del dashboard</span>
+      - <span class="s">"traefik.http.routers.traefik-dashboard.rule=Host(`traefik.tu-dominio.com`)"</span>
+      - <span class="s">"traefik.http.routers.traefik-dashboard.entrypoints=websecure"</span>
+      - <span class="s">"traefik.http.routers.traefik-dashboard.tls.certresolver=letsencrypt"</span>
+      - <span class="s">"traefik.http.routers.traefik-dashboard.service=api@internal"</span>
+      <span class="c"># Aplicar el middleware al router del dashboard</span>
+      - <span class="s">"traefik.http.routers.traefik-dashboard.middlewares=auth"</span></pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">3. Quitar insecure:true del traefik.yml</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">traefik/traefik.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Cambiar la sección api:</span>
+api:
+  dashboard: true
+  insecure: false   <span class="c"># ← ahora requiere autenticación</span>
+
+<span class="c"># Reiniciar</span>
+<span class="c"># docker compose restart traefik</span>
+
+<span class="c"># Acceder al dashboard ahora requiere usuario y contraseña:</span>
+<span class="c"># https://traefik.tu-dominio.com  →  usuario: admin / contraseña: mi_contrasena</span></pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" >← Estación anterior</button>
+    <button onclick="goE(1)"  >Siguiente estación →</button>
+  </div>
+</section>
+<section class="est " id="est-3">
+  <div class="est-hdr" style="--ec:#1F8C4E">
+    <div class="est-badge">04</div>
+    <div>
+      <h2>CI/CD — Deploy automático</h2>
+      <span class="est-sub">GitHub Actions · SSH deploy · Docker Hub · Variables de entorno en GitHub Secrets</span>
+    </div>
+    <span class="est-t">⏱ ~1.5 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Sin CI/CD cada deploy es un proceso manual propenso a errores: conectarse por SSH, hacer git pull, reiniciar el servicio y rezar para que nada falle. Con GitHub Actions, cada push a la rama main desencadena automáticamente: pruebas → build de la imagen Docker → push a Docker Hub → deploy en el servidor vía SSH. Cero intervención manual.</p>
+    <figure class="dg"><svg viewBox="0 0 900 200" role="img" aria-label="Pipeline CI/CD">
+  <defs><marker id="fl4" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="70" width="110" height="60" rx="9" fill="#EFF4F8" stroke="#1F8C4E" stroke-width="2"/>
+  <text x="65" y="93" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#1F8C4E">git push</text>
+  <text x="65" y="110" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">→ main</text>
+  <line x1="120" y1="100" x2="155" y2="100" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl4)"/>
+  <rect x="160" y="50" width="130" height="100" rx="9" fill="#162030" stroke="#1F8C4E" stroke-width="2"/>
+  <text x="225" y="78" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">GitHub</text>
+  <text x="225" y="94" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">Actions</text>
+  <text x="225" y="112" text-anchor="middle" font-size="9" fill="#8FA8C0">1. pytest</text>
+  <text x="225" y="127" text-anchor="middle" font-size="9" fill="#8FA8C0">2. docker build</text>
+  <text x="225" y="142" text-anchor="middle" font-size="9" fill="#8FA8C0">3. docker push</text>
+  <line x1="290" y1="100" x2="325" y2="100" stroke="#1F8C4E" stroke-width="2" marker-end="url(#fl4)"/>
+  <rect x="330" y="65" width="120" height="70" rx="9" fill="#162030" stroke="#F0B76A" stroke-width="2"/>
+  <text x="390" y="90" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#F0B76A">Docker Hub</text>
+  <text x="390" y="108" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">imagen:latest</text>
+  <text x="390" y="124" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">imagen:sha-abc123</text>
+  <line x1="450" y1="100" x2="495" y2="100" stroke="#1F8C4E" stroke-width="2" marker-end="url(#fl4)"/>
+  <rect x="500" y="50" width="140" height="100" rx="9" fill="#162030" stroke="#7EB6FF" stroke-width="2"/>
+  <text x="570" y="78" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">SSH al</text>
+  <text x="570" y="94" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">Servidor</text>
+  <text x="570" y="112" text-anchor="middle" font-size="9" fill="#8FA8C0">docker pull</text>
+  <text x="570" y="127" text-anchor="middle" font-size="9" fill="#8FA8C0">docker compose up</text>
+  <text x="570" y="142" text-anchor="middle" font-size="9" fill="#5FD3C4">zero downtime</text>
+  <line x1="640" y1="100" x2="685" y2="100" stroke="#1F8C4E" stroke-width="2" marker-end="url(#fl4)"/>
+  <rect x="690" y="65" width="120" height="70" rx="9" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+  <text x="750" y="93" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#1A56A0">Producción</text>
+  <text x="750" y="110" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#4A5B6E">🟢 live</text>
+  <text x="750" y="126" text-anchor="middle" font-size="9" fill="#1F8C4E">~2 min total</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Crear cuenta en Docker Hub y repositorio de imagen</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="3"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Docker Hub almacena las imágenes del contenedor. El workflow de GitHub Actions construye y sube la imagen ahí; el servidor la descarga desde ahí.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">hub.docker.com</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># 1. Crear cuenta en hub.docker.com</span>
+
+<span class="c"># 2. Crear repositorio público (gratis):</span>
+<span class="c">#    hub.docker.com → Repositories → Create → Nombre: sena-backend</span>
+
+<span class="c"># 3. Hacer login desde la terminal (para pruebas locales)</span>
+docker login -u tu-usuario-dockerhub
+
+<span class="c"># 4. Construir y etiquetar la imagen con tu usuario de Docker Hub</span>
+docker build -t tu-usuario-dockerhub/sena-backend:latest .
+
+<span class="c"># 5. Subir la imagen a Docker Hub</span>
+docker push tu-usuario-dockerhub/sena-backend:latest
+
+<span class="c"># Verificar que está en Docker Hub:</span>
+<span class="c"># hub.docker.com/r/tu-usuario-dockerhub/sena-backend</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>Configurar GitHub Secrets — credenciales seguras</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="3"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Los Secrets de GitHub son variables de entorno cifradas que solo el workflow puede leer. Nunca aparecen en los logs ni en el código.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">GitHub → Settings → Secrets</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># En tu repositorio de GitHub:</span>
+<span class="c"># Settings → Secrets and variables → Actions → New repository secret</span>
+
+<span class="c"># Agregar estos 5 secrets:</span>
+
+<span class="c"># DOCKERHUB_USERNAME   → tu usuario de Docker Hub</span>
+<span class="c"># DOCKERHUB_TOKEN      → token de Docker Hub (no la contraseña)</span>
+<span class="c">#   Obtenerlo en: hub.docker.com → Account Settings → Security → New Access Token</span>
+
+<span class="c"># SSH_HOST             → IP pública de tu servidor VPS</span>
+<span class="c"># SSH_USER             → usuario SSH (generalmente "ubuntu")</span>
+<span class="c"># SSH_PRIVATE_KEY      → clave SSH privada (cat ~/.ssh/id_rsa)</span>
+<span class="c">#   Si no tienes par de claves SSH:</span>
+ssh-keygen -t ed25519 -C <span class="s">"github-actions-deploy"</span>
+cat ~/.ssh/id_ed25519          <span class="c"># ← este es el SSH_PRIVATE_KEY</span>
+cat ~/.ssh/id_ed25519.pub      <span class="c"># ← agregar esto al servidor:</span>
+<span class="c">#                                  echo "..." &gt;&gt; ~/.ssh/authorized_keys</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>Workflow principal: CI/CD completo</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="3"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>El workflow tiene tres jobs encadenados: test (pytest), build-and-push (imagen Docker), y deploy (SSH al servidor). Si cualquier job falla, los siguientes no se ejecutan.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">.github/workflows/deploy.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>name: CI/CD — Test, Build, Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   <span class="c"># permite lanzarlo manualmente desde GitHub UI</span>
+
+jobs:
+  <span class="c"># ── Job 1: Ejecutar tests ──</span>
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: &gt;-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: <span class="s">'3.12'</span>
+          cache: <span class="s">'pip'</span>
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar pytest
+        env:
+          DB_USER: test_user
+          DB_PASSWORD: test_pass
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: test_db
+          JWT_SECRET_KEY: test-secret-key-solo-para-ci
+          JWT_ALGORITHM: HS256
+        run: pytest tests/ -v --tb=short
+
+  <span class="c"># ── Job 2: Construir y subir imagen a Docker Hub ──</span>
+  build-and-push:
+    needs: test   <span class="c"># solo si los tests pasan</span>
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: $${{ steps.meta.outputs.tags }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extraer metadatos (tag con SHA del commit)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/sena-backend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+
+      - name: Construir y subir imagen
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          <span class="c"># Caché: reutiliza capas de la imagen anterior (builds más rápidos)</span>
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/sena-backend:cache
+          cache-to:   type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/sena-backend:cache,mode=max
+
+  <span class="c"># ── Job 3: Deploy en el servidor via SSH ──</span>
+  deploy:
+    needs: build-and-push   <span class="c"># solo si la imagen se subió con éxito</span>
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host:     ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key:      ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/sena-backend
+
+            <span class="c"># Descargar la nueva imagen</span>
+            docker compose pull backend
+
+            <span class="c"># Reiniciar solo el backend (sin downtime en db y nginx)</span>
+            docker compose up -d --no-deps backend
+
+            <span class="c"># Limpiar imágenes antiguas (liberar espacio)</span>
+            docker image prune -f
+
+            echo <span class="s">"✅ Deploy completado: $(date)"</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>docker-compose.yml ajustado para CI/CD</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="3"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>En el servidor, el backend ya no usa "build: ." sino la imagen de Docker Hub. El CI/CD se encarga de construirla y subirla.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">docker-compose.yml (fragmento backend)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>  <span class="c"># ── Backend (en el servidor de producción) ──</span>
+  backend:
+    <span class="c"># Ya no construye localmente: descarga desde Docker Hub</span>
+    <span class="k">image</span>: tu-usuario-dockerhub/sena-backend:main
+    <span class="k">container_name</span>: sena-backend
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">env_file</span>: .env
+    <span class="k">environment</span>:
+      DB_HOST: db
+    <span class="k">depends_on</span>:
+      db:
+        condition: service_healthy
+    <span class="k">networks</span>:
+      - sena-net
+    labels:
+      - <span class="s">"traefik.enable=true"</span>
+      - <span class="s">"traefik.http.routers.backend.rule=Host(`api.tu-dominio.com`)"</span>
+      - <span class="s">"traefik.http.routers.backend.entrypoints=websecure"</span>
+      - <span class="s">"traefik.http.routers.backend.tls.certresolver=letsencrypt"</span>
+      - <span class="s">"traefik.http.services.backend.loadbalancer.server.port=8000"</span>
+
+<span class="c"># Inicializar en el servidor por primera vez:</span>
+<span class="c"># docker compose pull</span>
+<span class="c"># docker compose up -d</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>Verificar el pipeline completo</h3>
+    <label class="chk">
+      <input type="checkbox" data-e="3"> Completado
+    </label>
+  </div>
+  <div class="pbody">
+    <p>Después de hacer el primer push, el pipeline aparece en la pestaña Actions del repositorio de GitHub.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">GitHub → Actions</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Hacer un push para disparar el workflow</span>
+git add .github/workflows/deploy.yml
+git commit -m <span class="s">"feat: agregar pipeline CI/CD"</span>
+git push origin main
+
+<span class="c"># En GitHub:</span>
+<span class="c"># → Actions → "CI/CD — Test, Build, Deploy"</span>
+<span class="c"># → Ver los 3 jobs: test ✅ → build-and-push ✅ → deploy ✅</span>
+
+<span class="c"># Duración esperada:</span>
+<span class="c"># test:           ~45 segundos</span>
+<span class="c"># build-and-push: ~2-3 minutos (primera vez ~5 min)</span>
+<span class="c"># deploy:         ~30 segundos</span>
+<span class="c"># Total:          ~3-4 minutos por push</span>
+
+<span class="c"># Verificar en el servidor:</span>
+docker compose ps
+docker compose logs backend --tail=20</pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 04</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>El pipeline falla si los tests necesitan conexión real a PostgreSQL. Configura pytest para usar una base de datos SQLite en memoria durante los tests del CI, sin modificar el código de producción. Usa una variable de entorno TESTING=true y override el DATABASE_URL en database.py.</p>
+    </div>
+    <div class="sol" id="rsol-3">
+  <div class="sol-cab" onclick="toggleSol('rsol-3')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">1. Modificar database.py para detectar el modo test</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">app/database.py</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="k">import</span> os
+<span class="k">from</span> dotenv <span class="k">import</span> load_dotenv
+<span class="k">from</span> sqlalchemy.ext.asyncio <span class="k">import</span> (
+    create_async_engine, AsyncSession, async_sessionmaker
+)
+<span class="k">from</span> sqlalchemy.orm <span class="k">import</span> declarative_base
+
+load_dotenv()
+
+<span class="c"># Si TESTING=true, usar SQLite en memoria (sin PostgreSQL)</span>
+<span class="k">if</span> os.getenv(<span class="s">"TESTING"</span>) == <span class="s">"true"</span>:
+    DATABASE_URL = <span class="s">"sqlite+aiosqlite:///./test.db"</span>
+<span class="k">else</span>:
+    DATABASE_URL = (
+        f<span class="s">"postgresql+asyncpg://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"</span>
+        f<span class="s">"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"</span>
+    )
+
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=<span class="k">False</span>,
+    <span class="c"># SQLite necesita este parámetro en modo async</span>
+    connect_args={<span class="s">"check_same_thread"</span>: <span class="k">False</span>}
+    <span class="k">if</span> <span class="s">"sqlite"</span> <span class="k">in</span> DATABASE_URL <span class="k">else</span> {}
+)
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine, class_=AsyncSession, expire_on_commit=<span class="k">False</span>
+)
+Base = declarative_base()
+
+<span class="k">async</span> <span class="k">def</span> get_db():
+    <span class="k">async</span> <span class="k">with</span> AsyncSessionLocal() <span class="k">as</span> session:
+        <span class="k">yield</span> session</pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">2. Instalar aiosqlite como dependencia de test</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">requirements.txt</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Agregar al requirements.txt:</span>
+aiosqlite   <span class="c"># driver async para SQLite (solo tests)</span>
+
+<span class="c"># O como dependencia separada en requirements-dev.txt:</span>
+<span class="c"># aiosqlite</span>
+<span class="c"># pytest</span>
+<span class="c"># httpx</span>
+<span class="c"># pytest-asyncio</span></pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">3. Actualizar el job de test en el workflow (sin PostgreSQL)</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">.github/workflows/deploy.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>  test:
+    runs-on: ubuntu-latest
+    <span class="c"># Sin "services: postgres:" — ya no lo necesitamos</span>
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: <span class="s">'3.12'</span>
+          cache: <span class="s">'pip'</span>
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt &amp;&amp; pip install aiosqlite
+
+      - name: Ejecutar pytest con SQLite
+        env:
+          TESTING: <span class="s">"true"</span>            <span class="c"># ← activa SQLite en database.py</span>
+          JWT_SECRET_KEY: test-key
+          JWT_ALGORITHM: HS256
+          ACCESS_TOKEN_EXPIRE_MINUTES: <span class="s">"30"</span>
+        run: pytest tests/ -v --tb=short
+<span class="c"># Ahora los tests corren sin PostgreSQL: más rápidos y sin dependencias externas</span></pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" >← Estación anterior</button>
+    <button onclick="goE(1)"  disabled>Siguiente estación →</button>
+  </div>
+</section></main>
+<footer>Curso interactivo Deploy · ADSO 228118 · SENA CDMC Itagüí · <span class="hl">Ing. Luis Eladio Porras Camargo</span></footer>
+<script>
+const COLORS=["#1A56A0","#0A8F82","#7B3FBF","#1F8C4E"];
+let cur=0;
+document.querySelectorAll('.tab').forEach((b,i)=>{
+  b.addEventListener('click',()=>irE(i));
+});
+function irE(n){
+  cur=n;
+  document.querySelectorAll('.est').forEach((s,i)=>s.classList.toggle('vis',i===n));
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('on',i===n);
+    if(i===n) b.style.setProperty('--tc',COLORS[i]);
+  });
+  window.scrollTo({top:0});
+  prog();
+}
+function goE(d){const n=cur+d; if(n>=0&&n<=3) irE(n);}
+document.addEventListener('change',e=>{if(e.target.matches('input[type=checkbox]'))prog();});
+function prog(){
+  const all=[...document.querySelectorAll('input[type=checkbox]')];
+  const done=all.filter(c=>c.checked).length;
+  document.getElementById('pf').style.width=(all.length?Math.round(done/all.length*100):0)+'%';
+}
+function toggleSol(id){
+  const el=document.getElementById(id);
+  const b=el.querySelector('.sol-body');
+  const ic=el.querySelector('.ico');
+  const open=b.style.display==='block';
+  b.style.display=open?'none':'block';
+  ic.style.transform=open?'':'rotate(180deg)';
+}
+function cp(btn){
+  const pre=btn.closest('.ed').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='¡Copiado!';
+    setTimeout(()=>btn.textContent='Copiar',1500);
+  });
+}
+// Activar color del tab activo al inicio
+(function(){
+  document.querySelectorAll('.tab')[0].style.setProperty('--tc',COLORS[0]);
+})();
+</script>
+</body>
+</html>

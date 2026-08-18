@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deploy Windows 11 · Docker Desktop · ADSO 228118</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F0F4F8;--tinta:#111D2B;--suave:#4A5B6E;--azul:#1A56A0;--teal:#0A8F82;--ambar:#B87A10;--ok:#1F8C4E;--err:#B83030;--term:#0B1520;--borde:#C8D5E2;--card:#fff;--radio:10px;--sh:0 2px 12px rgba(17,29,43,.07)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tinta);line-height:1.65;font-size:16px}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif}code,pre{font-family:'JetBrains Mono',Consolas,monospace}
+button{font-family:inherit;cursor:pointer}:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+header{background:var(--term);color:#D7E2EF;padding:28px 20px 0;border-bottom:4px solid var(--azul)}
+.hi{max-width:1100px;margin:0 auto}
+.eyebrow{color:#7EB6FF;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+header h1{font-size:clamp(21px,3.6vw,38px);font-weight:700;margin:6px 0 4px;line-height:1.1}
+header h1 em{color:#5FD3C4;font-style:normal}
+.sub{color:#8FA8C0;font-size:14px;margin-bottom:20px;max-width:760px}
+.win-badge{display:inline-flex;align-items:center;gap:6px;background:#0078D4;color:#fff;
+           font-family:'Space Grotesk';font-weight:700;font-size:12px;padding:4px 12px;
+           border-radius:6px;margin-bottom:14px}
+.tabs{display:flex;max-width:1100px;margin:0 auto;overflow-x:auto}
+.tab{flex:1;min-width:140px;background:none;border:none;color:#8FA8C0;padding:14px 8px;
+     text-align:center;border-top:3px solid transparent;transition:all .2s}
+.tnum{display:block;font-family:'JetBrains Mono';font-weight:700;font-size:14px;margin-bottom:3px}
+.tlab{display:block;font-family:'Space Grotesk';font-weight:700;font-size:12px;line-height:1.2}
+.tsub{display:block;font-size:10px;opacity:.65;margin-top:2px}
+.th{display:block;font-size:10px;font-family:'JetBrains Mono';color:#7EB6FF;margin-top:3px}
+.tab:hover{color:#fff;background:#0D1828}.tab.on{color:#fff;border-top-color:var(--tc,var(--azul));background:#0D1828}
+.pbar{height:4px;background:var(--borde);max-width:1100px;margin:10px auto 0;overflow:hidden}
+.pfill{height:100%;background:var(--azul);transition:width .3s}
+main{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+.est{display:none}.est.vis{display:block;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.est-hdr{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;
+         background:var(--card);border-radius:var(--radio);border-left:5px solid var(--ec,var(--azul));
+         box-shadow:var(--sh);margin-bottom:28px}
+.est-badge{width:48px;height:48px;border-radius:12px;background:var(--ec,var(--azul));
+           color:#fff;display:flex;align-items:center;justify-content:center;
+           font-family:'JetBrains Mono';font-weight:700;font-size:18px;flex-shrink:0}
+.est-hdr h2{font-size:23px}.est-sub{font-size:13px;color:var(--suave)}
+.est-t{margin-left:auto;font-family:'JetBrains Mono';font-size:12px;color:var(--suave);white-space:nowrap}
+.acto{margin-bottom:38px}
+.acab{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--borde);padding-bottom:7px;margin-bottom:16px}
+.anum{font-family:'JetBrains Mono';font-size:11.5px;font-weight:600;color:var(--azul);letter-spacing:.1em}
+.acab h2{font-size:20px}.lead{color:var(--suave);max-width:840px;margin-bottom:12px;font-size:15px}
+.dg{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);padding:14px;margin:12px 0;box-shadow:var(--sh)}
+.dg svg{width:100%;height:auto;display:block}
+.paso{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);margin-bottom:18px;overflow:hidden}
+.pcab{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--borde);background:#FAFCFE}
+.pnum{background:var(--azul);color:#fff;font-family:'JetBrains Mono';font-size:12px;font-weight:700;min-width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.pcab h3{font-size:15.5px;flex:1}
+.chk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--suave);cursor:pointer;user-select:none;white-space:nowrap}
+.chk input{width:16px;height:16px;accent-color:var(--ok);cursor:pointer}
+.pbody{padding:15px}.pbody p{margin-bottom:10px;max-width:860px;font-size:15px}
+.ed{background:var(--term);border-radius:10px;overflow:hidden;margin:10px 0;border:1px solid #1E2C3F}
+.ebar{display:flex;align-items:center;gap:8px;background:#162030;padding:7px 12px;border-bottom:1px solid #1E2C3F}
+.dots{display:flex;gap:5px}.dots span{width:10px;height:10px;border-radius:50%}
+.dots span:nth-child(1){background:#E5564C}.dots span:nth-child(2){background:#E5B554}.dots span:nth-child(3){background:#4FBF6B}
+.fich{font-family:'JetBrains Mono';font-size:11.5px;color:#8FA8C0;flex:1}
+.tag-n{background:#0078D4;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono'}
+.bcopy{background:none;border:1px solid #1E2C3F;color:#8FA8C0;font-size:11px;padding:3px 9px;border-radius:6px;font-family:'JetBrains Mono';cursor:pointer}
+.bcopy:hover{color:#fff;border-color:var(--teal)}
+.ed pre{padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.72;color:#D7E2EF;tab-size:2}
+.k{color:#7EB6FF}.s{color:#8FD9A8}.c{color:#5B7084;font-style:italic}.n{color:#F0B76A}
+.reto{background:linear-gradient(135deg,#0B1520,#122030);color:#E8F0F9;border-radius:var(--radio);padding:18px;margin-top:18px;border:1px solid #1E3450}
+.ey{color:var(--ambar);font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.reto h3{font-size:17px;margin:5px 0 6px}.reto p{color:#A8BCCC;font-size:14.5px;max-width:800px}
+.sol{background:var(--card);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sh);margin-top:14px;overflow:hidden}
+.sol-cab{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:#F5F8FB;border-bottom:1px solid var(--borde);cursor:pointer}
+.sol-cab h3{font-size:15px}.ico{font-size:16px;transition:transform .25s}.sol-body{display:none;padding:16px}
+.sol-step-title{font-weight:600;margin:0 0 6px;font-size:14px}
+.sol-div{border:none;border-top:1px solid var(--borde);margin:14px 0}
+.nav-e{display:flex;justify-content:space-between;margin-top:32px;gap:10px}
+.nav-e button{background:var(--card);border:1px solid var(--borde);border-radius:10px;padding:10px 18px;font-weight:600;font-size:14px;color:var(--tinta);box-shadow:var(--sh)}
+.nav-e button:hover{border-color:var(--azul)}.nav-e button:disabled{opacity:.3;cursor:default}
+footer{background:var(--term);color:#5B7084;text-align:center;padding:22px 20px;font-size:13px}
+footer .hl{color:#7EB6FF}
+@media(max-width:680px){.tab{min-width:90px}.tsub,.th{display:none}.est-t{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">
+    <span class="eyebrow">SENA CDMC · ADSO 228118 · Ruta Deploy</span>
+    <div class="win-badge">⊞ Windows 11</div>
+    <h1>Deploy del Backend <em>FastAPI</em> — Windows 11</h1>
+    <p class="sub">Docker Desktop + WSL2 · Nginx · Traefik + SSL · CI/CD con GitHub Actions desde PowerShell · Los mismos archivos Dockerfile y docker-compose.yml que en Linux</p>
+  </div>
+  <nav class="tabs" aria-label="Estaciones">
+<button class="tab on" data-est="0"
+        style="--tc:#1A56A0">
+  <span class="tnum">01</span>
+  <span class="tlab">Docker Desktop en Windows 11</span>
+  <span class="tsub">WSL2</span>
+  <span class="th">~1.5 h</span>
+</button>
+<button class="tab " data-est="1"
+        style="">
+  <span class="tnum">02</span>
+  <span class="tlab">Docker + Nginx</span>
+  <span class="tsub">Dockerfile</span>
+  <span class="th">~1.5 h</span>
+</button>
+<button class="tab " data-est="2"
+        style="">
+  <span class="tnum">03</span>
+  <span class="tlab">Docker + Traefik + SSL automático</span>
+  <span class="tsub">Traefik v3</span>
+  <span class="th">~1.5 h</span>
+</button>
+<button class="tab " data-est="3"
+        style="">
+  <span class="tnum">04</span>
+  <span class="tlab">CI/CD — Deploy automático</span>
+  <span class="tsub">GitHub Actions</span>
+  <span class="th">~1.5 h</span>
+</button></nav>
+</header>
+<div class="pbar" style="padding:0 20px"><div class="pfill" id="pf" style="width:0%"></div></div>
+<main>
+<section class="est vis" id="est-0">
+  <div class="est-hdr" style="--ec:#1A56A0">
+    <div class="est-badge">01</div>
+    <div>
+      <h2>Docker Desktop en Windows 11</h2>
+      <span class="est-sub">WSL2 · Docker Desktop · PostgreSQL en contenedor · Sin máquina virtual</span>
+    </div>
+    <span class="est-t">⏱ ~1.5 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">En Windows 11 no existe systemd, ni Nginx de producción, ni el ecosistema de servicios de Linux. La solución profesional es <strong>Docker Desktop</strong>, que usa WSL2 (un kernel Linux real embebido en Windows) como motor interno. El resultado: los mismos <code>Dockerfile</code>, <code>docker-compose.yml</code> y configuraciones de Nginx de las estaciones 02–04 funcionan <em>sin cambiar una sola línea</em>. Apriendes el mismo flujo que usarás en cualquier servidor de producción.</p>
+    <figure class="dg"><svg viewBox="0 0 860 200" role="img" aria-label="Arquitectura Docker Desktop Windows 11">
+  <defs><marker id="fl1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="20" width="840" height="160" rx="12" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+  <text x="420" y="42" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="13" fill="#1A56A0">Windows 11 — tu máquina PorrasLuis</text>
+  <rect x="30" y="55" width="160" height="110" rx="10" fill="#fff" stroke="#C8D5E2" stroke-width="1.5"/>
+  <text x="110" y="80" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#111D2B">VS Code</text>
+  <text x="110" y="97" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">sena_mvc_project/</text>
+  <text x="110" y="113" text-anchor="middle" font-size="10" fill="#4A5B6E">tu código en</text>
+  <text x="110" y="129" text-anchor="middle" font-size="10" fill="#4A5B6E">C:Projects</text>
+  <text x="110" y="147" text-anchor="middle" font-size="10" fill="#4A5B6E">PowerShell</text>
+  <line x1="190" y1="110" x2="225" y2="110" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl1)"/>
+  <rect x="230" y="50" width="390" height="120" rx="10" fill="#0B1520"/>
+  <text x="425" y="72" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#5FD3C4">Docker Desktop (WSL2) — kernel Linux real</text>
+  <rect x="248" y="82" width="100" height="74" rx="8" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+  <text x="298" y="104" text-anchor="middle" font-size="10" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">nginx</text>
+  <text x="298" y="120" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:80</text>
+  <text x="298" y="136" text-anchor="middle" font-size="9" fill="#F0B76A">nginx:alpine</text>
+  <rect x="365" y="82" width="110" height="74" rx="8" fill="#162030" stroke="#7EB6FF" stroke-width="1.5"/>
+  <text x="420" y="104" text-anchor="middle" font-size="10" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">backend</text>
+  <text x="420" y="120" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:8000</text>
+  <text x="420" y="136" text-anchor="middle" font-size="9" fill="#F0B76A">python:3.12-slim</text>
+  <rect x="492" y="82" width="110" height="74" rx="8" fill="#162030" stroke="#336791" stroke-width="1.5"/>
+  <text x="547" y="104" text-anchor="middle" font-size="10" font-family="Space Grotesk" font-weight="700" fill="#336791">db</text>
+  <text x="547" y="120" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:5432</text>
+  <text x="547" y="136" text-anchor="middle" font-size="9" fill="#F0B76A">postgres:16-alpine</text>
+  <line x1="620" y1="110" x2="660" y2="110" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl1)"/>
+  <rect x="665" y="65" width="165" height="90" rx="10" fill="#fff" stroke="#C8D5E2" stroke-width="1.5"/>
+  <text x="748" y="90" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#1A56A0">Navegador</text>
+  <text x="748" y="107" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">localhost:80</text>
+  <text x="748" y="124" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#0A8F82">localhost/docs</text>
+  <text x="748" y="141" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#0A8F82">localhost/api/</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Instalar Docker Desktop para Windows</h3>
+    <label class="chk"><input type="checkbox" data-e="0"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Docker Desktop incluye WSL2, el motor Docker y Docker Compose. No necesitas instalar nada más. El instalador configura WSL2 automáticamente.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell (Administrador)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Opción A — Winget (recomendada, ya incluido en Windows 11)</span>
+winget install Docker.DockerDesktop
+
+<span class="c"># Reiniciar Windows cuando lo pida el instalador</span>
+
+<span class="c"># Opción B — Descarga manual:</span>
+<span class="c"># https://docs.docker.com/desktop/install/windows-install/</span>
+<span class="c"># → Docker Desktop Installer.exe → Next → Next → Finish</span>
+
+<span class="c"># Después de reiniciar, abrir Docker Desktop y esperar</span>
+<span class="c"># el ícono de la ballena en la barra de tareas quede verde</span>
+
+<span class="c"># Verificar en PowerShell (no requiere Administrador):</span>
+<span class="k">docker</span> --version
+<span class="c"># Docker version 27.x.x</span>
+
+<span class="k">docker</span> compose version
+<span class="c"># Docker Compose version v2.x.x</span>
+
+<span class="c"># Prueba rápida — debe descargar y correr hello-world:</span>
+<span class="k">docker</span> run hello-world</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>Configurar WSL2 — límite de memoria para tu equipo</h3>
+    <label class="chk"><input type="checkbox" data-e="0"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Por defecto WSL2 puede usar hasta el 50% de la RAM. Con 16 GB en tu equipo, conviene limitarlo a 6 GB para que Windows y VS Code sigan fluidos mientras Docker corre.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">C:\Users\PorrasLuis\.wslconfig</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Crear o editar el archivo .wslconfig</span>
+<span class="c"># (Abrirlo con Notepad directamente desde PowerShell)</span>
+notepad <span class="s">"$env:USERPROFILE.wslconfig"</span>
+
+<span class="c"># Contenido del archivo:</span>
+[wsl2]
+memory=6GB          <span class="c"># máximo RAM para WSL2 (tu equipo tiene 16 GB)</span>
+processors=4        <span class="c"># máximo CPUs (tu Ryzen 7 4700U tiene 8 núcleos)</span>
+swap=2GB
+localhostForwarding=true
+
+<span class="c"># Guardar y cerrar Notepad</span>
+<span class="c"># Aplicar los cambios reiniciando WSL2:</span>
+wsl --shutdown
+<span class="c"># Luego reiniciar Docker Desktop desde la barra de tareas</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>Clonar el proyecto y crear el .env</h3>
+    <label class="chk"><input type="checkbox" data-e="0"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El proyecto vive en tu sistema de archivos de Windows. Docker Desktop lo monta automáticamente en los contenedores sin configuración adicional.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Ir a tu carpeta de proyectos (ajusta la ruta)</span>
+<span class="k">cd</span> C:Projects
+<span class="c"># Si no existe:</span>
+<span class="k">mkdir</span> C:Projects
+<span class="k">cd</span> C:Projects
+
+<span class="c"># Clonar el repositorio</span>
+git clone https://github.com/lporras567/sena_mvc_project.git
+<span class="k">cd</span> sena_mvc_project
+
+<span class="c"># Crear el archivo .env de desarrollo local</span>
+<span class="c"># (Copiar el .env.example si existe)</span>
+Copy-Item .env.example .env
+
+<span class="c"># Editar con VS Code o Notepad</span>
+code .env
+<span class="c"># o: notepad .env</span>
+
+<span class="c"># Contenido del .env:</span>
+<span class="c"># DB_USER=postgres</span>
+<span class="c"># DB_PASSWORD=sena_pass_2026</span>
+<span class="c"># DB_HOST=db</span>
+<span class="c"># DB_PORT=5432</span>
+<span class="c"># DB_NAME=sena_mvc_db</span>
+<span class="c"># JWT_SECRET_KEY=clave_local_de_desarrollo</span>
+<span class="c"># JWT_ALGORITHM=HS256</span>
+<span class="c"># ACCESS_TOKEN_EXPIRE_MINUTES=30</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>Verificar la estructura de archivos para Docker</h3>
+    <label class="chk"><input type="checkbox" data-e="0"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El proyecto debe tener el Dockerfile, docker-compose.yml y la carpeta nginx/ antes de levantar los contenedores.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Verificar que existen los archivos necesarios</span>
+ls
+<span class="c"># Debe mostrar:</span>
+<span class="c"># app/              Dockerfile         .env</span>
+<span class="c"># nginx/            docker-compose.yml requirements.txt</span>
+
+<span class="c"># Si falta la carpeta nginx, crearla:</span>
+<span class="k">mkdir</span> <span class="k">nginx</span>
+<span class="c"># Crear nginx/nginx.conf (el mismo de la Estación 02 Linux — sin cambios)</span>
+
+<span class="c"># Ver el contenido de la carpeta nginx</span>
+ls <span class="k">nginx</span>
+<span class="c"># nginx.conf</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>Levantar todos los contenedores</h3>
+    <label class="chk"><input type="checkbox" data-e="0"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Un solo comando construye las imágenes y levanta los tres contenedores. En Windows los comandos son idénticos a Linux — esa es la ventaja de Docker.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell (en la raíz del proyecto)</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Construir imágenes y levantar en segundo plano</span>
+<span class="k">docker</span> compose up --build -d
+
+<span class="c"># Ver el estado — esperar que los 3 estén "Up"</span>
+<span class="k">docker</span> compose ps
+<span class="c"># NAME            STATUS          PORTS</span>
+<span class="c"># sena-db         Up (healthy)    5432/tcp</span>
+<span class="c"># sena-backend    Up              8000/tcp</span>
+<span class="c"># sena-nginx      Up              0.0.0.0:80-&gt;80/tcp</span>
+
+<span class="c"># Ver logs (Ctrl+C para salir sin detener los contenedores)</span>
+<span class="k">docker</span> compose logs -f
+
+<span class="c"># Verificar que la API responde</span>
+<span class="c"># En PowerShell:</span>
+<span class="k">Invoke</span>-WebRequest http://localhost/api/ | Select-Object -ExpandProperty Content
+<span class="c"># {"mensaje": "Backend MVC Asíncrono activo"}</span>
+
+<span class="c"># O simplemente abrir en el navegador:</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost/docs"</span>
+<span class="c"># → Swagger UI de tu backend</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">6</span>
+    <h3>Comandos esenciales de Docker en PowerShell</h3>
+    <label class="chk"><input type="checkbox" data-e="0"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Referencia rápida: todos los comandos docker y docker compose funcionan igual en PowerShell que en Bash de Linux.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># ── Gestión del ciclo de vida ──</span>
+<span class="k">docker</span> compose up -d          <span class="c"># levantar en segundo plano</span>
+<span class="k">docker</span> compose down           <span class="c"># detener y eliminar contenedores</span>
+<span class="k">docker</span> compose down -v        <span class="c"># detener + borrar volúmenes (CUIDADO: borra la BD)</span>
+<span class="k">docker</span> compose restart        <span class="c"># reiniciar todos los servicios</span>
+<span class="k">docker</span> compose restart backend <span class="c"># reiniciar solo el backend</span>
+
+<span class="c"># ── Ver estado y logs ──</span>
+<span class="k">docker</span> compose ps             <span class="c"># estado de los contenedores</span>
+<span class="k">docker</span> compose logs -f        <span class="c"># logs en tiempo real (todos)</span>
+<span class="k">docker</span> compose logs -f backend <span class="c"># logs solo del backend</span>
+
+<span class="c"># ── Entrar a un contenedor ──</span>
+<span class="k">docker</span> compose exec backend bash   <span class="c"># terminal dentro del backend</span>
+<span class="k">docker</span> compose exec db psql -U postgres -d sena_mvc_db  <span class="c"># psql directo</span>
+
+<span class="c"># ── Actualizar el código (sin bajar la BD) ──</span>
+<span class="c"># 1. Guardar cambios en VS Code</span>
+<span class="c"># 2. En PowerShell:</span>
+<span class="k">docker</span> compose build backend
+<span class="k">docker</span> compose up -d --no-deps backend
+
+<span class="c"># ── Limpiar imágenes y contenedores huérfanos ──</span>
+<span class="k">docker</span> system prune -f</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">7</span>
+    <h3>Acceder a pgAdmin desde Windows</h3>
+    <label class="chk"><input type="checkbox" data-e="0"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>PostgreSQL corre dentro del contenedor pero su puerto 5432 no está expuesto a Windows por defecto. Tienes dos opciones: usar pgAdmin dentro de Docker o exponer el puerto.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">Docker Desktop / Navegador</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Opción A — Exponer el puerto de PostgreSQL a Windows</span>
+<span class="c"># Agregar en docker-compose.yml, en el servicio "db":</span>
+<span class="c">#   ports:</span>
+<span class="c">#     - "5432:5432"    # ← agregar esta línea</span>
+<span class="c"># Luego: docker compose up -d</span>
+<span class="c"># Y en pgAdmin de Windows conectar a: localhost:5432</span>
+
+<span class="c"># Opción B — Agregar pgAdmin como contenedor (recomendada)</span>
+<span class="c"># Agregar en docker-compose.yml:</span>
+
+<span class="c">#  pgadmin:</span>
+<span class="c">#    image: dpage/pgadmin4</span>
+<span class="c">#    container_name: sena-pgadmin</span>
+<span class="c">#    environment:</span>
+<span class="c">#      PGADMIN_DEFAULT_EMAIL: admin@sena.edu.co</span>
+<span class="c">#      PGADMIN_DEFAULT_PASSWORD: admin123</span>
+<span class="c">#    ports:</span>
+<span class="c">#      - "5050:80"</span>
+<span class="c">#    depends_on:</span>
+<span class="c">#      - db</span>
+<span class="c">#    networks:</span>
+<span class="c">#      - sena-net</span>
+
+<span class="c"># Levantar:</span>
+<span class="k">docker</span> compose up -d pgadmin
+
+<span class="c"># Abrir en navegador:</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost:5050"</span>
+<span class="c"># Email: admin@sena.edu.co / Password: admin123</span>
+<span class="c"># Servidor: db (nombre del contenedor) / Puerto: 5432</span></pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 01</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>Docker Desktop abre automáticamente al iniciar Windows y consume recursos aunque no estés desarrollando. Configura Docker Desktop para que NO arranque con Windows y crea un script PowerShell "iniciar-sena.ps1" que arranque Docker Desktop y levante los contenedores con un solo clic.</p>
+    </div>
+    <div class="sol" id="rsol-0">
+  <div class="sol-cab" onclick="toggleSol('rsol-0')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">1. Desactivar el arranque automático de Docker Desktop</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">Docker Desktop → Settings</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># En Docker Desktop (ícono en barra de tareas → Settings):</span>
+<span class="c"># General → desmarcar "Start Docker Desktop when you sign in"</span>
+<span class="c"># Apply &amp; Restart</span>
+
+<span class="c"># O desde PowerShell (modificar el registro):</span>
+<span class="c"># El archivo de configuración de Docker Desktop está en:</span>
+<span class="c"># C:UsersPorrasLuisAppDataRoamingDockersettings.json</span>
+<span class="c"># Cambiar "autoStart": true  por  "autoStart": false</span></pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">2. Script PowerShell — iniciar-sena.ps1</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">C:\Projects\sena_mvc_project\iniciar-sena.ps1</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># iniciar-sena.ps1</span>
+<span class="c"># Uso: click derecho → Ejecutar con PowerShell</span>
+<span class="c"># O desde PowerShell: .iniciar-sena.ps1</span>
+
+<span class="k">Write</span>-Host <span class="s">"Iniciando entorno SENA Backend..."</span> -ForegroundColor Cyan
+
+<span class="c"># 1. Arrancar Docker Desktop si no está corriendo</span>
+$dockerRunning = <span class="k">Get</span>-Process <span class="s">"Docker Desktop"</span> -ErrorAction SilentlyContinue
+if (-not $dockerRunning) {
+    <span class="k">Write</span>-Host <span class="s">"Arrancando Docker Desktop..."</span> -ForegroundColor Yellow
+    <span class="k">Start</span>-Process <span class="s">"C:Program FilesDockerDockerDocker Desktop.exe"</span>
+
+    <span class="c"># Esperar hasta que el daemon de Docker responda</span>
+    <span class="k">Write</span>-Host <span class="s">"Esperando que Docker esté listo..."</span> -ForegroundColor Yellow
+    $intentos = 0
+    do {
+        <span class="k">Start</span>-Sleep -Seconds 3
+        $intentos++
+        $ok = <span class="k">docker</span> info 2&gt;$null
+    } while (-not $ok -and $intentos -lt 20)
+
+    if ($intentos -ge 20) {
+        <span class="k">Write</span>-Host <span class="s">"Docker no respondio. Intentalo manualmente."</span> -ForegroundColor Red
+        exit 1
+    }
+}
+
+<span class="k">Write</span>-Host <span class="s">"Docker listo."</span> -ForegroundColor Green
+
+<span class="c"># 2. Ir al proyecto y levantar los contenedores</span>
+<span class="k">Set</span>-Location <span class="s">"C:Projectssena_mvc_project"</span>
+<span class="k">docker</span> compose up -d
+
+<span class="c"># 3. Mostrar estado</span>
+<span class="k">docker</span> compose ps
+
+<span class="c"># 4. Abrir Swagger UI en el navegador</span>
+<span class="k">Start</span>-Sleep -Seconds 3
+<span class="k">Start</span>-Process <span class="s">"http://localhost/docs"</span>
+<span class="k">Write</span>-Host <span class="s">"Backend disponible en http://localhost/docs"</span> -ForegroundColor Green</pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">3. Crear acceso directo en el escritorio</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Crear acceso directo en el escritorio que ejecute el script</span>
+$WshShell = <span class="k">New</span>-Object -comObject WScript.Shell
+$Shortcut = $WshShell.CreateShortcut(
+    <span class="s">"$env:USERPROFILEDesktopIniciar SENA Backend.lnk"</span>
+)
+$Shortcut.TargetPath = <span class="s">"powershell.exe"</span>
+$Shortcut.Arguments  = <span class="s">"-ExecutionPolicy Bypass -File C:Projectssena_mvc_projectiniciar-sena.ps1"</span>
+$Shortcut.WorkingDirectory = <span class="s">"C:Projectssena_mvc_project"</span>
+$Shortcut.IconLocation = <span class="s">"C:Program FilesDockerDockerDocker Desktop.exe,0"</span>
+$Shortcut.Save()
+
+<span class="k">Write</span>-Host <span class="s">"Acceso directo creado en el escritorio."</span> -ForegroundColor Green</pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" disabled>← Estación anterior</button>
+    <button onclick="goE(1)"  >Siguiente estación →</button>
+  </div>
+</section>
+<section class="est " id="est-1">
+  <div class="est-hdr" style="--ec:#0A8F82">
+    <div class="est-badge">02</div>
+    <div>
+      <h2>Docker + Nginx</h2>
+      <span class="est-sub">Dockerfile · docker-compose · Nginx · Volúmenes · Mismos archivos que en Linux</span>
+    </div>
+    <span class="est-t">⏱ ~1.5 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Esta estación es idéntica a la versión Linux. Los archivos <code>Dockerfile</code>, <code>docker-compose.yml</code> y <code>nginx/nginx.conf</code> no cambian ni una línea. La única diferencia es que en Windows el comando <code>docker compose</code> se escribe en PowerShell en vez de en Bash — y funciona igual.</p>
+    <figure class="dg"><svg viewBox="0 0 860 180" role="img" aria-label="Docker compose en Windows">
+  <defs><marker id="fl2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="60" width="110" height="60" rx="9" fill="#EFF4F8" stroke="#0A8F82" stroke-width="2"/>
+  <text x="65" y="88" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#0A8F82">PowerShell</text>
+  <text x="65" y="106" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">docker compose</text>
+  <line x1="120" y1="90" x2="168" y2="90" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl2)"/>
+  <rect x="173" y="20" width="490" height="140" rx="12" fill="#0B1520" stroke="#0A8F82" stroke-width="2"/>
+  <text x="418" y="42" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#5FD3C4">Docker Desktop / WSL2 — mismos contenedores que Linux</text>
+  <rect x="193" y="55" width="130" height="90" rx="8" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+  <text x="258" y="80" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">nginx</text>
+  <text x="258" y="97" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:80 → backend:8000</text>
+  <text x="258" y="113" text-anchor="middle" font-size="9" fill="#F0B76A">nginx:alpine</text>
+  <text x="258" y="130" text-anchor="middle" font-size="9" fill="#8FA8C0">sirve Angular</text>
+  <line x1="323" y1="100" x2="358" y2="100" stroke="#5FD3C4" stroke-width="2" marker-end="url(#fl2)"/>
+  <rect x="363" y="55" width="140" height="90" rx="8" fill="#162030" stroke="#7EB6FF" stroke-width="1.5"/>
+  <text x="433" y="80" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">backend</text>
+  <text x="433" y="97" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">FastAPI async</text>
+  <text x="433" y="113" text-anchor="middle" font-size="9" fill="#F0B76A">python:3.12-slim</text>
+  <line x1="503" y1="100" x2="538" y2="100" stroke="#5FD3C4" stroke-width="2" marker-end="url(#fl2)"/>
+  <rect x="543" y="55" width="100" height="90" rx="8" fill="#162030" stroke="#336791" stroke-width="1.5"/>
+  <text x="593" y="80" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#336791">db</text>
+  <text x="593" y="97" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">PostgreSQL 16</text>
+  <text x="593" y="130" text-anchor="middle" font-size="9" fill="#8FA8C0">volumen</text>
+  <line x1="663" y1="90" x2="710" y2="90" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl2)"/>
+  <rect x="715" y="65" width="130" height="60" rx="9" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+  <text x="780" y="90" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#1A56A0">localhost:80</text>
+  <text x="780" y="108" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">Chrome / Edge</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Dockerfile — exactamente igual que en Linux</h3>
+    <label class="chk"><input type="checkbox" data-e="1"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El Dockerfile no tiene nada de Linux-específico: construye una imagen basada en Python que corre en cualquier plataforma que tenga Docker. No cambiar nada.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">Dockerfile</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Dockerfile — sin cambios respecto a la versión Linux</span>
+FROM python:3.12-slim AS builder
+WORKDIR /build
+RUN pip install --upgrade pip
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+FROM python:3.12-slim
+WORKDIR /app
+COPY --from=builder /install /usr/local
+COPY ./app ./app
+RUN adduser --disabled-password --gecos <span class="s">""</span> appuser &amp;&amp;     chown -R appuser:appuser /app
+USER appuser
+EXPOSE 8000
+CMD [<span class="s">"uvicorn"</span>, <span class="s">"app.main:app"</span>,
+     <span class="s">"--host"</span>, <span class="s">"0.0.0.0"</span>,
+     <span class="s">"--port"</span>, <span class="s">"8000"</span>,
+     <span class="s">"--workers"</span>, <span class="s">"2"</span>]</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>.dockerignore — exactamente igual que en Linux</h3>
+    <label class="chk"><input type="checkbox" data-e="1"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El .dockerignore tampoco cambia. Solo asegúrate de que el archivo no tenga extensión (no ".dockerignore.txt").</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">.dockerignore</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+.git/
+.gitignore
+tests/
+*.md
+*.log
+.pytest_cache/
+dist/
+node_modules/
+
+<span class="c"># En Windows: verificar que el archivo no tiene extensión .txt</span>
+<span class="c"># PowerShell:</span>
+Get-Item .dockerignore</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>docker-compose.yml — único ajuste: rutas con barras normales</h3>
+    <label class="chk"><input type="checkbox" data-e="1"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Docker en Windows acepta rutas con barra normal (/) igual que Linux. La única diferencia real es que el volumen de datos de PostgreSQL se almacena en WSL2 internamente — completamente transparente.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">docker-compose.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: sena-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB:       ${DB_NAME}
+    volumes:
+      <span class="c"># Igual que Linux: Docker gestiona el volumen internamente en WSL2</span>
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sena-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sena-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sena-net
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:alpine
+    container_name: sena-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      <span class="c"># Ruta relativa: funciona igual en Windows y Linux</span>
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/dist/sena-frontend/browser:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - sena-net
+
+volumes:
+  postgres_data:
+
+networks:
+  sena-net:
+    driver: bridge</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>nginx/nginx.conf — sin cambios respecto a Linux</h3>
+    <label class="chk"><input type="checkbox" data-e="1"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>La configuración de Nginx corre dentro del contenedor Linux de Nginx, no en Windows. Por eso es idéntica.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">nginx/nginx.conf</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>upstream backend_api {
+    server backend:8000;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    location /api/ {
+        proxy_pass         http://backend_api/;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_read_timeout 60s;
+    }
+
+    location /docs {
+        proxy_pass http://backend_api/docs;
+        proxy_set_header Host $host;
+    }
+
+    location /openapi.json {
+        proxy_pass http://backend_api/openapi.json;
+        proxy_set_header Host $host;
+    }
+
+    location / {
+        root  /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+}</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>Levantar y verificar desde PowerShell</h3>
+    <label class="chk"><input type="checkbox" data-e="1"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Todos los comandos docker compose son idénticos. La única diferencia visual es que el prompt es PS C:\> en vez de ubuntu@servidor:~$.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Desde la carpeta del proyecto en PowerShell:</span>
+<span class="k">cd</span> C:Projectssena_mvc_project
+
+<span class="k">docker</span> compose up --build -d
+
+<span class="c"># Estado de los contenedores</span>
+<span class="k">docker</span> compose ps
+
+<span class="c"># Logs en tiempo real (Ctrl+C para salir)</span>
+<span class="k">docker</span> compose logs -f
+
+<span class="c"># Probar la API desde PowerShell</span>
+<span class="k">Invoke</span>-RestMethod http://localhost/api/
+<span class="c"># Respuesta: @{mensaje=Backend MVC Asíncrono activo}</span>
+
+<span class="c"># Abrir Swagger UI</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost/docs"</span>
+
+<span class="c"># Abrir pgAdmin (si lo agregaste al compose)</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost:5050"</span></pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 02</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>El frontend Angular compilado necesita estar en ./frontend/dist/sena-frontend/browser/ para que Nginx lo sirva. Crea un script PowerShell "build-frontend.ps1" que compile el proyecto Angular y copie los archivos al lugar correcto, de modo que ejecutar un solo script deje todo listo para docker compose up.</p>
+    </div>
+    <div class="sol" id="rsol-1">
+  <div class="sol-cab" onclick="toggleSol('rsol-1')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">Script build-frontend.ps1</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">C:\Projects\sena_mvc_project\build-frontend.ps1</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># build-frontend.ps1</span>
+<span class="c"># Compila el frontend Angular y lo coloca donde Nginx lo espera</span>
+
+param(
+    [string]$FrontendPath = <span class="s">"C:Projectssena-frontend"</span>,
+    [string]$OutputPath   = <span class="s">"C:Projectssena_mvc_projectrontend"</span>
+)
+
+<span class="k">Write</span>-Host <span class="s">"Compilando frontend Angular..."</span> -ForegroundColor Cyan
+
+<span class="c"># 1. Ir al proyecto Angular</span>
+if (-not (<span class="k">Test</span>-Path $FrontendPath)) {
+    <span class="k">Write</span>-Host <span class="s">"No se encontró el proyecto Angular en: $FrontendPath"</span> -ForegroundColor Red
+    <span class="k">Write</span>-Host <span class="s">"Ajusta la ruta con: .uild-frontend.ps1 -FrontendPath C:	uuta"</span>
+    exit 1
+}
+
+<span class="k">Set</span>-Location $FrontendPath
+
+<span class="c"># 2. Instalar dependencias si node_modules no existe</span>
+if (-not (<span class="k">Test</span>-Path <span class="s">"node_modules"</span>)) {
+    <span class="k">Write</span>-Host <span class="s">"Instalando dependencias npm..."</span> -ForegroundColor Yellow
+    npm install
+}
+
+<span class="c"># 3. Build de producción</span>
+<span class="k">Write</span>-Host <span class="s">"Ejecutando ng build..."</span> -ForegroundColor Yellow
+ng build --configuration production
+
+if ($LASTEXITCODE -ne 0) {
+    <span class="k">Write</span>-Host <span class="s">"Error en ng build. Revisa los errores arriba."</span> -ForegroundColor Red
+    exit 1
+}
+
+<span class="c"># 4. Copiar dist al lugar donde Nginx lo espera</span>
+$distSource = Join-Path $FrontendPath <span class="s">"distsena-frontendrowser"</span>
+$distDest   = Join-Path $OutputPath   <span class="s">"distsena-frontendrowser"</span>
+
+<span class="k">Write</span>-Host <span class="s">"Copiando dist a $distDest..."</span> -ForegroundColor Yellow
+<span class="k">New</span>-Item -ItemType Directory -Force -Path $distDest | <span class="k">Out</span>-Null
+Copy-Item <span class="s">"$distSource*"</span> $distDest -Recurse -Force
+
+<span class="k">Write</span>-Host <span class="s">"Frontend compilado y copiado."</span> -ForegroundColor Green
+<span class="k">Write</span>-Host <span class="s">"Ahora ejecuta: docker compose up --build -d"</span> -ForegroundColor Cyan</pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" >← Estación anterior</button>
+    <button onclick="goE(1)"  >Siguiente estación →</button>
+  </div>
+</section>
+<section class="est " id="est-2">
+  <div class="est-hdr" style="--ec:#7B3FBF">
+    <div class="est-badge">03</div>
+    <div>
+      <h2>Docker + Traefik + SSL automático</h2>
+      <span class="est-sub">Traefik v3 · Let's Encrypt · Labels · Ajuste de permisos en Windows</span>
+    </div>
+    <span class="est-t">⏱ ~1.5 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">Traefik en Windows con Docker Desktop funciona igual que en Linux, con un único ajuste crítico: el archivo <code>acme.json</code> que almacena los certificados SSL debe tener permisos <code>600</code> en Linux, pero en Windows esos permisos los gestiona el contenedor internamente. Se resuelve con una línea en el <code>docker-compose.yml</code>.</p>
+    <figure class="dg"><svg viewBox="0 0 860 180" role="img" aria-label="Traefik en Docker Desktop Windows">
+  <defs><marker id="fl3" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="60" width="110" height="60" rx="9" fill="#EFF4F8" stroke="#7B3FBF" stroke-width="2"/>
+  <text x="65" y="88" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#7B3FBF">Internet</text>
+  <text x="65" y="106" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">:80/:443</text>
+  <line x1="120" y1="90" x2="165" y2="90" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl3)"/>
+  <rect x="170" y="45" width="140" height="90" rx="9" fill="#162030" stroke="#C39AFF" stroke-width="2"/>
+  <text x="240" y="72" text-anchor="middle" font-size="12" font-family="Space Grotesk" font-weight="700" fill="#C39AFF">Traefik v3</text>
+  <text x="240" y="89" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">auto-descubrimiento</text>
+  <text x="240" y="105" text-anchor="middle" font-size="9" fill="#8FA8C0">SSL Let's Encrypt</text>
+  <text x="240" y="121" text-anchor="middle" font-size="9" fill="#5FD3C4">labels Docker</text>
+  <line x1="310" y1="80" x2="350" y2="65" stroke="#C39AFF" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#fl3)"/>
+  <line x1="310" y1="110" x2="350" y2="125" stroke="#C39AFF" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#fl3)"/>
+  <rect x="355" y="40" width="130" height="55" rx="8" fill="#162030" stroke="#7EB6FF" stroke-width="1.5"/>
+  <text x="420" y="63" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">backend</text>
+  <text x="420" y="82" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">:8000 + labels</text>
+  <rect x="355" y="110" width="130" height="55" rx="8" fill="#162030" stroke="#0A8F82" stroke-width="1.5"/>
+  <text x="420" y="133" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">frontend</text>
+  <text x="420" y="152" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">nginx + labels</text>
+  <rect x="515" y="65" width="160" height="55" rx="8" fill="#162030" stroke="#F0B76A" stroke-width="1.5"/>
+  <text x="595" y="86" text-anchor="middle" font-size="10" font-family="Space Grotesk" font-weight="700" fill="#F0B76A">Windows: acme.json</text>
+  <text x="595" y="104" text-anchor="middle" font-size="9" fill="#8FA8C0">permisos gestionados</text>
+  <text x="595" y="118" text-anchor="middle" font-size="9" fill="#5FD3C4">por el contenedor</text>
+  <rect x="700" y="55" width="145" height="75" rx="9" fill="#EFF4F8" stroke="#7B3FBF" stroke-width="1.5"/>
+  <text x="773" y="80" text-anchor="middle" font-size="10" font-family="Space Grotesk" font-weight="700" fill="#7B3FBF">Dashboard</text>
+  <text x="773" y="97" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#4A5B6E">localhost:8080</text>
+  <text x="773" y="113" text-anchor="middle" font-size="9" fill="#4A5B6E">monitoreo local</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Crear la carpeta traefik y el acme.json en Windows</h3>
+    <label class="chk"><input type="checkbox" data-e="2"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>En Linux hacemos "chmod 600 acme.json" para restringir permisos. En Windows ese comando no existe, pero Docker Desktop gestiona los permisos del archivo internamente a través de WSL2.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Crear la carpeta y el archivo (PowerShell)</span>
+<span class="k">cd</span> C:Projectssena_mvc_project
+<span class="k">mkdir</span> traefik -ErrorAction SilentlyContinue
+
+<span class="c"># Crear el acme.json vacío (los permisos los gestiona Docker internamente)</span>
+<span class="k">New</span>-Item -Path traefikacme.json -ItemType File -Force
+
+<span class="c"># En Windows NO es necesario chmod 600</span>
+<span class="c"># Docker Desktop lo gestiona a través de WSL2 automáticamente</span>
+
+<span class="c"># Verificar estructura</span>
+<span class="k">Get</span>-ChildItem traefik
+<span class="c"># acme.json    traefik.yml</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>traefik/traefik.yml — sin cambios respecto a Linux</h3>
+    <label class="chk"><input type="checkbox" data-e="2"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>La configuración de Traefik es idéntica. Corre dentro de su contenedor Linux, no en Windows.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">traefik/traefik.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: sena-net
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: tu-email@ejemplo.com
+      storage: /acme.json
+      httpChallenge:
+        entryPoint: web
+
+api:
+  dashboard: true
+  insecure: true</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>docker-compose.yml con Traefik — ajuste de permisos en Windows</h3>
+    <label class="chk"><input type="checkbox" data-e="2"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El único cambio respecto a Linux: agregamos un comando de inicio que establece los permisos del acme.json dentro del contenedor, solucionando el error de "file too open" de Let's Encrypt.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">docker-compose.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre>services:
+
+  traefik:
+    image: traefik:v3.0
+    container_name: sena-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+    <span class="c"># AJUSTE WINDOWS: fijar permisos del acme.json al arrancar</span>
+    <span class="c"># Let's Encrypt rechaza el archivo si tiene permisos muy abiertos</span>
+    entrypoint:
+      - sh
+      - -c
+      - "chmod 600 /acme.json &amp;&amp; traefik"
+    networks:
+      - sena-net
+
+  db:
+    image: postgres:16-alpine
+    container_name: sena-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB:       ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sena-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: sena-backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sena-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.tu-dominio.com`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+
+  frontend:
+    image: nginx:alpine
+    container_name: sena-frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend/dist/sena-frontend/browser:/usr/share/nginx/html:ro
+    networks:
+      - sena-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`tu-dominio.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+volumes:
+  postgres_data:
+
+networks:
+  sena-net:
+    driver: bridge</pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>Levantar Traefik desde PowerShell</h3>
+    <label class="chk"><input type="checkbox" data-e="2"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Mismo comando que en Linux. Traefik obtiene el certificado SSL automáticamente si tienes un dominio real apuntando a tu IP pública.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Levantar todos los servicios</span>
+<span class="k">docker</span> compose up -d
+
+<span class="c"># Ver logs de Traefik (incluye el proceso de certificado SSL)</span>
+<span class="k">docker</span> compose logs -f traefik
+
+<span class="c"># Dashboard de Traefik (en desarrollo local)</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost:8080"</span>
+
+<span class="c"># Verificar que los routers y servicios están configurados</span>
+<span class="c"># En el dashboard: HTTP → Routers debe mostrar "backend" y "frontend"</span>
+<span class="c"># HTTP → Services debe mostrar los puertos correctos</span>
+
+<span class="c"># Para desarrollo local sin dominio real:</span>
+<span class="c"># Usar localhost directamente (sin SSL):</span>
+<span class="c"># traefik.yml → quitar la redirección HTTP→HTTPS</span>
+<span class="c"># y usar entryPoint "web" directamente</span></pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 03</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>Traefik en desarrollo local sin dominio real no puede obtener certificado SSL de Let's Encrypt. Crea una configuración alternativa "docker-compose.local.yml" que use HTTP simple (sin SSL) para desarrollo en Windows, de modo que puedas usar "docker compose -f docker-compose.yml -f docker-compose.local.yml up" para sobreescribir solo la parte de Traefik.</p>
+    </div>
+    <div class="sol" id="rsol-2">
+  <div class="sol-cab" onclick="toggleSol('rsol-2')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">docker-compose.local.yml — override para desarrollo local</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">docker-compose.local.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># docker-compose.local.yml</span>
+<span class="c"># Override solo para desarrollo local sin dominio real</span>
+<span class="c"># Uso: docker compose -f docker-compose.yml -f docker-compose.local.yml up -d</span>
+
+services:
+  traefik:
+    <span class="c"># Sobreescribir el comando para usar HTTP simple (sin ACME/Let's Encrypt)</span>
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      <span class="c"># Sin entrypoint websecure ni certificatesResolvers</span>
+    <span class="c"># No montar el traefik.yml (usamos --command directamente)</span>
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      <span class="c"># No montar acme.json ni traefik.yml en modo local</span>
+
+  backend:
+    labels:
+      <span class="c"># Sobreescribir labels: usar HTTP en vez de HTTPS, localhost en vez de dominio</span>
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+
+  frontend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"</pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">Uso desde PowerShell</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Desarrollo local (Windows, sin dominio, sin SSL):</span>
+<span class="k">docker</span> compose -f <span class="k">docker</span>-compose.yml -f <span class="k">docker</span>-compose.local.yml up -d
+
+<span class="c"># Producción (servidor real con dominio):</span>
+<span class="k">docker</span> compose up -d
+
+<span class="c"># Verificar en local:</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost/api/"</span>   <span class="c"># API sin SSL</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost/docs"</span>   <span class="c"># Swagger</span>
+<span class="k">Start</span>-Process <span class="s">"http://localhost:8080"</span>   <span class="c"># Dashboard Traefik</span></pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" >← Estación anterior</button>
+    <button onclick="goE(1)"  >Siguiente estación →</button>
+  </div>
+</section>
+<section class="est " id="est-3">
+  <div class="est-hdr" style="--ec:#1F8C4E">
+    <div class="est-badge">04</div>
+    <div>
+      <h2>CI/CD — Deploy automático</h2>
+      <span class="est-sub">GitHub Actions · Docker Hub · SSH al servidor · Mismo pipeline que Linux</span>
+    </div>
+    <span class="est-t">⏱ ~1.5 h</span>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 1 · EL PORQUÉ</span></div>
+    <p class="lead">El pipeline de CI/CD corre en los servidores de GitHub (Ubuntu), no en tu Windows. Por eso es <strong>100% idéntico</strong> a la versión Linux: los jobs de GitHub Actions siempre corren en Linux independientemente de tu sistema operativo local. Tu rol es solo configurar los Secrets y hacer push desde PowerShell.</p>
+    <figure class="dg"><svg viewBox="0 0 900 200" role="img" aria-label="CI/CD desde Windows">
+  <defs><marker id="fl4" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="#4A5B6E"/></marker></defs>
+  <rect x="10" y="65" width="130" height="70" rx="9" fill="#EFF4F8" stroke="#1F8C4E" stroke-width="2"/>
+  <text x="75" y="93" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#1F8C4E">PowerShell</text>
+  <text x="75" y="110" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">git push origin</text>
+  <text x="75" y="126" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#4A5B6E">main</text>
+  <line x1="140" y1="100" x2="178" y2="100" stroke="#4A5B6E" stroke-width="2" marker-end="url(#fl4)"/>
+  <rect x="183" y="45" width="155" height="110" rx="9" fill="#162030" stroke="#1F8C4E" stroke-width="2"/>
+  <text x="261" y="70" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#5FD3C4">GitHub Actions</text>
+  <text x="261" y="88" text-anchor="middle" font-size="9" fill="#8FA8C0">runs-on: ubuntu-latest</text>
+  <text x="261" y="104" text-anchor="middle" font-size="9" fill="#8FA8C0">1. pytest</text>
+  <text x="261" y="119" text-anchor="middle" font-size="9" fill="#8FA8C0">2. docker build+push</text>
+  <text x="261" y="134" text-anchor="middle" font-size="9" fill="#8FA8C0">3. SSH deploy</text>
+  <text x="261" y="147" text-anchor="middle" font-size="9" fill="#F0B76A">corre en servidores</text>
+  <text x="261" y="161" text-anchor="middle" font-size="9" fill="#F0B76A">de GitHub (Linux)</text>
+  <line x1="338" y1="100" x2="373" y2="100" stroke="#1F8C4E" stroke-width="2" marker-end="url(#fl4)"/>
+  <rect x="378" y="65" width="120" height="70" rx="9" fill="#162030" stroke="#F0B76A" stroke-width="2"/>
+  <text x="438" y="96" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#F0B76A">Docker Hub</text>
+  <text x="438" y="114" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#8FA8C0">imagen:latest</text>
+  <line x1="498" y1="100" x2="538" y2="100" stroke="#1F8C4E" stroke-width="2" marker-end="url(#fl4)"/>
+  <rect x="543" y="45" width="155" height="110" rx="9" fill="#162030" stroke="#7EB6FF" stroke-width="2"/>
+  <text x="621" y="70" text-anchor="middle" font-size="11" font-family="Space Grotesk" font-weight="700" fill="#7EB6FF">VPS Linux</text>
+  <text x="621" y="88" text-anchor="middle" font-size="9" fill="#8FA8C0">docker pull</text>
+  <text x="621" y="103" text-anchor="middle" font-size="9" fill="#8FA8C0">docker compose up</text>
+  <text x="621" y="118" text-anchor="middle" font-size="9" fill="#5FD3C4">producción real</text>
+  <text x="621" y="133" text-anchor="middle" font-size="9" fill="#8FA8C0">Ubuntu 24.04</text>
+  <line x1="698" y1="100" x2="738" y2="100" stroke="#4A5B6E" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#fl4)"/>
+  <rect x="743" y="65" width="140" height="70" rx="9" fill="#EFF4F8" stroke="#1A56A0" stroke-width="2"/>
+  <text x="813" y="93" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="11" fill="#1A56A0">tu-dominio.com</text>
+  <text x="813" y="110" text-anchor="middle" font-size="9" font-family="JetBrains Mono" fill="#4A5B6E">🟢 live</text>
+  <text x="813" y="125" text-anchor="middle" font-size="9" fill="#1F8C4E">~3 min por push</text>
+</svg></figure>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 2 · EL CÓMO</span></div>
+    
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">1</span>
+    <h3>Configurar Git en Windows para el pipeline</h3>
+    <label class="chk"><input type="checkbox" data-e="3"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El pipeline se dispara con git push. Verificar que Git está configurado correctamente en Windows antes de crear el workflow.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Verificar la instalación de Git</span>
+git --version
+<span class="c"># git version 2.x.x.windows.x</span>
+
+<span class="c"># Si no está instalado:</span>
+winget install Git.Git
+
+<span class="c"># Configurar identidad (si no está configurada)</span>
+git config --global user.name <span class="s">"Luis Eladio Porras"</span>
+git config --global user.email <span class="s">"lporras567@gmail.com"</span>
+
+<span class="c"># Verificar configuración del repositorio remoto</span>
+git remote -v
+<span class="c"># origin  https://github.com/lporras567/sena_mvc_project.git (fetch)</span>
+<span class="c"># origin  https://github.com/lporras567/sena_mvc_project.git (push)</span>
+
+<span class="c"># Asegurarse de estar en la rama main</span>
+git branch
+<span class="c"># * main</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">2</span>
+    <h3>Generar par de claves SSH para el deploy en Windows</h3>
+    <label class="chk"><input type="checkbox" data-e="3"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>La clave SSH privada se guarda en GitHub Secrets y la pública en el servidor. Se genera en PowerShell con ssh-keygen, que viene incluido en Windows 10/11.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Generar par de claves ED25519 (más seguro y más corto que RSA)</span>
+ssh-keygen -t ed25519 -C <span class="s">"github-actions-deploy"</span> -f <span class="s">"$env:USERPROFILE.sshgithub_actions_deploy"</span>
+<span class="c"># Passphrase: dejar VACÍO (Enter) — el workflow no puede ingresar passphrase</span>
+
+<span class="c"># Ver la clave privada (copiar al Secret SSH_PRIVATE_KEY en GitHub)</span>
+<span class="k">Get</span>-Content <span class="s">"$env:USERPROFILE.sshgithub_actions_deploy"</span>
+<span class="c"># -----BEGIN OPENSSH PRIVATE KEY-----</span>
+<span class="c"># b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAA...</span>
+<span class="c"># -----END OPENSSH PRIVATE KEY-----</span>
+
+<span class="c"># Ver la clave pública (agregar al servidor)</span>
+<span class="k">Get</span>-Content <span class="s">"$env:USERPROFILE.sshgithub_actions_deploy.pub"</span>
+<span class="c"># ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... github-actions-deploy</span>
+
+<span class="c"># Agregar la clave pública al servidor (ejecutar en el servidor Linux):</span>
+<span class="c"># echo "ssh-ed25519 AAAAC3Nz..." &gt;&gt; ~/.ssh/authorized_keys</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">3</span>
+    <h3>Configurar GitHub Secrets desde Windows</h3>
+    <label class="chk"><input type="checkbox" data-e="3"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Los Secrets se configuran en el navegador, no en la terminal. Este paso es idéntico independientemente del sistema operativo.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">GitHub.com → Settings → Secrets</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Abrir directamente la página de Secrets del repo:</span>
+<span class="k">Start</span>-Process <span class="s">"https://github.com/lporras567/sena_mvc_project/settings/secrets/actions"</span>
+
+<span class="c"># Crear estos 5 Secrets (New repository secret):</span>
+
+<span class="c"># DOCKERHUB_USERNAME   → tu usuario de Docker Hub</span>
+<span class="c"># DOCKERHUB_TOKEN      → token de Docker Hub</span>
+<span class="c">#   Obtenerlo en:</span>
+<span class="k">Start</span>-Process <span class="s">"https://hub.docker.com/settings/security"</span>
+<span class="c">#   Account Settings → Security → New Access Token → "github-actions"</span>
+
+<span class="c"># SSH_HOST             → IP pública del VPS de producción</span>
+<span class="c"># SSH_USER             → ubuntu (o el usuario del servidor)</span>
+<span class="c"># SSH_PRIVATE_KEY      → contenido completo de:</span>
+<span class="c">#   C:UsersPorrasLuis.sshgithub_actions_deploy</span>
+<span class="c">#   (incluyendo las líneas -----BEGIN y -----END)</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">4</span>
+    <h3>El workflow .yml — sin cambios respecto a Linux</h3>
+    <label class="chk"><input type="checkbox" data-e="3"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>El archivo del workflow es idéntico a la versión Linux porque corre en servidores de GitHub (Ubuntu), no en tu Windows. Solo el "git push" lo ejecutas tú desde PowerShell.</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">.github/workflows/deploy.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># El workflow es 100% idéntico — ver Estación 04 de la versión Linux.</span>
+<span class="c"># Resumen de los 3 jobs:</span>
+
+<span class="c"># Job 1: test</span>
+<span class="c">#   runs-on: ubuntu-latest</span>
+<span class="c">#   Levanta PostgreSQL como servicio</span>
+<span class="c">#   Ejecuta pytest</span>
+
+<span class="c"># Job 2: build-and-push</span>
+<span class="c">#   needs: test</span>
+<span class="c">#   runs-on: ubuntu-latest</span>
+<span class="c">#   Login a Docker Hub con secrets</span>
+<span class="c">#   docker build + push con tag del SHA del commit</span>
+
+<span class="c"># Job 3: deploy</span>
+<span class="c">#   needs: build-and-push</span>
+<span class="c">#   runs-on: ubuntu-latest</span>
+<span class="c">#   SSH al VPS → docker compose pull + up -d --no-deps backend</span></pre>
+</div>
+  </div>
+</div>
+<div class="paso">
+  <div class="pcab">
+    <span class="pnum">5</span>
+    <h3>Disparar y monitorear el pipeline desde Windows</h3>
+    <label class="chk"><input type="checkbox" data-e="3"> Completado</label>
+  </div>
+  <div class="pbody">
+    <p>Hacer push desde PowerShell dispara el workflow automáticamente. Puedes monitorear el progreso en el navegador o con la CLI de GitHub (gh).</p>
+    <div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">PowerShell + GitHub.com</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Hacer push para disparar el pipeline</span>
+git add .
+git commit -m <span class="s">"feat: pipeline CI/CD configurado"</span>
+git push origin main
+
+<span class="c"># Abrir la pestaña Actions en el navegador</span>
+<span class="k">Start</span>-Process <span class="s">"https://github.com/lporras567/sena_mvc_project/actions"</span>
+
+<span class="c"># Alternativa: monitorear desde PowerShell con GitHub CLI</span>
+<span class="c"># Instalar gh si no está:</span>
+winget install GitHub.cli
+
+<span class="c"># Login con GitHub CLI</span>
+gh auth login
+
+<span class="c"># Ver el estado del último workflow</span>
+gh run list --limit 5
+
+<span class="c"># Ver logs en tiempo real del último run</span>
+gh run watch</pre>
+</div>
+  </div>
+</div>
+  </div>
+
+  <div class="acto">
+    <div class="acab"><span class="anum">ACTO 3 · RETO</span></div>
+    <div class="reto">
+      <span class="ey">RETO ESTACIÓN 04</span>
+      <h3>Lleva el conocimiento más lejos</h3>
+      <p>Agrega una notificación por correo cuando el pipeline falle. Usa la action "dawidd6/action-send-mail" para enviar un email con el link al log del job fallido y el mensaje de error.</p>
+    </div>
+    <div class="sol" id="rsol-3">
+  <div class="sol-cab" onclick="toggleSol('rsol-3')">
+    <h3>📂 Ver solución del reto</h3><span class="ico">▼</span>
+  </div>
+  <div class="sol-body">
+<p class="sol-step-title">Agregar el step de notificación al workflow</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">.github/workflows/deploy.yml</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Agregar este job al final del workflow (después de "deploy"):</span>
+
+  notify-failure:
+    name: Notificar fallo
+    <span class="c"># Solo se ejecuta si algún job anterior falló</span>
+    needs: [test, build-and-push, deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Enviar email de notificación
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port:    465
+          secure:         true
+          username:       ${{ secrets.MAIL_USERNAME }}
+          password:       ${{ secrets.MAIL_PASSWORD }}
+          subject:        <span class="s">"❌ Pipeline fallido — sena_mvc_project"</span>
+          to:             lporras567@gmail.com
+          from:           GitHub Actions
+          body: |
+            El pipeline de CI/CD ha fallado.
+
+            Repositorio: ${{ github.repository }}
+            Rama:        ${{ github.ref_name }}
+            Commit:      ${{ github.sha }}
+            Actor:       ${{ github.actor }}
+
+            Ver el log completo:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}</pre>
+</div>
+<hr class="sol-div">
+<p class="sol-step-title">Agregar los Secrets de email en GitHub</p>
+<div class="ed">
+<div class="ebar">
+  <div class="dots"><span></span><span></span><span></span></div>
+  <span class="fich">GitHub → Settings → Secrets</span>
+  <button class="bcopy" onclick="cp(this)">Copiar</button>
+</div>
+<pre><span class="c"># Crear 2 secrets adicionales:</span>
+<span class="c"># MAIL_USERNAME → tu correo Gmail (lporras567@gmail.com)</span>
+<span class="c"># MAIL_PASSWORD → contraseña de aplicación de Gmail</span>
+<span class="c">#</span>
+<span class="c"># Para obtener la contraseña de aplicación de Gmail:</span>
+<span class="k">Start</span>-Process <span class="s">"https://myaccount.google.com/apppasswords"</span>
+<span class="c"># Google → Cuenta → Seguridad → Verificación en 2 pasos → Contraseñas de app</span>
+<span class="c"># Seleccionar "Correo" y "Windows" → Generar</span>
+<span class="c"># Copiar la contraseña de 16 caracteres como MAIL_PASSWORD</span></pre>
+</div>
+<hr class="sol-div"></div>
+</div>
+  </div>
+
+  <div class="nav-e">
+    <button onclick="goE(-1)" >← Estación anterior</button>
+    <button onclick="goE(1)"  disabled>Siguiente estación →</button>
+  </div>
+</section></main>
+<footer>Curso interactivo Deploy Windows 11 · ADSO 228118 · SENA CDMC Itagüí · <span class="hl">Ing. Luis Eladio Porras Camargo</span></footer>
+<script>
+const COLORS=["#1A56A0","#0A8F82","#7B3FBF","#1F8C4E"];
+let cur=0;
+document.querySelectorAll('.tab').forEach((b,i)=>{
+  b.addEventListener('click',()=>irE(i));
+});
+function irE(n){
+  cur=n;
+  document.querySelectorAll('.est').forEach((s,i)=>s.classList.toggle('vis',i===n));
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('on',i===n);
+    if(i===n) b.style.setProperty('--tc',COLORS[i]);
+  });
+  window.scrollTo({top:0});
+  prog();
+}
+function goE(d){const n=cur+d;if(n>=0&&n<=3)irE(n);}
+document.addEventListener('change',e=>{if(e.target.matches('input[type=checkbox]'))prog();});
+function prog(){
+  const all=[...document.querySelectorAll('input[type=checkbox]')];
+  const done=all.filter(c=>c.checked).length;
+  document.getElementById('pf').style.width=(all.length?Math.round(done/all.length*100):0)+'%';
+}
+function toggleSol(id){
+  const el=document.getElementById(id);
+  const b=el.querySelector('.sol-body');
+  const ic=el.querySelector('.ico');
+  const open=b.style.display==='block';
+  b.style.display=open?'none':'block';
+  ic.style.transform=open?'':'rotate(180deg)';
+}
+function cp(btn){
+  const pre=btn.closest('.ed').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='¡Copiado!';
+    setTimeout(()=>btn.textContent='Copiar',1500);
+  });
+}
+(function(){
+  document.querySelectorAll('.tab')[0].style.setProperty('--tc',COLORS[0]);
+})();
+</script>
+</body>
+</html>
