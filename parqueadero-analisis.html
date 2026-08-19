@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRS Parqueadero El Poblado — Fase de Análisis ADSO</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --surface-alt: #f1f3f5;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --primary: #2b6cb0;
+    --primary-light: #ebf4ff;
+    --primary-dark: #1a4971;
+    --accent: #e67e22;
+    --accent-light: #fef3e2;
+    --success: #27ae60;
+    --success-light: #e8f8ef;
+    --danger: #e74c3c;
+    --danger-light: #fdecea;
+    --sena-green: #39A900;
+    --sena-green-light: #e8f5e0;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --tab-inactive: #e9ecef;
+    --shadow: 0 2px 8px rgba(0,0,0,.08);
+    --shadow-lg: 0 4px 20px rgba(0,0,0,.12);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #3182ce 100%);
+    color: white;
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,.04);
+    border-radius: 50%;
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--sena-green);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-bottom: .75rem;
+  }
+  .header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: .35rem; }
+  .header .subtitle { font-size: .95rem; opacity: .85; font-weight: 300; }
+  .header .meta {
+    margin-top: 1rem;
+    font-size: .75rem;
+    opacity: .65;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* ── NAV TABS ── */
+  .nav-container {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 12px 16px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    color: var(--text-muted);
+    transition: all .2s;
+    user-select: none;
+  }
+  .nav-tab:hover { color: var(--primary); background: var(--primary-light); }
+  .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+  /* ── CONTENT ── */
+  .main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .card-header .icon { font-size: 1.3rem; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .section-number {
+    background: var(--primary);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-subtitle {
+    color: var(--text-muted);
+    font-size: .85rem;
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; margin-bottom: 1rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: var(--surface-alt); }
+  tr:hover td { background: var(--primary-light); }
+  .td-id { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--primary); white-space: nowrap; }
+  .td-origin { font-style: italic; color: var(--text-muted); font-size: 12.5px; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    font-size: 14px;
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+  }
+  .callout .ico { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .callout-info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .callout-success { background: var(--success-light); border-left: 4px solid var(--success); }
+  .callout-warning { background: var(--accent-light); border-left: 4px solid var(--accent); }
+  .callout-danger { background: var(--danger-light); border-left: 4px solid var(--danger); }
+  .callout-sena { background: var(--sena-green-light); border-left: 4px solid var(--sena-green); }
+
+  /* ── ACCORDION ── */
+  .accordion { margin-bottom: .75rem; }
+  .accordion-btn {
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all .2s;
+  }
+  .accordion-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+  .accordion-btn.open { background: var(--primary); color: white; border-color: var(--primary); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+  .accordion-btn .arrow { transition: transform .25s; }
+  .accordion-btn.open .arrow { transform: rotate(180deg); }
+  .accordion-body {
+    display: none;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    padding: 1.25rem;
+    background: var(--surface);
+  }
+  .accordion-body.open { display: block; }
+
+  /* ── FLOW DIAGRAMS (text) ── */
+  .flow {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin-bottom: 1rem;
+  }
+
+  /* ── PROTOTYPE MOCKUPS ── */
+  .proto {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+  .proto-bar {
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .proto-body { padding: 1.25rem; }
+  .proto-field {
+    margin-bottom: .75rem;
+  }
+  .proto-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .proto-field .input-mock {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .proto-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: default;
+    margin-top: .5rem;
+  }
+  .proto-btn-primary { background: var(--sena-green); color: white; }
+  .proto-btn-secondary { background: var(--surface-alt); color: var(--text); border: 1px solid var(--border); }
+  .proto-btn-danger { background: var(--danger); color: white; }
+  .proto-info-card {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: .75rem;
+    font-size: 13px;
+  }
+  .proto-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .proto-col { flex: 1; min-width: 200px; }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-green { background: #d4edda; color: #155724; }
+  .tag-red { background: #f8d7da; color: #721c24; }
+  .tag-blue { background: #d1ecf1; color: #0c5460; }
+  .tag-orange { background: #fff3cd; color: #856404; }
+
+  /* ── TRACEABILITY ── */
+  .trace-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .5rem;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+  .trace-arrow { color: var(--primary); font-weight: 700; }
+  .trace-chip {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── UML CLASS DIAGRAM ── */
+  .uml-class {
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    min-width: 220px;
+    margin: .5rem;
+    vertical-align: top;
+    background: var(--surface);
+    font-size: 13px;
+  }
+  .uml-class-name {
+    background: var(--primary);
+    color: white;
+    padding: 8px 12px;
+    font-weight: 700;
+    text-align: center;
+    font-size: 14px;
+  }
+  .uml-attrs, .uml-methods {
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .uml-attrs div, .uml-methods div {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .uml-methods div::before { content: '+ '; color: var(--success); font-weight: 700; }
+  .uml-attrs div::before { content: '- '; color: var(--danger); font-weight: 700; }
+
+  .uml-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .5rem;
+    margin: 1rem 0;
+  }
+
+  /* ── BACKLOG ── */
+  .backlog-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: .5rem;
+    background: var(--surface);
+    font-size: 13.5px;
+  }
+  .backlog-priority {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .bp-alta { background: #f8d7da; color: #721c24; }
+  .bp-media { background: #fff3cd; color: #856404; }
+  .bp-baja { background: #d1ecf1; color: #0c5460; }
+  .backlog-pts {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  /* ── SPRINT BOARD ── */
+  .sprint-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .sprint-col {
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+  .sprint-col-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: .75rem;
+    color: var(--text-muted);
+  }
+  .sprint-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: .5rem;
+    font-size: 12.5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+
+  /* ── CHECKLIST ── */
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--surface-alt);
+    font-size: 13.5px;
+  }
+  .check-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  /* ── MISC ── */
+  strong { font-weight: 600; }
+  .mb-1 { margin-bottom: 1rem; }
+  .mb-05 { margin-bottom: .5rem; }
+  .mt-1 { margin-top: 1rem; }
+  .text-sm { font-size: 13px; }
+  .text-xs { font-size: 12px; color: var(--text-muted); }
+  .text-center { text-align: center; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
+  p { margin-bottom: .75rem; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.3rem; }
+    .nav-tab { padding: 10px 12px; font-size: 11.5px; }
+    .card { padding: 1rem; }
+    .uml-class { min-width: 180px; }
+    .proto-row { flex-direction: column; }
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .nav-container { display: none; }
+    .section { display: block !important; page-break-inside: avoid; }
+    .accordion-body { display: block !important; }
+    .header { background: var(--primary) !important; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="badge">SENA — ADSO 228118</div>
+  <h1>📋 SRS — Parqueadero El Poblado</h1>
+  <div class="subtitle">Especificación de Requisitos de Software · Fase de Análisis · IEEE 830</div>
+  <div class="meta">
+    <span>Ficha 3387459</span>
+    <span>GFPI-F-135 V04</span>
+    <span>Instructor: Ing. Luis Eladio Porras Camargo</span>
+    <span>Agosto 2026</span>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<div class="nav-container">
+  <div class="nav-tabs" id="navTabs">
+    <div class="nav-tab active" data-tab="intro">1. Introducción</div>
+    <div class="nav-tab" data-tab="tgs">2. TGS</div>
+    <div class="nav-tab" data-tab="requisitos">3. Requisitos</div>
+    <div class="nav-tab" data-tab="casosuso">4. Casos de Uso</div>
+    <div class="nav-tab" data-tab="historias">5. Historias</div>
+    <div class="nav-tab" data-tab="modelo">6. Modelo</div>
+    <div class="nav-tab" data-tab="prototipos">7. Prototipos</div>
+    <div class="nav-tab" data-tab="validacion">8. Validación</div>
+    <div class="nav-tab" data-tab="scrum">9. Scrum</div>
+    <div class="nav-tab" data-tab="ficha">10. Ficha Técnica</div>
+    <div class="nav-tab" data-tab="trazabilidad">11. Trazabilidad</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 1: INTRODUCCIÓN -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section active" id="intro">
+  <div class="section-title"><span class="section-number">1</span> Introducción</div>
+  <div class="section-subtitle">Propósito, alcance y contexto del proyecto</div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🎯</span> 1.1 Propósito</div>
+    <p>Este documento especifica los requisitos funcionales y no funcionales del sistema de gestión para el <strong>Parqueadero El Poblado</strong>, ubicado en el sector El Poblado de Medellín, Colombia. Está dirigido al equipo de desarrollo (aprendices ADSO ficha 3387459), al cliente (dueño del parqueadero) y al instructor como Product Owner.</p>
+    <p>El documento sigue el estándar <strong>IEEE 830-1998</strong> (Recommended Practice for Software Requirements Specifications) y sirve como referente técnico para las fases posteriores de diseño, desarrollo y pruebas.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">📐</span> 1.2 Alcance</div>
+    <p>El sistema <strong>ParkControl</strong> es una aplicación web que gestionará el registro de ingreso y salida de vehículos (carros y motos), el cálculo automático de cobros por tiempo de estadía, la gestión de clientes con mensualidad y la generación de reportes diarios de recaudo.</p>
+    <div class="callout callout-warning">
+      <span class="ico">⚠️</span>
+      <div><strong>Fuera del alcance v1.0:</strong> pagos electrónicos, reconocimiento automático de placas (ANPR), integración con facturación DIAN, gestión de múltiples sedes, reservas de cupo en línea.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">📖</span> 1.3 Definiciones y acrónimos</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Término</th><th>Definición</th></tr>
+        <tr><td><strong>Tiquete</strong></td><td>Registro digital del ingreso de un vehículo con placa, tipo, hora de entrada y estado.</td></tr>
+        <tr><td><strong>Tiempo de gracia</strong></td><td>Período de 10 minutos tras el ingreso durante el cual la salida no genera cobro.</td></tr>
+        <tr><td><strong>Hora iniciada</strong></td><td>Toda fracción de hora se cobra como hora completa (redondeo hacia arriba).</td></tr>
+        <tr><td><strong>Tarifa máxima del día</strong></td><td>$30.000 COP — valor que se cobra cuando el cliente pierde el tiquete.</td></tr>
+        <tr><td><strong>Cliente mensual</strong></td><td>Usuario con una suscripción vigente que le permite ingresar y salir sin cobro por tiempo.</td></tr>
+        <tr><td><strong>Cupo</strong></td><td>Espacio disponible para un vehículo. Capacidad total: 50 puestos.</td></tr>
+        <tr><td><strong>SRS</strong></td><td>Software Requirements Specification — Documento de especificación de requisitos.</td></tr>
+        <tr><td><strong>RF / RNF</strong></td><td>Requisito Funcional / Requisito No Funcional.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🗣️</span> 1.4 La voz del cliente</div>
+    <div class="callout callout-sena">
+      <span class="ico">💬</span>
+      <div>
+        <em>«Necesito un sistema para controlar mi parqueadero. Cuando entra un carro registro la placa y la hora; cuando sale, cobro según el tiempo. Y quiero saber cuánto vendo al día.»</em>
+        <div class="text-xs mt-1">— Dueño del Parqueadero El Poblado</div>
+      </div>
+    </div>
+    <p>A partir de esta declaración inicial, el proceso de <strong>elicitación de requisitos</strong> (sesión de preguntas al cliente) reveló las siguientes reglas de negocio:</p>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Pregunta del analista</th><th>Respuesta del cliente</th></tr>
+        <tr><td>¿Solo carros o también motos?</td><td>Carros y motos, con tarifas distintas: carro $3.000/h, moto $1.500/h.</td></tr>
+        <tr><td>¿Se cobra por hora exacta o fracción?</td><td>Por hora iniciada: toda fracción se paga como hora completa.</td></tr>
+        <tr><td>¿Hay tiempo de gracia?</td><td>Sí, si sale en 10 minutos o menos, no se cobra.</td></tr>
+        <tr><td>¿Qué pasa si pierde el tiquete?</td><td>Se cobra la tarifa máxima del día: $30.000.</td></tr>
+        <tr><td>¿Existen clientes con mensualidad?</td><td>Sí, si la mensualidad está vigente salen sin cobro.</td></tr>
+        <tr><td>¿Cuál es la capacidad del parqueadero?</td><td>50 puestos; si está lleno, no se permite el ingreso.</td></tr>
+        <tr><td>¿Qué reporte necesita al final del día?</td><td>Total recaudado y número de vehículos atendidos.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">👥</span> 1.5 Características de los usuarios</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Usuario</th><th>Nivel TIC</th><th>Responsabilidades en el sistema</th></tr>
+        <tr><td><strong>Cajero</strong></td><td>Básico</td><td>Registrar entrada/salida de vehículos, cobrar, consultar vehículos por placa.</td></tr>
+        <tr><td><strong>Administrador</strong></td><td>Intermedio</td><td>Generar reportes diarios, configurar tarifas, gestionar clientes mensuales.</td></tr>
+        <tr><td><strong>Dueño</strong></td><td>Básico</td><td>Consultar reportes y dashboard de indicadores.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 2: TGS -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="tgs">
+  <div class="section-title"><span class="section-number">2</span> Caracterización de procesos (TGS)</div>
+  <div class="section-subtitle">El parqueadero analizado como sistema según la Teoría General de Sistemas</div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🔄</span> 2.1 El parqueadero como sistema</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Componente</th><th>Descripción</th></tr>
+        <tr><td><strong>Sistema mayor</strong></td><td>Parqueadero El Poblado</td></tr>
+        <tr><td><strong>Entradas</strong></td><td>Vehículos que ingresan · Datos de placa y tipo · Pagos de mensualidad · Configuración de tarifas</td></tr>
+        <tr><td><strong>Subsistemas</strong></td><td>Control de ingreso · Control de salida y cobro · Gestión de mensualidades · Reportes y estadísticas</td></tr>
+        <tr><td><strong>Salidas</strong></td><td>Tiquetes de entrada · Comprobantes de cobro · Reportes diarios · Alertas de cupo lleno</td></tr>
+        <tr><td><strong>Retroalimentación</strong></td><td>Indicador de ocupación en tiempo real · Alertas de cupo próximo a agotarse · Reporte de recaudo vs. meta diaria</td></tr>
+        <tr><td><strong>Fronteras</strong></td><td>No gestiona mantenimiento de infraestructura · No integra pagos electrónicos (v1.0) · No incluye cámaras ni sensores</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">⚙️</span> 2.2 Identificación de procesos organizacionales</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Proceso</th><th>Descripción</th><th>Actores</th></tr>
+        <tr><td><strong>Registrar ingreso</strong></td><td>Capturar placa, tipo de vehículo y hora de entrada; validar cupo disponible; generar tiquete.</td><td>Cajero, Sistema</td></tr>
+        <tr><td><strong>Registrar salida y cobrar</strong></td><td>Buscar vehículo por placa, calcular tiempo y valor, registrar pago y liberar cupo.</td><td>Cajero, Sistema</td></tr>
+        <tr><td><strong>Gestionar mensualidades</strong></td><td>Registrar, renovar y consultar clientes con suscripción mensual.</td><td>Administrador</td></tr>
+        <tr><td><strong>Configurar tarifas</strong></td><td>Actualizar valores de tarifa por tipo de vehículo sin modificar el código.</td><td>Administrador</td></tr>
+        <tr><td><strong>Generar reportes</strong></td><td>Producir resumen diario de recaudo total y vehículos atendidos.</td><td>Administrador, Dueño</td></tr>
+        <tr><td><strong>Gestionar tiquete perdido</strong></td><td>Aplicar tarifa máxima del día cuando el cliente no presenta tiquete.</td><td>Cajero, Sistema</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🗺️</span> 2.3 Mapa de procesos</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Nivel</th><th>Categoría</th><th>Procesos</th></tr>
+        <tr><td class="tag tag-blue">Estratégico</td><td>Dirección</td><td>Reportes e indicadores KPI · Configuración de tarifas · Planificación de capacidad</td></tr>
+        <tr><td class="tag tag-green">Misional</td><td>Negocio clave</td><td>Registro de ingreso · Registro de salida y cobro · Gestión de mensualidades · Tiquete perdido</td></tr>
+        <tr><td class="tag tag-orange">Apoyo</td><td>Soporte</td><td>Gestión de usuarios · Seguridad y autenticación · Respaldo de datos · Auditoría de transacciones</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 3: REQUISITOS -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="requisitos">
+  <div class="section-title"><span class="section-number">3</span> Requisitos específicos</div>
+  <div class="section-subtitle">Requisitos funcionales y no funcionales del sistema ParkControl</div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">✅</span> 3.1 Requisitos funcionales</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>ID</th><th>Requisito</th><th>Origen (cliente)</th></tr>
+        <tr><td class="td-id">RF-01</td><td>El sistema debe permitir al cajero registrar el ingreso de un vehículo capturando: placa, tipo (carro/moto) y hora de entrada, generando un tiquete digital.</td><td class="td-origin">«registro la placa y la hora»</td></tr>
+        <tr><td class="td-id">RF-02</td><td>El sistema debe validar la disponibilidad de cupo (capacidad máxima: 50 puestos) antes de permitir el ingreso. Si el parqueadero está lleno, debe mostrar el mensaje «Parqueadero lleno — No hay cupo disponible».</td><td class="td-origin">«hay 50 puestos»</td></tr>
+        <tr><td class="td-id">RF-03</td><td>El sistema debe permitir al cajero registrar la salida de un vehículo y calcular automáticamente el valor a cobrar según el tiempo transcurrido y la tarifa del tipo de vehículo (carro: $3.000/h, moto: $1.500/h).</td><td class="td-origin">«cuando sale, cobro según el tiempo»</td></tr>
+        <tr><td class="td-id">RF-04</td><td>El sistema debe cobrar por hora iniciada: toda fracción de hora se cobra como hora completa (redondeo hacia arriba con <code>ceil</code>).</td><td class="td-origin">«la fracción se paga completa»</td></tr>
+        <tr><td class="td-id">RF-05</td><td>El sistema debe aplicar un tiempo de gracia de 10 minutos: si el vehículo sale en 10 minutos o menos desde su ingreso, el valor a cobrar es $0.</td><td class="td-origin">«si sale rapidito no le cobro»</td></tr>
+        <tr><td class="td-id">RF-06</td><td>El sistema debe permitir al cajero marcar un tiquete como «perdido», aplicando automáticamente la tarifa máxima del día ($30.000 COP) independientemente del tiempo real.</td><td class="td-origin">«si pierde el tiquete, tarifa plena»</td></tr>
+        <tr><td class="td-id">RF-07</td><td>El sistema debe identificar vehículos con mensualidad vigente por su placa y permitir su salida sin cobro por tiempo. Si la mensualidad está vencida, se cobra normalmente.</td><td class="td-origin">«tengo clientes de mensualidad»</td></tr>
+        <tr><td class="td-id">RF-08</td><td>El sistema debe generar un reporte de cierre diario que muestre: total recaudado ($), número de vehículos atendidos, desglose por tipo (carros/motos) y número de tiquetes perdidos.</td><td class="td-origin">«quiero saber cuánto vendo al día»</td></tr>
+        <tr><td class="td-id">RF-09</td><td>El sistema debe permitir al cajero consultar un vehículo dentro del parqueadero por su placa, mostrando hora de entrada, tiempo transcurrido y valor acumulado en tiempo real.</td><td class="td-origin">(descubierto al prototipar)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🔧</span> 3.2 Requisitos no funcionales</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>ID</th><th>Categoría</th><th>Requisito</th><th>Métrica de verificación</th></tr>
+        <tr><td class="td-id">RNF-01</td><td>Usabilidad</td><td>El registro de salida debe completarse en pocos pasos para que el cajero atienda la fila con agilidad.</td><td>≤ 3 clics desde la búsqueda por placa hasta la confirmación del cobro.</td></tr>
+        <tr><td class="td-id">RNF-02</td><td>Mantenibilidad</td><td>Las tarifas por tipo de vehículo, el tiempo de gracia y la tarifa máxima deben ser parametrizables sin modificar el código fuente.</td><td>Valores almacenados en tabla de configuración de la base de datos.</td></tr>
+        <tr><td class="td-id">RNF-03</td><td>Trazabilidad</td><td>Toda transacción de cobro debe quedar registrada con datos completos para auditoría.</td><td>Log con: fecha, hora, placa, cajero, monto, tipo de cobro (normal/gracia/perdido/mensual).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="ico">📝</span>
+    <div><strong>Diferencia clave:</strong> los requisitos funcionales describen <em>QUÉ hace</em> el sistema (registrar, calcular, cobrar); los no funcionales describen <em>CÓMO debe ser</em> el sistema (rápido, parametrizable, auditable).</div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 4: CASOS DE USO -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="casosuso">
+  <div class="section-title"><span class="section-number">4</span> Casos de uso</div>
+  <div class="section-subtitle">Actores, diagrama y especificación detallada de cada caso de uso</div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">👤</span> 4.1 Actores del sistema</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Actor</th><th>Descripción</th><th>Casos de uso</th></tr>
+        <tr><td><strong>Cajero</strong></td><td>Operario que atiende la entrada/salida del parqueadero.</td><td>CU-01, CU-02, CU-03</td></tr>
+        <tr><td><strong>Administrador</strong></td><td>Hereda de Cajero. Gestiona tarifas, mensualidades y reportes.</td><td>CU-01…CU-06</td></tr>
+        <tr><td><strong>Sistema</strong></td><td>Actor secundario que ejecuta validaciones y cálculos automáticos.</td><td>Todos (validaciones internas)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">📊</span> 4.2 Resumen de casos de uso</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>ID</th><th>Caso de uso</th><th>Actor principal</th><th>RF cubiertos</th></tr>
+        <tr><td class="td-id">CU-01</td><td>Registrar entrada de vehículo</td><td>Cajero</td><td>RF-01, RF-02</td></tr>
+        <tr><td class="td-id">CU-02</td><td>Registrar salida y cobrar</td><td>Cajero</td><td>RF-03, RF-04, RF-05, RF-06, RF-07, RF-09</td></tr>
+        <tr><td class="td-id">CU-03</td><td>Consultar vehículo por placa</td><td>Cajero</td><td>RF-09</td></tr>
+        <tr><td class="td-id">CU-04</td><td>Generar reporte diario</td><td>Administrador</td><td>RF-08</td></tr>
+        <tr><td class="td-id">CU-05</td><td>Configurar tarifas</td><td>Administrador</td><td>RNF-02</td></tr>
+        <tr><td class="td-id">CU-06</td><td>Gestionar clientes mensuales</td><td>Administrador</td><td>RF-07</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- CU-01 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>📄 CU-01: Registrar entrada de vehículo</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="tbl-wrap">
+        <table>
+          <tr><td style="width:180px"><strong>Identificador</strong></td><td>CU-01</td></tr>
+          <tr><td><strong>Nombre</strong></td><td>Registrar entrada de vehículo</td></tr>
+          <tr><td><strong>Actor principal</strong></td><td>Cajero</td></tr>
+          <tr><td><strong>RF cubiertos</strong></td><td>RF-01, RF-02</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>El cajero está autenticado. El parqueadero tiene al menos 1 cupo disponible.</td></tr>
+          <tr><td><strong>Flujo principal</strong></td><td>
+            1. El cajero selecciona «Registrar entrada».<br>
+            2. El cajero ingresa la placa del vehículo.<br>
+            3. El cajero selecciona el tipo (carro/moto).<br>
+            4. El sistema valida que hay cupo disponible (RF-02).<br>
+            5. El sistema registra la hora de entrada automáticamente.<br>
+            6. El sistema genera un tiquete digital y reduce el cupo en 1.<br>
+            7. El sistema muestra el tiquete con placa, tipo, hora y cupo restante.
+          </td></tr>
+          <tr><td><strong>Flujos alternos</strong></td><td>
+            <strong>4a. Parqueadero lleno:</strong> el sistema muestra «Parqueadero lleno — No hay cupo disponible» y no permite el registro.<br>
+            <strong>2a. Placa ya registrada:</strong> el sistema muestra «Este vehículo ya se encuentra dentro del parqueadero» y bloquea el ingreso.
+          </td></tr>
+          <tr><td><strong>Postcondiciones</strong></td><td>El tiquete queda registrado con estado «activo». El cupo disponible se reduce en 1. Queda registro en el log de auditoría (RNF-03).</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CU-02 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>📄 CU-02: Registrar salida y cobrar</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="tbl-wrap">
+        <table>
+          <tr><td style="width:180px"><strong>Identificador</strong></td><td>CU-02</td></tr>
+          <tr><td><strong>Nombre</strong></td><td>Registrar salida y cobrar</td></tr>
+          <tr><td><strong>Actor principal</strong></td><td>Cajero</td></tr>
+          <tr><td><strong>RF cubiertos</strong></td><td>RF-03, RF-04, RF-05, RF-06, RF-07, RF-09</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>El vehículo tiene un tiquete activo con hora de entrada registrada.</td></tr>
+          <tr><td><strong>Flujo principal</strong></td><td>
+            1. El cajero consulta el vehículo por su placa (RF-09).<br>
+            2. El sistema muestra la hora de entrada y el tiempo transcurrido.<br>
+            3. El sistema calcula el valor: tarifa del tipo × horas iniciadas (RF-03, RF-04).<br>
+            4. El cajero confirma el cobro y registra la hora de salida.<br>
+            5. El sistema libera el cupo (+1) y guarda la transacción para el reporte (RF-08).
+          </td></tr>
+          <tr><td><strong>Flujos alternos</strong></td><td>
+            <strong>a) Tiempo de gracia (RF-05):</strong> si el tiempo ≤ 10 min, el valor es $0. Se registra la salida sin cobro.<br><br>
+            <strong>b) Tiquete perdido (RF-06):</strong> el cajero marca «tiquete perdido». El sistema aplica la tarifa máxima del día ($30.000).<br><br>
+            <strong>c) Cliente mensual (RF-07):</strong> si la placa tiene mensualidad vigente, el valor es $0. Si está vencida, se cobra por tiempo normalmente.
+          </td></tr>
+          <tr><td><strong>Postcondiciones</strong></td><td>El cupo queda liberado. La transacción queda registrada con: placa, tipo, hora entrada, hora salida, tiempo, valor cobrado, tipo de cobro (normal/gracia/perdido/mensual), cajero (RNF-03).</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CU-03 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>📄 CU-03: Consultar vehículo por placa</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="tbl-wrap">
+        <table>
+          <tr><td style="width:180px"><strong>Identificador</strong></td><td>CU-03</td></tr>
+          <tr><td><strong>Actor principal</strong></td><td>Cajero</td></tr>
+          <tr><td><strong>RF cubiertos</strong></td><td>RF-09</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>El cajero está autenticado.</td></tr>
+          <tr><td><strong>Flujo principal</strong></td><td>
+            1. El cajero ingresa la placa en el campo de búsqueda.<br>
+            2. El sistema busca el vehículo en los tiquetes activos.<br>
+            3. El sistema muestra: placa, tipo, hora de entrada, tiempo transcurrido y valor acumulado en tiempo real.
+          </td></tr>
+          <tr><td><strong>Flujos alternos</strong></td><td>
+            <strong>2a. Placa no encontrada:</strong> el sistema muestra «No se encontró un vehículo con esa placa dentro del parqueadero».
+          </td></tr>
+          <tr><td><strong>Postcondiciones</strong></td><td>Ninguna (solo consulta, no modifica datos).</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CU-04 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>📄 CU-04: Generar reporte diario</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="tbl-wrap">
+        <table>
+          <tr><td style="width:180px"><strong>Identificador</strong></td><td>CU-04</td></tr>
+          <tr><td><strong>Actor principal</strong></td><td>Administrador</td></tr>
+          <tr><td><strong>RF cubiertos</strong></td><td>RF-08</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>El administrador está autenticado. Existe al menos una transacción registrada en la fecha seleccionada.</td></tr>
+          <tr><td><strong>Flujo principal</strong></td><td>
+            1. El administrador selecciona «Reporte diario» y elige la fecha.<br>
+            2. El sistema calcula: total recaudado, número de vehículos atendidos, desglose carros/motos, tiquetes perdidos.<br>
+            3. El sistema presenta el reporte en pantalla.<br>
+            4. El administrador puede exportar en PDF o Excel.
+          </td></tr>
+          <tr><td><strong>Flujos alternos</strong></td><td>
+            <strong>2a. Sin transacciones:</strong> el sistema muestra «No hay transacciones registradas para esta fecha».
+          </td></tr>
+          <tr><td><strong>Postcondiciones</strong></td><td>El reporte queda disponible para consulta y descarga.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CU-05 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>📄 CU-05: Configurar tarifas</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="tbl-wrap">
+        <table>
+          <tr><td style="width:180px"><strong>Identificador</strong></td><td>CU-05</td></tr>
+          <tr><td><strong>Actor principal</strong></td><td>Administrador</td></tr>
+          <tr><td><strong>RNF cubiertos</strong></td><td>RNF-02</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>El administrador está autenticado con rol de administrador.</td></tr>
+          <tr><td><strong>Flujo principal</strong></td><td>
+            1. El administrador accede al módulo «Configuración».<br>
+            2. El sistema muestra los valores actuales: tarifa carro, tarifa moto, tiempo de gracia, tarifa máxima día.<br>
+            3. El administrador modifica los valores deseados.<br>
+            4. El sistema valida que los valores sean positivos y guarda los cambios.
+          </td></tr>
+          <tr><td><strong>Flujos alternos</strong></td><td>
+            <strong>4a. Valor inválido:</strong> el sistema muestra «El valor debe ser un número positivo» y no guarda.
+          </td></tr>
+          <tr><td><strong>Postcondiciones</strong></td><td>Las nuevas tarifas aplican inmediatamente para los próximos cobros. Queda registro de quién cambió la tarifa y cuándo (RNF-03).</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CU-06 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>📄 CU-06: Gestionar clientes mensuales</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="tbl-wrap">
+        <table>
+          <tr><td style="width:180px"><strong>Identificador</strong></td><td>CU-06</td></tr>
+          <tr><td><strong>Actor principal</strong></td><td>Administrador</td></tr>
+          <tr><td><strong>RF cubiertos</strong></td><td>RF-07</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>El administrador está autenticado.</td></tr>
+          <tr><td><strong>Flujo principal</strong></td><td>
+            1. El administrador accede al módulo «Clientes mensuales».<br>
+            2. El administrador registra un nuevo cliente: nombre, cédula, placa, fecha inicio y fecha fin de mensualidad.<br>
+            3. El sistema valida que la placa no tenga otra mensualidad activa.<br>
+            4. El sistema guarda el registro.
+          </td></tr>
+          <tr><td><strong>Flujos alternos</strong></td><td>
+            <strong>3a. Placa con mensualidad activa:</strong> el sistema muestra «Esta placa ya tiene una mensualidad vigente».<br>
+            <strong>b. Renovar:</strong> el administrador puede extender la fecha fin de una mensualidad existente.
+          </td></tr>
+          <tr><td><strong>Postcondiciones</strong></td><td>El cliente mensual queda registrado. El sistema lo reconoce automáticamente en CU-02 al registrar salida.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 5: HISTORIAS DE USUARIO -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="historias">
+  <div class="section-title"><span class="section-number">5</span> Historias de usuario</div>
+  <div class="section-subtitle">Funcionalidades desde la perspectiva del usuario con criterios de aceptación BDD</div>
+
+  <!-- HU-01 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>🟢 HU-01: Registrar entrada de vehículo (3 pts · Alta)</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="callout callout-sena">
+        <span class="ico">📝</span>
+        <div>Como <strong>cajero</strong>, quiero registrar el ingreso de un vehículo capturando su placa y tipo, para tener control de los vehículos dentro del parqueadero.</div>
+      </div>
+      <p><strong>Criterios de aceptación:</strong></p>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-01.1:</strong> DADO QUE el parqueadero tiene cupo disponible, CUANDO el cajero registra placa «ABC123» tipo «carro», ENTONCES el sistema genera un tiquete con hora de entrada y muestra cupo restante.</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-01.2:</strong> DADO QUE el parqueadero tiene 50 vehículos (lleno), CUANDO el cajero intenta registrar una entrada, ENTONCES el sistema muestra «Parqueadero lleno» y no permite el registro.</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-01.3:</strong> DADO QUE la placa «ABC123» ya tiene un tiquete activo, CUANDO el cajero intenta registrar esa misma placa, ENTONCES el sistema muestra «Este vehículo ya se encuentra dentro del parqueadero».</div></div>
+      <p class="text-xs"><strong>RF trazados:</strong> RF-01, RF-02 · <strong>CU:</strong> CU-01</p>
+    </div>
+  </div>
+
+  <!-- HU-02 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>🟢 HU-02: Registrar salida y cobrar (8 pts · Alta)</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="callout callout-sena">
+        <span class="ico">📝</span>
+        <div>Como <strong>cajero</strong>, quiero registrar la salida de un vehículo y que el sistema calcule automáticamente el valor a cobrar, para cobrarle correctamente al cliente y liberar el cupo.</div>
+      </div>
+      <p><strong>Criterios de aceptación:</strong></p>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-02.1 (Cobro normal):</strong> DADO QUE un carro ingresó hace 2 horas y 10 minutos, CUANDO el cajero registra la salida, ENTONCES el sistema cobra 3 horas × $3.000 = <strong>$9.000</strong>.</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-02.2 (Moto):</strong> DADO QUE una moto ingresó hace 1 hora y 45 minutos, CUANDO el cajero registra la salida, ENTONCES el sistema cobra 2 horas × $1.500 = <strong>$3.000</strong>.</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-02.3:</strong> DADO QUE el cobro se confirma, CUANDO el sistema registra la salida, ENTONCES el cupo disponible aumenta en 1 y la transacción queda registrada para el reporte diario.</div></div>
+      <p class="text-xs"><strong>RF trazados:</strong> RF-03, RF-04 · <strong>CU:</strong> CU-02</p>
+    </div>
+  </div>
+
+  <!-- HU-03 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>🟢 HU-03: Aplicar tiempo de gracia (3 pts · Alta)</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="callout callout-sena">
+        <span class="ico">📝</span>
+        <div>Como <strong>cajero</strong>, quiero que el sistema reconozca automáticamente cuando un vehículo sale dentro del tiempo de gracia, para no cobrarle al cliente.</div>
+      </div>
+      <p><strong>Criterios de aceptación:</strong></p>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-03.1:</strong> DADO QUE un vehículo ingresó hace 7 minutos, CUANDO el cajero registra la salida, ENTONCES el valor es <strong>$0</strong> y se muestra «Tiempo de gracia — Sin cobro».</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-03.2:</strong> DADO QUE un vehículo ingresó hace exactamente 10 minutos, CUANDO el cajero registra la salida, ENTONCES el valor es <strong>$0</strong> (10 min está dentro del límite).</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-03.3:</strong> DADO QUE un vehículo ingresó hace 11 minutos, CUANDO el cajero registra la salida, ENTONCES se cobra 1 hora completa según la tarifa del tipo.</div></div>
+      <p class="text-xs"><strong>RF trazados:</strong> RF-05 · <strong>CU:</strong> CU-02 (flujo alterno a)</p>
+    </div>
+  </div>
+
+  <!-- HU-04 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>🟡 HU-04: Gestionar tiquete perdido (5 pts · Alta)</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="callout callout-sena">
+        <span class="ico">📝</span>
+        <div>Como <strong>cajero</strong>, quiero poder marcar un tiquete como perdido para aplicar la tarifa máxima del día y no dejar salir el vehículo gratis.</div>
+      </div>
+      <p><strong>Criterios de aceptación:</strong></p>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-04.1:</strong> DADO QUE un cliente dice que perdió su tiquete, CUANDO el cajero marca «Tiquete perdido» en el sistema, ENTONCES el valor a cobrar es <strong>$30.000</strong> independientemente del tiempo real.</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-04.2:</strong> DADO QUE se registra un tiquete perdido, CUANDO se genera el reporte diario, ENTONCES la transacción aparece marcada como «tiquete perdido» en el desglose.</div></div>
+      <p class="text-xs"><strong>RF trazados:</strong> RF-06 · <strong>CU:</strong> CU-02 (flujo alterno b)</p>
+    </div>
+  </div>
+
+  <!-- HU-05 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>🟡 HU-05: Identificar cliente mensual (5 pts · Media)</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="callout callout-sena">
+        <span class="ico">📝</span>
+        <div>Como <strong>cajero</strong>, quiero que el sistema identifique automáticamente si un vehículo tiene mensualidad vigente, para dejarlo salir sin cobro.</div>
+      </div>
+      <p><strong>Criterios de aceptación:</strong></p>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-05.1:</strong> DADO QUE la placa «XYZ789» tiene mensualidad vigente hasta el 30 de septiembre, CUANDO el cajero registra la salida el 15 de septiembre, ENTONCES el valor es <strong>$0</strong> y se muestra <span class="tag tag-blue">Cliente mensual</span>.</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-05.2:</strong> DADO QUE la placa «XYZ789» tenía mensualidad hasta el 31 de agosto (vencida), CUANDO el cajero registra la salida el 5 de septiembre, ENTONCES se cobra normalmente por tiempo y se muestra <span class="tag tag-orange">Mensualidad vencida</span>.</div></div>
+      <p class="text-xs"><strong>RF trazados:</strong> RF-07 · <strong>CU:</strong> CU-02 (flujo alterno c), CU-06</p>
+    </div>
+  </div>
+
+  <!-- HU-06 -->
+  <div class="accordion">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>🟡 HU-06: Generar reporte diario (5 pts · Media)</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+      <div class="callout callout-sena">
+        <span class="ico">📝</span>
+        <div>Como <strong>administrador</strong>, quiero generar un reporte de cierre diario con el total recaudado y los vehículos atendidos, para entregarle cuentas al dueño.</div>
+      </div>
+      <p><strong>Criterios de aceptación:</strong></p>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-06.1:</strong> DADO QUE se atendieron 35 vehículos hoy con un total de $120.000, CUANDO el administrador genera el reporte, ENTONCES el sistema muestra: Total recaudado: $120.000, Vehículos: 35, Carros: 20, Motos: 15, Tiquetes perdidos: 2.</div></div>
+      <div class="callout callout-success"><span class="ico">✅</span><div><strong>CA-06.2:</strong> DADO QUE no hay transacciones en la fecha seleccionada, CUANDO el administrador genera el reporte, ENTONCES el sistema muestra «No hay transacciones registradas para esta fecha».</div></div>
+      <p class="text-xs"><strong>RF trazados:</strong> RF-08 · <strong>CU:</strong> CU-04</p>
+    </div>
+  </div>
+
+  <!-- PRODUCT BACKLOG -->
+  <div class="card mt-1">
+    <div class="card-header"><span class="icon">📋</span> 5.2 Product Backlog priorizado</div>
+    <div class="backlog-item"><span class="backlog-priority bp-alta">Alta</span> <strong>HU-01</strong> — Registrar entrada de vehículo <span class="backlog-pts">3 pts</span></div>
+    <div class="backlog-item"><span class="backlog-priority bp-alta">Alta</span> <strong>HU-02</strong> — Registrar salida y cobrar <span class="backlog-pts">8 pts</span></div>
+    <div class="backlog-item"><span class="backlog-priority bp-alta">Alta</span> <strong>HU-03</strong> — Aplicar tiempo de gracia <span class="backlog-pts">3 pts</span></div>
+    <div class="backlog-item"><span class="backlog-priority bp-alta">Alta</span> <strong>HU-04</strong> — Gestionar tiquete perdido <span class="backlog-pts">5 pts</span></div>
+    <div class="backlog-item"><span class="backlog-priority bp-media">Media</span> <strong>HU-05</strong> — Identificar cliente mensual <span class="backlog-pts">5 pts</span></div>
+    <div class="backlog-item"><span class="backlog-priority bp-media">Media</span> <strong>HU-06</strong> — Generar reporte diario <span class="backlog-pts">5 pts</span></div>
+    <div class="callout callout-info mt-1">
+      <span class="ico">📊</span>
+      <div><strong>Total:</strong> 29 puntos de esfuerzo · <strong>Velocidad estimada:</strong> 16 pts/sprint · <strong>Sprints estimados:</strong> 2 sprints de 2 semanas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 6: MODELO CONCEPTUAL -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="modelo">
+  <div class="section-title"><span class="section-number">6</span> Modelo conceptual de datos</div>
+  <div class="section-subtitle">Diagrama de clases preliminar derivado de la ingeniería de requisitos</div>
+
+  <div class="callout callout-info mb-1">
+    <span class="ico">💡</span>
+    <div><strong>Técnica aplicada:</strong> subrayar los sustantivos de los casos de uso → clases candidatas. Descartar los que son atributos (placa, hora) o quedan fuera del alcance (parqueadero físico). Las clases que sobreviven son las entidades del dominio.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🏗️</span> 6.1 Diagrama de clases</div>
+    <div class="uml-grid">
+      <div class="uml-class">
+        <div class="uml-class-name">Vehiculo</div>
+        <div class="uml-attrs">
+          <div>placa: String [7] (PK, único)</div>
+          <div>tipo: Enum {carro, moto}</div>
+        </div>
+        <div class="uml-methods">
+          <div>estaAdentro(): Boolean</div>
+        </div>
+      </div>
+      <div class="uml-class">
+        <div class="uml-class-name">Tiquete</div>
+        <div class="uml-attrs">
+          <div>id: Integer (PK)</div>
+          <div>horaEntrada: DateTime</div>
+          <div>horaSalida: DateTime (null)</div>
+          <div>valor: Decimal</div>
+          <div>perdido: Boolean</div>
+          <div>tipoCobro: Enum {normal, gracia, perdido, mensual}</div>
+          <div>estado: Enum {activo, cerrado}</div>
+        </div>
+        <div class="uml-methods">
+          <div>calcularMinutos(): Integer</div>
+          <div>calcularValor(): Decimal</div>
+          <div>estaVencido(): Boolean</div>
+        </div>
+      </div>
+      <div class="uml-class">
+        <div class="uml-class-name">Tarifa</div>
+        <div class="uml-attrs">
+          <div>id: Integer (PK)</div>
+          <div>tipo: Enum {carro, moto}</div>
+          <div>valorHora: Decimal</div>
+          <div>tiempoGracia: Integer (min)</div>
+          <div>tarifaMaxDia: Decimal</div>
+          <div>vigente: Boolean</div>
+        </div>
+        <div class="uml-methods">
+          <div>obtenerTarifaVigente(tipo): Tarifa</div>
+        </div>
+      </div>
+      <div class="uml-class">
+        <div class="uml-class-name">Cliente</div>
+        <div class="uml-attrs">
+          <div>id: Integer (PK)</div>
+          <div>nombre: String [100]</div>
+          <div>cedula: String [15] (único)</div>
+          <div>placa: String [7]</div>
+          <div>fechaInicioMensualidad: Date</div>
+          <div>fechaFinMensualidad: Date</div>
+        </div>
+        <div class="uml-methods">
+          <div>mensualidadVigente(): Boolean</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🔗</span> 6.2 Relaciones</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Relación</th><th>Cardinalidad</th><th>Descripción</th></tr>
+        <tr><td>Vehiculo → Tiquete</td><td>1 — *</td><td>Un vehículo puede tener muchos tiquetes (uno por cada visita), pero solo uno activo a la vez.</td></tr>
+        <tr><td>Tiquete → Tarifa</td><td>* — 1</td><td>Cada tiquete usa la tarifa vigente del tipo de vehículo al momento de calcular el cobro.</td></tr>
+        <tr><td>Cliente → Vehiculo</td><td>1 — 1..*</td><td>Un cliente mensual se asocia a una o más placas. La relación es opcional (no todo vehículo tiene cliente).</td></tr>
+      </table>
+    </div>
+    <div class="callout callout-warning">
+      <span class="ico">🎓</span>
+      <div><strong>Punto de discusión clave:</strong> «hora» NO es una clase, es un <em>atributo</em> de Tiquete. «Parqueadero» NO es una clase del modelo porque es el sistema mismo, no una entidad que se almacena. Distinguir entidad de atributo es el aprendizaje central de esta fase.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 7: PROTOTIPOS -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="prototipos">
+  <div class="section-title"><span class="section-number">7</span> Prototipos del sistema</div>
+  <div class="section-subtitle">Wireframes de media fidelidad para las pantallas principales</div>
+
+  <div class="callout callout-info mb-1">
+    <span class="ico">💡</span>
+    <div><strong>El prototipo no decora, descubre.</strong> Al dibujar la pantalla «Registrar salida» apareció el RF-09 (buscar por placa) que no estaba en el enunciado original. El análisis es iterativo: el prototipo nos devuelve a los requisitos.</div>
+  </div>
+
+  <!-- P-01 -->
+  <div class="proto">
+    <div class="proto-bar">🖥️ P-01: Panel principal del cajero</div>
+    <div class="proto-body">
+      <p class="text-sm mb-1"><strong>HU asociadas:</strong> Todas · <strong>CU:</strong> Todos</p>
+      <div class="proto-row">
+        <div class="proto-col">
+          <div class="proto-info-card" style="text-align:center;">
+            <div style="font-size:2rem; font-weight:800; color:var(--primary);">38</div>
+            <div class="text-xs">Cupo disponible de 50</div>
+            <div style="background:var(--border);height:8px;border-radius:4px;margin-top:6px;">
+              <div style="background:var(--sena-green);height:8px;border-radius:4px;width:76%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="proto-col">
+          <div class="proto-info-card" style="text-align:center;">
+            <div style="font-size:2rem; font-weight:800; color:var(--success);">$87.000</div>
+            <div class="text-xs">Recaudo del día</div>
+          </div>
+        </div>
+        <div class="proto-col">
+          <div class="proto-info-card" style="text-align:center;">
+            <div style="font-size:2rem; font-weight:800; color:var(--accent);">23</div>
+            <div class="text-xs">Vehículos atendidos hoy</div>
+          </div>
+        </div>
+      </div>
+      <div class="proto-row mt-1">
+        <div class="proto-col"><span class="proto-btn proto-btn-primary" style="width:100%;text-align:center;display:block;">🚗 Registrar entrada</span></div>
+        <div class="proto-col"><span class="proto-btn proto-btn-secondary" style="width:100%;text-align:center;display:block;background:var(--accent);color:white;">🚙 Registrar salida</span></div>
+        <div class="proto-col"><span class="proto-btn proto-btn-secondary" style="width:100%;text-align:center;display:block;">🔍 Buscar vehículo</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P-02 -->
+  <div class="proto">
+    <div class="proto-bar">🖥️ P-02: Registrar entrada de vehículo</div>
+    <div class="proto-body">
+      <p class="text-sm mb-1"><strong>HU:</strong> HU-01 · <strong>CU:</strong> CU-01 · <strong>RF:</strong> RF-01, RF-02</p>
+      <div class="proto-row">
+        <div class="proto-col">
+          <div class="proto-field">
+            <label>Placa del vehículo *</label>
+            <div class="input-mock">ABC 123</div>
+          </div>
+          <div class="proto-field">
+            <label>Tipo de vehículo *</label>
+            <div style="display:flex;gap:.5rem;">
+              <span class="proto-btn proto-btn-primary">🚗 Carro</span>
+              <span class="proto-btn proto-btn-secondary">🏍️ Moto</span>
+            </div>
+          </div>
+        </div>
+        <div class="proto-col">
+          <div class="proto-info-card">
+            <div class="text-xs">Fecha y hora de entrada</div>
+            <div style="font-weight:700;">19/08/2026 — 10:35 AM</div>
+            <div class="text-xs" style="margin-top:6px;">Cupo disponible</div>
+            <div style="font-weight:700;">38 de 50 <span class="tag tag-green">Disponible</span></div>
+          </div>
+        </div>
+      </div>
+      <hr class="divider">
+      <span class="proto-btn proto-btn-primary">✅ Confirmar entrada</span>
+      <span class="proto-btn proto-btn-secondary" style="margin-left:.5rem;">Cancelar</span>
+      <div class="callout callout-danger mt-1">
+        <span class="ico">❌</span>
+        <div><strong>Mensaje de error (cuando lleno):</strong> «Parqueadero lleno — No hay cupo disponible»</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P-03 -->
+  <div class="proto">
+    <div class="proto-bar">🖥️ P-03: Registrar salida y cobrar</div>
+    <div class="proto-body">
+      <p class="text-sm mb-1"><strong>HU:</strong> HU-02, HU-03, HU-04, HU-05 · <strong>CU:</strong> CU-02 · <strong>RF:</strong> RF-03 a RF-07, RF-09</p>
+      <div class="proto-field">
+        <label>Buscar vehículo por placa (RF-09)</label>
+        <div class="input-mock">ABC 123 <span style="margin-left:auto;color:var(--primary);font-weight:600;cursor:default;">🔍 Buscar</span></div>
+      </div>
+      <div class="proto-row">
+        <div class="proto-col">
+          <div class="proto-info-card">
+            <div style="font-weight:700;">🚗 Carro — ABC 123</div>
+            <div class="text-xs" style="margin-top:4px;">Hora de entrada: <strong>08:15 AM</strong></div>
+            <div class="text-xs">Hora actual: <strong>10:35 AM</strong></div>
+            <div class="text-xs">Tiempo transcurrido: <strong>2h 20min</strong></div>
+            <div class="tag tag-green" style="margin-top:6px;">Tiquete activo</div>
+          </div>
+        </div>
+        <div class="proto-col">
+          <div class="proto-info-card" style="background:var(--accent-light);border-color:var(--accent);">
+            <div class="text-xs">Cálculo del cobro</div>
+            <div style="font-size:12px;margin-top:4px;">Horas iniciadas: <strong>3</strong> (2h 20m → ceil = 3)</div>
+            <div style="font-size:12px;">Tarifa carro: <strong>$3.000/h</strong></div>
+            <hr class="divider" style="margin:.5rem 0;">
+            <div style="font-size:1.3rem;font-weight:800;color:var(--accent);">Total: $9.000</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap;">
+        <span class="proto-btn proto-btn-primary">💰 Confirmar cobro</span>
+        <span class="proto-btn proto-btn-danger">🎫 Tiquete perdido ($30.000)</span>
+        <span class="proto-btn proto-btn-secondary">Cancelar</span>
+      </div>
+      <div class="callout callout-success mt-1">
+        <span class="ico">✅</span>
+        <div><strong>Validaciones en tiempo real:</strong> si es cliente mensual muestra <span class="tag tag-blue">Mensual — $0</span> · si es gracia muestra <span class="tag tag-green">Gracia — $0</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 8: VALIDACIÓN -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="validacion">
+  <div class="section-title"><span class="section-number">8</span> Validación de requisitos</div>
+  <div class="section-subtitle">Casos de prueba y lista de chequeo de artefactos</div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🧪</span> 8.1 Casos de prueba</div>
+
+    <div class="accordion">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        <span>CP-02-01: Cobro normal exitoso</span><span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tbl-wrap"><table>
+          <tr><td style="width:160px"><strong>Objetivo</strong></td><td>Verificar que el cobro normal funciona correctamente.</td></tr>
+          <tr><td><strong>HU / CU</strong></td><td>HU-02 / CU-02</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>Carro con placa ABC123, ingresó a las 08:00. Tarifa carro: $3.000/h.</td></tr>
+          <tr><td><strong>Pasos</strong></td><td>1. Buscar placa «ABC123». 2. El sistema muestra 2h 10min transcurridos. 3. Confirmar cobro.</td></tr>
+          <tr><td><strong>Resultado esperado</strong></td><td>Valor cobrado: $9.000 (3 horas × $3.000). Cupo +1. Transacción registrada.</td></tr>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        <span>CP-02-02: Tiempo de gracia</span><span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tbl-wrap"><table>
+          <tr><td style="width:160px"><strong>Objetivo</strong></td><td>Verificar que vehículos con ≤10 min no generan cobro.</td></tr>
+          <tr><td><strong>HU / CU</strong></td><td>HU-03 / CU-02 (alterno a)</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>Moto con placa XYZ789, ingresó hace 7 minutos.</td></tr>
+          <tr><td><strong>Pasos</strong></td><td>1. Buscar placa «XYZ789». 2. El sistema muestra 7 min. 3. Confirmar salida.</td></tr>
+          <tr><td><strong>Resultado esperado</strong></td><td>Valor: $0. Mensaje: «Tiempo de gracia — Sin cobro». Cupo +1.</td></tr>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        <span>CP-02-03: Tiquete perdido</span><span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tbl-wrap"><table>
+          <tr><td style="width:160px"><strong>Objetivo</strong></td><td>Verificar que el tiquete perdido cobra la tarifa máxima.</td></tr>
+          <tr><td><strong>HU / CU</strong></td><td>HU-04 / CU-02 (alterno b)</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>Carro con placa DEF456, tiquete activo.</td></tr>
+          <tr><td><strong>Pasos</strong></td><td>1. Buscar placa «DEF456». 2. Clic en «Tiquete perdido». 3. Confirmar.</td></tr>
+          <tr><td><strong>Resultado esperado</strong></td><td>Valor: $30.000. Tipo de cobro: «perdido». Transacción registrada.</td></tr>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        <span>CP-02-04: Cliente mensual vigente</span><span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tbl-wrap"><table>
+          <tr><td style="width:160px"><strong>Objetivo</strong></td><td>Verificar que un cliente mensual sale sin cobro.</td></tr>
+          <tr><td><strong>HU / CU</strong></td><td>HU-05 / CU-02 (alterno c)</td></tr>
+          <tr><td><strong>Precondiciones</strong></td><td>Placa GHI012 con mensualidad vigente hasta 30/09/2026.</td></tr>
+          <tr><td><strong>Pasos</strong></td><td>1. Buscar placa «GHI012». 2. El sistema muestra «Cliente mensual». 3. Confirmar salida.</td></tr>
+          <tr><td><strong>Resultado esperado</strong></td><td>Valor: $0. Tipo de cobro: «mensual». Badge: «Cliente mensual».</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">☑️</span> 8.2 Lista de chequeo de artefactos</div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>El documento SRS tiene portada, introducción, alcance y versión.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Cada RF es claro, no ambiguo y verificable.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Cada RNF tiene métrica de verificación cuantificable.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Cada HU tiene criterios de aceptación en formato Dado/Cuando/Entonces.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Cada CU tiene flujo principal, al menos un flujo alterno y postcondiciones.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>El diagrama de clases tiene atributos con tipos y relaciones con cardinalidad.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Hay prototipos para las 3 pantallas principales.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Cada caso de prueba se traza a una HU y un CU.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Los actores del diagrama coinciden con los del SRS.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Cada HU se puede rastrear hasta un RF del SRS.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>Cada RF se puede rastrear hasta una frase del cliente.</div></div>
+    <div class="check-item"><span class="check-icon">✅</span> <div>El Product Backlog está priorizado y tiene puntos de esfuerzo.</div></div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 9: SCRUM -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="scrum">
+  <div class="section-title"><span class="section-number">9</span> Marco metodológico — Scrum</div>
+  <div class="section-subtitle">Selección y adaptación de la metodología al contexto del proyecto</div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">⚖️</span> 9.1 Criterios de selección</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Criterio</th><th>Análisis ParkControl</th><th>Favorece</th></tr>
+        <tr><td>Tamaño del proyecto</td><td>Pequeño-mediano (29 pts, 4 módulos)</td><td>Ágil</td></tr>
+        <tr><td>Claridad de requisitos</td><td>Parcialmente definidos, descubiertos iterativamente</td><td>Ágil</td></tr>
+        <tr><td>Disponibilidad del cliente</td><td>Instructor disponible como Product Owner</td><td>Scrum</td></tr>
+        <tr><td>Tamaño del equipo</td><td>3–5 aprendices</td><td>Scrum</td></tr>
+        <tr><td>Experiencia del equipo</td><td>Nivel tecnólogo, en formación</td><td>Scrum (guiado)</td></tr>
+        <tr><td>Plazo de entrega</td><td>4 semanas (2 sprints)</td><td>Scrum</td></tr>
+      </table>
+    </div>
+    <div class="callout callout-sena">
+      <span class="ico">✅</span>
+      <div><strong>Metodología seleccionada: SCRUM.</strong> La adaptabilidad, las entregas incrementales y el tamaño del equipo lo hacen ideal. Cada sprint produce un incremento funcional que el cliente puede validar.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">👥</span> 9.2 Roles adaptados al contexto académico</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Rol Scrum</th><th>Adaptación SENA</th><th>Responsabilidad</th></tr>
+        <tr><td><strong>Product Owner</strong></td><td>Instructor</td><td>Representa al dueño del parqueadero. Prioriza el backlog y valida los incrementos.</td></tr>
+        <tr><td><strong>Scrum Master</strong></td><td>Aprendiz rotativo (uno por sprint)</td><td>Facilita las ceremonias y elimina impedimentos del equipo.</td></tr>
+        <tr><td><strong>Development Team</strong></td><td>Equipo de aprendices (3–5)</td><td>Auto-organizado. Construye el incremento del sprint.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🏃</span> 9.3 Planificación de sprints</div>
+    <div class="sprint-board">
+      <div class="sprint-col">
+        <div class="sprint-col-title">Sprint 1 (16 pts)</div>
+        <div class="sprint-card"><strong>HU-01</strong> Registrar entrada <span class="tag tag-green">3 pts</span></div>
+        <div class="sprint-card"><strong>HU-02</strong> Registrar salida y cobrar <span class="tag tag-red">8 pts</span></div>
+        <div class="sprint-card"><strong>HU-03</strong> Tiempo de gracia <span class="tag tag-green">3 pts</span></div>
+        <div class="sprint-card" style="border-left:3px solid var(--primary);"><strong>Objetivo:</strong> Flujo básico entrada → salida → cobro funcionando</div>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-title">Sprint 2 (13 pts)</div>
+        <div class="sprint-card"><strong>HU-04</strong> Tiquete perdido <span class="tag tag-orange">5 pts</span></div>
+        <div class="sprint-card"><strong>HU-05</strong> Cliente mensual <span class="tag tag-orange">5 pts</span></div>
+        <div class="sprint-card"><strong>HU-06</strong> Reporte diario <span class="tag tag-orange">5 pts</span></div>
+        <div class="sprint-card" style="border-left:3px solid var(--primary);"><strong>Objetivo:</strong> Casos especiales + reportes + ajustes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">✔️</span> 9.4 Definition of Done</div>
+    <div class="check-item"><span class="check-icon">✓</span> <div>Código desarrollado y revisado por otro miembro del equipo.</div></div>
+    <div class="check-item"><span class="check-icon">✓</span> <div>Pruebas unitarias escritas con cobertura mínima del 80%.</div></div>
+    <div class="check-item"><span class="check-icon">✓</span> <div>Funcionalidad desplegada en ambiente de pruebas.</div></div>
+    <div class="check-item"><span class="check-icon">✓</span> <div>Documentación técnica actualizada.</div></div>
+    <div class="check-item"><span class="check-icon">✓</span> <div>Aprobado por el Product Owner (instructor).</div></div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 10: FICHA TÉCNICA -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="ficha">
+  <div class="section-title"><span class="section-number">10</span> Ficha técnica del sistema</div>
+  <div class="section-subtitle">Stack tecnológico, requisitos de hardware/software y estimación económica</div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">💻</span> 10.1 Stack tecnológico propuesto</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Capa</th><th>Tecnología</th><th>Licencia</th></tr>
+        <tr><td><strong>Frontend</strong></td><td>HTML5 + CSS3 + JavaScript (Vanilla) o React 18</td><td>MIT / Libre</td></tr>
+        <tr><td><strong>Backend</strong></td><td>Python 3.12 + FastAPI</td><td>MIT</td></tr>
+        <tr><td><strong>Base de datos</strong></td><td>PostgreSQL 16</td><td>PostgreSQL License (libre)</td></tr>
+        <tr><td><strong>ORM</strong></td><td>SQLAlchemy 2 + Alembic</td><td>MIT</td></tr>
+        <tr><td><strong>Autenticación</strong></td><td>JWT + bcrypt (factor 12)</td><td>MIT</td></tr>
+        <tr><td><strong>Servidor web</strong></td><td>Uvicorn + NGINX (proxy reverso)</td><td>MIT / BSD</td></tr>
+        <tr><td><strong>Control de versiones</strong></td><td>Git + GitHub</td><td>Libre</td></tr>
+        <tr><td><strong>IDE</strong></td><td>VS Code</td><td>MIT</td></tr>
+      </table>
+    </div>
+    <div class="callout callout-success">
+      <span class="ico">💰</span>
+      <div><strong>Costo de licencias: $0 COP.</strong> Todo el stack tecnológico es open source.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">🖥️</span> 10.2 Requisitos de hardware</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Componente</th><th>Servidor</th><th>Cliente</th></tr>
+        <tr><td>Procesador</td><td>Intel Core i3 o equivalente (2+ núcleos)</td><td>Cualquiera</td></tr>
+        <tr><td>RAM</td><td>4 GB mínimo</td><td>2 GB</td></tr>
+        <tr><td>Almacenamiento</td><td>SSD 50 GB</td><td>N/A</td></tr>
+        <tr><td>Red</td><td>LAN 100 Mbps</td><td>WiFi o LAN</td></tr>
+        <tr><td>Sistema operativo</td><td>Ubuntu Server 22.04 LTS / Windows 11</td><td>Cualquier navegador moderno</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">💵</span> 10.3 Estimación económica (Año 1)</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Ítem</th><th>Valor</th></tr>
+        <tr><td>Infraestructura (VPS básico o local)</td><td>$1.200.000 COP/año (o $0 si es local)</td></tr>
+        <tr><td>Licencias de software</td><td>$0 COP (todo open source)</td></tr>
+        <tr><td>Dominio web (.co)</td><td>$80.000 COP/año</td></tr>
+        <tr><td>Certificado SSL</td><td>$0 COP (Let's Encrypt)</td></tr>
+        <tr><td>Desarrollo (costo académico)</td><td>$0 COP (equipo SENA ADSO)</td></tr>
+        <tr><td style="font-weight:700;background:var(--primary-light);">TOTAL INVERSIÓN AÑO 1</td><td style="font-weight:700;background:var(--primary-light);">$1.280.000 COP</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SECCIÓN 11: TRAZABILIDAD -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="section" id="trazabilidad">
+  <div class="section-title"><span class="section-number">11</span> Matriz de trazabilidad</div>
+  <div class="section-subtitle">La cadena completa: frase del cliente → requisito → caso de uso → clase → prototipo</div>
+
+  <div class="callout callout-sena mb-1">
+    <span class="ico">🎯</span>
+    <div><strong>Este es el artefacto central.</strong> Demuestra que cada decisión técnica se puede rastrear hasta una necesidad real del cliente. La trazabilidad es la evidencia de que el análisis fue riguroso.</div>
+  </div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <tr>
+          <th>Lo que dijo el cliente</th>
+          <th>RF</th>
+          <th>CU / HU</th>
+          <th>Clase · atributo</th>
+          <th>Prototipo</th>
+        </tr>
+        <tr>
+          <td class="td-origin">«registro la placa y la hora»</td>
+          <td class="td-id">RF-01</td>
+          <td>CU-01 / HU-01</td>
+          <td>Tiquete.horaEntrada, Vehiculo.placa</td>
+          <td>P-02</td>
+        </tr>
+        <tr>
+          <td class="td-origin">«hay 50 puestos»</td>
+          <td class="td-id">RF-02</td>
+          <td>CU-01 / HU-01 (CA-01.2)</td>
+          <td>Configuración.capacidad</td>
+          <td>P-01 (cupo), P-02</td>
+        </tr>
+        <tr>
+          <td class="td-origin">«cobro según el tiempo»</td>
+          <td class="td-id">RF-03</td>
+          <td>CU-02 / HU-02</td>
+          <td>Tarifa.valorHora, Tiquete.calcularValor()</td>
+          <td>P-03</td>
+        </tr>
+        <tr>
+          <td class="td-origin">«la fracción se paga completa»</td>
+          <td class="td-id">RF-04</td>
+          <td>CU-02 / HU-02 (CA-02.1)</td>
+          <td>math.ceil(minutos/60)</td>
+          <td>P-03 (cálculo)</td>
+        </tr>
+        <tr>
+          <td class="td-origin">«si sale rapidito no le cobro»</td>
+          <td class="td-id">RF-05</td>
+          <td>CU-02 alterno a / HU-03</td>
+          <td>Tarifa.tiempoGracia</td>
+          <td>P-03 (badge gracia)</td>
+        </tr>
+        <tr>
+          <td class="td-origin">«si pierde el tiquete, tarifa plena»</td>
+          <td class="td-id">RF-06</td>
+          <td>CU-02 alterno b / HU-04</td>
+          <td>Tiquete.perdido, Tarifa.tarifaMaxDia</td>
+          <td>P-03 (botón perdido)</td>
+        </tr>
+        <tr>
+          <td class="td-origin">«tengo clientes de mensualidad»</td>
+          <td class="td-id">RF-07</td>
+          <td>CU-02 alterno c / HU-05, CU-06</td>
+          <td>Cliente.mensualidadVigente()</td>
+          <td>P-03 (badge mensual)</td>
+        </tr>
+        <tr>
+          <td class="td-origin">«quiero saber cuánto vendo al día»</td>
+          <td class="td-id">RF-08</td>
+          <td>CU-04 / HU-06</td>
+          <td>Reporte: sum(Tiquete.valor)</td>
+          <td>P-01 (recaudo)</td>
+        </tr>
+        <tr>
+          <td class="td-origin">(descubierto al prototipar)</td>
+          <td class="td-id">RF-09</td>
+          <td>CU-03</td>
+          <td>Vehiculo.placa → búsqueda</td>
+          <td>P-03 (campo buscar)</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">📚</span> Glosario de términos</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Término</th><th>Definición</th></tr>
+        <tr><td><strong>Elicitación</strong></td><td>Proceso de descubrir y precisar las necesidades del cliente mediante el diálogo y la indagación.</td></tr>
+        <tr><td><strong>Caso de uso</strong></td><td>Descripción de la interacción entre un actor y el sistema para lograr un objetivo, con flujos principal y alternos.</td></tr>
+        <tr><td><strong>Historia de usuario</strong></td><td>Descripción breve de una funcionalidad desde la perspectiva del usuario: «Como… quiero… para…».</td></tr>
+        <tr><td><strong>Criterio de aceptación</strong></td><td>Condición verificable expresada como Dado–Cuando–Entonces que define cuándo una historia está terminada.</td></tr>
+        <tr><td><strong>Modelo conceptual</strong></td><td>Representación de las entidades del dominio, sus atributos y relaciones, derivada del análisis.</td></tr>
+        <tr><td><strong>Trazabilidad</strong></td><td>Capacidad de relacionar cada elemento de la solución con el requisito que lo origina.</td></tr>
+        <tr><td><strong>Product Backlog</strong></td><td>Lista priorizada de todas las funcionalidades que el sistema debe implementar.</td></tr>
+        <tr><td><strong>Sprint</strong></td><td>Iteración de tiempo fijo (2 semanas) en Scrum donde se produce un incremento funcional.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="icon">📄</span> Control del documento</div>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Campo</th><th>Información</th></tr>
+        <tr><td>Título</td><td>SRS — ParkControl · Parqueadero El Poblado · Fase de Análisis</td></tr>
+        <tr><td>Código</td><td>GFPI-F-135 V04</td></tr>
+        <tr><td>Versión</td><td>1.0</td></tr>
+        <tr><td>Programa</td><td>Tecnólogo ADSO — Código 228118 · Ficha 3387459</td></tr>
+        <tr><td>Elaborado por</td><td>Ing. Luis Eladio Porras Camargo</td></tr>
+        <tr><td>Fecha</td><td>Agosto de 2026</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <strong>SENA</strong> — Centro del Diseño y la Manufactura del Cuero (CDMC) · Regional Antioquia · Itagüí<br>
+  Tecnólogo en Análisis y Desarrollo de Software (ADSO) · Código 228118 · Ficha 3387459<br>
+  Instructor: Ing. Luis Eladio Porras Camargo · Agosto 2026<br>
+  <span style="margin-top:4px;display:inline-block;">Documento generado como herramienta educativa · Formato GFPI-F-135 V04</span>
+</div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+// Tab navigation
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// Accordion
+function toggleAccordion(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  btn.classList.toggle('open');
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>
